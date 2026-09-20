@@ -2,55 +2,55 @@
 
 ## Last Update
 
-2026-09-20 — Persiapan commit pertama project dan publikasi ke GitHub; tidak ada perubahan logic aplikasi.
+2026-09-20 — Tahap 2B Role & Authorization selesai dan terverifikasi.
 
 ## Tahap Saat Ini
 
-Tahap 0 — Dokumentasi dan Fondasi Project.
+Tahap 1, Tahap 2A, dan Tahap 2B selesai. Menunggu instruksi untuk Tahap 3.
 
 ## Completed
 
-Selesai:
+- Dokumentasi konteks, roadmap, keputusan, dan aturan agent.
+- Repository GitHub terhubung; commit awal project `b3d94a4` (`first commit`) telah dipush sebelumnya. Pengguna mengizinkan publikasi gabungan hasil Tahap 1, 2A, dan 2B beserta dokumentasi penjelasan.
+- PHP `pdo_pgsql` aktif; koneksi Laravel ke PostgreSQL `spmt_booking_room` berhasil. Password hanya disimpan dalam `.env` lokal yang diabaikan Git.
+- Analisis project: Laravel 10.50.3, model User dan migration bawaan, tanpa package role/permission. Tidak mengubah dependency.
+- Tujuh migration baru untuk tabel fondasi. Sesuai permintaan pengguna, kolom unit, role, dan status aktif digabung langsung ke migration pembuatan users; migration penambahan terpisah dihapus. Migration organizational_units diurutkan sebelum users agar foreign key valid.
+- Model OrganizationalUnit, Floor, Facility, Room dan relasi User; validasi calon PIC melalui EligibleRoomPic.
+- Constraint PostgreSQL: foreign key, batas kapasitas, nilai enum, kode ruang unik, dan pasangan pivot unik. Penghapusan unit/lantai yang masih digunakan dibatasi.
+- Seeder development: 3 unit, 3 akun, 8 lantai, 7 fasilitas, dan 4 ruang contoh. Seeder bisa diulang dan tidak mereset password akun lama.
+- Template koneksi `.env.example` dan default database diarahkan ke PostgreSQL.
+- Panduan singkat tabel, akun dummy, dan cara melihat data di `docs/DATABASE.md`.
+- Test integrasi memakai schema PostgreSQL sementara; konfigurasi XML PHPUnit disesuaikan dengan PHPUnit 10 yang sudah terpasang.
+- Tahap 2A: Breeze 1.29.1 baru dipasang pada Laravel 10.50.3. Scaffolding session/LoginRequest resmi disesuaikan untuk login internal, logout, Remember Me, dan dashboard Blade sederhana tanpa NPM build.
+- Akun nonaktif ditolak sebelum login; session/Remember Me akun yang dinonaktifkan juga dihentikan. Password salah tidak mengungkap status akun.
+- Route login memakai guest, dashboard/logout memakai auth; form POST memakai CSRF. Sejak Tahap 2B, redirect dashboard mengikuti role. Registrasi publik dan route profil/reset password/verifikasi email tidak tersedia.
+- Helper schema test dipindahkan ke `tests/PostgresTestCase.php` agar dipakai bersama oleh test fondasi dan authentication. Panduan menjalankan tersedia di `docs/AUTHENTICATION.md`.
+- Tahap 2B: empat Gate terpusat, middleware `can` pada kelompok route, dashboard Pegawai/PIC/Super Admin, navigasi `@can`, halaman 403, dan sebelas halaman placeholder melalui satu view bersama.
+- Login dan guest redirect memakai mapping dashboard yang sama. Role tidak dikenal ditolak dengan 403. Unit organisasi hanya ditampilkan; tidak dipakai untuk authorization.
+- PIC dapat mengakses halaman pegawai; admin dapat mengakses administrasi, informasi umum, dan placeholder PIC tanpa mengubah assignment `room_pics`. Rincian route dan akses ada di `docs/AUTHORIZATION.md`.
+- Penjelasan percakapan tentang `can`, nama izin `access-employee`, awalan nama route `admin.`/`pic.`, pemisahan auth.php, dan alasan tidak membutuhkan NPM disimpan di `docs/AUTHORIZATION.md` untuk rujukan berikutnya.
 
-- Pembuatan dokumentasi project awal: `AGENTS.md`, `docs/PROJECT_CONTEXT.md`, `docs/ROADMAP.md`, `docs/PROGRESS.md`, dan `docs/DECISIONS.md`.
+## Verifikasi Aktual
 
-- Inisialisasi repository Git lokal dengan branch `main` dan remote `origin` ke `https://github.com/ahsanul22/spmt-booking-room.git`. Akses remote berhasil diverifikasi; remote sudah memiliki branch `main`. History lokal telah diselaraskan dengan commit awal remote sebelum membuat commit project `first commit`.
+- Migration awal pernah menjalankan 12 file. Setelah penggabungan migration users, riwayat migration lokal diselaraskan menjadi 11 file tanpa menghapus atau mengubah data aplikasi. `php artisan migrate:status`: seluruh 11 migration berstatus Ran.
+- `php artisan db:seed --no-interaction`: berhasil.
+- `php artisan test` setelah Tahap 2B: **38 passed, 513 assertions**, mencakup 16 test authentication, 9 test authorization, 11 test fondasi, dan 2 test existing.
+- `php artisan migrate --no-interaction`: Nothing to migrate; migration Tahap 1 tidak diubah pada Tahap 2A. Seeder existing dijalankan ulang dan berhasil.
+- Route list terverifikasi: kelompok umum, pegawai, PIC, admin memakai auth + can; login/logout tetap tersedia dan tidak ada route registrasi publik.
+- Ketiga akun development pada database lokal terverifikasi aktif dan password dummy lolos validasi guard Laravel; tidak mereset password akun.
+- Test authentication mencakup ketiga role, password salah, akun nonaktif, auth/guest, session regeneration, logout/session invalidation/CSRF rotation, CSRF 419, throttle login, Remember Me, dan penonaktifan session lama.
+- Test authorization login memakai akun seeder pada schema PostgreSQL sementara, lalu mencoba URL setiap area secara langsung. Memverifikasi menu, redirect per role, 403, role tidak dikenal dalam memori, perubahan role pada request berikutnya, unit null, dan assignment PIC tetap sama. Tidak menjalankan test pada tabel development/produksi.
+- Pengujian mencakup seluruh relasi, seed ulang, password, validasi PIC, enum, kapasitas, seluruh foreign key fondasi, unique pivot/kode, restrict/cascade, penolakan seed produksi, dan rollback/migrate ulang pada schema test.
+- Laravel Pint pada file PHP terkait: passed. `git diff --check`: tidak ada kesalahan whitespace.
+- Tidak menjalankan reset atau rollback terhadap tabel development; rollback test hanya di schema sementara.
 
-- Perluasan `.gitignore` untuk environment selain template, private key, dump/database lokal, log, hasil test, dan konfigurasi tool lokal. Dependency, cache, build, serta upload lokal tetap diabaikan. `.env.example` dan `composer.lock` disertakan.
+## Batasan dan Asumsi
 
-## In Progress
-
-- Tahap 0 tetap menjadi tahap aktif. Dokumentasi awal selesai; menunggu instruksi berikutnya.
-
-## Belum Dikerjakan
-
-- Database.
-- Authentication.
-- Authorization.
-- Master data.
-- Booking.
-- Approval.
-- Calendar.
-- Notification.
-- Dashboard.
-- Testing final.
-
-Daftar ini mencatat status pengembangan requirement project, bukan menyatakan bahwa repository tidak memiliki file bawaan framework.
-
-## Issues / Blockers
-
-- Tidak ada blocker untuk pembuatan dokumentasi awal.
-- Requirement yang belum diputuskan tercatat di bagian klarifikasi `PROJECT_CONTEXT.md`; perlu diselesaikan sebelum implementasi terkait.
-- History awal remote telah dipertahankan sebagai dasar commit project; tidak diperlukan force push.
+- Satu role dan maksimal satu unit per user. PIC mendapat halaman pegawai; hak booking pribadi admin dan pewarisan akses unit masih belum ditentukan.
+- Data dummy bukan struktur/data resmi perusahaan. Password development tercatat di `docs/DATABASE.md`.
+- Validasi role PIC tersedia untuk dipakai pemanggil; penulisan pivot langsung tidak menjalankannya otomatis. Validasi siklus unit, minimal satu PIC, dan perubahan role ditangani pada modul pengelolaan berikutnya.
+- Belum membuat CRUD master data, booking, approval, kalender, notification, atau dashboard kompleks. Halaman modul masih placeholder; dashboard hanya identitas, unit, navigasi sesuai akses, dan logout. Migration, seeder, dependency, serta struktur role tidak diubah pada Tahap 2B.
 
 ## Next Step
 
-Menunggu instruksi pengguna berikutnya. Jangan memulai Tahap 1 atau membuat fitur aplikasi secara otomatis.
-
-## Test Result
-
-Test aplikasi belum dijalankan karena task hanya membuat dokumentasi dan tidak mengubah logic aplikasi. Tidak ada hasil test aplikasi yang diklaim.
-
-Verifikasi koneksi GitHub (2026-09-20): `git remote -v` menunjukkan URL fetch/push yang sesuai, dan `git ls-remote origin` berhasil membaca HEAD serta branch `main`. Test aplikasi tidak dijalankan karena perubahan hanya konfigurasi Git dan dokumentasi.
-
-Verifikasi persiapan commit (2026-09-20): `git check-ignore` mengonfirmasi file environment, dependency, build, upload, cache, database, dump, private key, dan konfigurasi lokal diabaikan; `.env.example` tidak diabaikan. Pemindaian pola token/private key pada file yang tidak diabaikan tidak menemukan kecocokan. Test aplikasi tidak dijalankan karena hanya aturan ignore, dokumentasi, dan konfigurasi Git yang diubah.
+Tunggu instruksi pengguna untuk Tahap 3. Jangan membuat CRUD master data atau booking secara otomatis.

@@ -162,8 +162,8 @@ Tidak perlu desain kompleks atau CSS custom berlebihan. Frontend final akan dike
 
 Hal berikut belum diputuskan dan bukan aturan implementasi:
 
-- Apakah satu pegawai dapat memiliki beberapa role, dan apakah PIC/Super Admin juga dapat booking sebagai pegawai?
-- Apakah akses unit `restricted` diwariskan ke unit turunan, dan apakah pegawai dapat terhubung ke lebih dari satu unit?
+- Fondasi menggunakan satu role dan maksimal satu unit per user sesuai instruksi Tahap 1. Pada Tahap 2B, PIC mendapat akses halaman pegawai termasuk placeholder My Booking. Hak Super Admin untuk melakukan booking pribadi belum diputuskan.
+- Apakah akses unit `restricted` diwariskan ke unit turunan?
 - Apa batas waktu dan kewenangan pembatalan, serta apakah booking dapat diubah atau dijadwalkan ulang?
 - Apakah booking yang bersebelahan diperbolehkan, apakah ada buffer, jam operasional, durasi maksimum, atau booking lintas hari? Zona waktu bisnis juga perlu ditetapkan.
 - Kapan Pending kedaluwarsa, kapan booking menjadi Completed, dan bagaimana Completed diperlakukan dalam pemeriksaan konflik?

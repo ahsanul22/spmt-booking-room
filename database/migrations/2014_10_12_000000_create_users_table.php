@@ -17,6 +17,10 @@ return new class extends Migration
             $table->string('email')->unique();
             $table->timestamp('email_verified_at')->nullable();
             $table->string('password');
+            $table->foreignId('organizational_unit_id')->nullable()->constrained()->restrictOnDelete();
+            $table->enum('role', ['user', 'room_pic', 'super_admin'])->default('user');
+            $table->boolean('is_active')->default(true);
+            $table->index('organizational_unit_id');
             $table->rememberToken();
             $table->timestamps();
         });

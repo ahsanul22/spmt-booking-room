@@ -2,8 +2,9 @@
 
 namespace App\Providers;
 
-// use Illuminate\Support\Facades\Gate;
+use App\Models\User;
 use Illuminate\Foundation\Support\Providers\AuthServiceProvider as ServiceProvider;
+use Illuminate\Support\Facades\Gate;
 
 class AuthServiceProvider extends ServiceProvider
 {
@@ -23,6 +24,15 @@ class AuthServiceProvider extends ServiceProvider
     {
         $this->registerPolicies();
 
-        //
+        $areas = [
+            'access-general' => [User::ROLE_USER, User::ROLE_ROOM_PIC, User::ROLE_SUPER_ADMIN],
+            'access-employee' => [User::ROLE_USER, User::ROLE_ROOM_PIC],
+            'access-pic' => [User::ROLE_ROOM_PIC, User::ROLE_SUPER_ADMIN],
+            'access-admin' => [User::ROLE_SUPER_ADMIN],
+        ];
+
+        foreach ($areas as $ability => $roles) {
+            Gate::define($ability, fn (User $user): bool => $user->is_active && in_array($user->role, $roles, true));
+        }
     }
 }
