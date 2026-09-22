@@ -34,7 +34,26 @@ class FoundationSeeder extends Seeder
                 'name' => 'Departemen Pengadaan', 'type' => 'department', 'parent_id' => $division->id,
             ]);
 
-            $admin = $this->user('admin@example.test', 'Super Admin Demo', User::ROLE_SUPER_ADMIN, $directorate);
+            $itDivision = OrganizationalUnit::firstOrCreate([
+                'name' => 'Divisi Teknologi Informasi', 'type' => 'division', 'parent_id' => $directorate->id,
+            ]);
+            OrganizationalUnit::firstOrCreate([
+                'name' => 'Departemen Pengembangan Sistem', 'type' => 'department', 'parent_id' => $itDivision->id,
+            ]);
+
+            $operationsDirectorate = OrganizationalUnit::firstOrCreate([
+                'name' => 'Direktorat Operasi', 'type' => 'directorate', 'parent_id' => null,
+            ]);
+            $operationsDivision = OrganizationalUnit::firstOrCreate([
+                'name' => 'Divisi Operasional Terminal', 'type' => 'division', 'parent_id' => $operationsDirectorate->id,
+            ]);
+            foreach (['Departemen Perencanaan Operasi', 'Departemen Pelayanan Terminal'] as $name) {
+                OrganizationalUnit::firstOrCreate([
+                    'name' => $name, 'type' => 'department', 'parent_id' => $operationsDivision->id,
+                ]);
+            }
+
+            $this->user('admin@example.test', 'Super Admin Demo', User::ROLE_SUPER_ADMIN, $directorate);
             $pic = $this->user('pic@example.test', 'Room PIC Demo', User::ROLE_ROOM_PIC, $division);
             $this->user('pegawai@example.test', 'Pegawai Demo', User::ROLE_USER, $department);
 
@@ -59,10 +78,8 @@ class FoundationSeeder extends Seeder
                     'access_type' => $access, 'requires_approval' => $approval, 'status' => $status,
                 ]);
 
-                foreach ([$pic, $admin] as $user) {
-                    Validator::make(['pic_id' => $user->id], ['pic_id' => [new EligibleRoomPic]])->validate();
-                }
-                $room->pics()->syncWithoutDetaching([$pic->id, $admin->id]);
+                Validator::make(['pic_id' => $pic->id], ['pic_id' => [new EligibleRoomPic]])->validate();
+                $room->pics()->syncWithoutDetaching([$pic->id]);
                 $room->facilities()->syncWithoutDetaching([
                     $facilities['Projector']->id, $facilities['HDMI']->id, $facilities['Whiteboard']->id,
                 ]);

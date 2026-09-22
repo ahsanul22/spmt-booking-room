@@ -24,8 +24,8 @@ class DatabaseFoundationTest extends PostgresTestCase
         $admin->save();
         $this->seed();
 
-        foreach (['organizational_units' => 3, 'users' => 3, 'floors' => 8, 'facilities' => 7,
-            'rooms' => 4, 'room_pics' => 8, 'facility_room' => 12, 'room_unit_access' => 4] as $table => $count) {
+        foreach (['organizational_units' => 9, 'users' => 3, 'floors' => 8, 'facilities' => 7,
+            'rooms' => 4, 'room_pics' => 4, 'facility_room' => 12, 'room_unit_access' => 4] as $table => $count) {
             $this->assertDatabaseCount($table, $count);
         }
         $this->assertTrue(Hash::check('changed-password', $admin->fresh()->password));
@@ -42,11 +42,21 @@ class DatabaseFoundationTest extends PostgresTestCase
         $this->assertTrue($division->children->contains($department));
         $this->assertSame('directorate', $division->parent->type);
 
+        $units = OrganizationalUnit::with('parent')->get();
+        foreach ($units as $unit) {
+            $this->assertTrue($unit->is_active);
+            if ($unit->type === 'directorate') {
+                $this->assertNull($unit->parent);
+            } else {
+                $this->assertSame($unit->type === 'division' ? 'directorate' : 'division', $unit->parent->type);
+            }
+        }
+
         $room = Room::where('code', 'DEMO-01')->firstOrFail();
         $this->assertTrue($room->floor->rooms->contains($room));
         $this->assertCount(3, $room->facilities);
         $this->assertTrue($room->facilities->first()->rooms->contains($room));
-        $this->assertCount(2, $room->pics);
+        $this->assertCount(1, $room->pics);
         $this->assertTrue($room->pics->first()->managedRooms->contains($room));
         $this->assertTrue($room->allowedOrganizationalUnits->contains($department));
         $this->assertTrue($department->accessibleRooms->contains($room));
@@ -56,11 +66,11 @@ class DatabaseFoundationTest extends PostgresTestCase
         $this->assertCount(0, Room::where('code', 'DEMO-SM')->firstOrFail()->allowedOrganizationalUnits);
     }
 
-    public function test_pic_validation_accepts_only_pic_and_admin_roles(): void
+    public function test_pic_validation_accepts_only_room_pic_role(): void
     {
         foreach (User::all() as $user) {
             $valid = Validator::make(['pic_id' => $user->id], ['pic_id' => [new EligibleRoomPic]])->passes();
-            $this->assertSame($user->role !== 'user', $valid);
+            $this->assertSame($user->role === 'room_pic', $valid);
         }
         foreach ([-1, 'invalid', ['id' => 1]] as $value) {
             $this->assertFalse(Validator::make(['pic_id' => $value], ['pic_id' => [new EligibleRoomPic]])->passes());
@@ -137,7 +147,7 @@ class DatabaseFoundationTest extends PostgresTestCase
         }
         $this->assertDatabaseCount('users', 3);
         $this->assertDatabaseCount('facilities', 7);
-        $this->assertDatabaseCount('organizational_units', 3);
+        $this->assertDatabaseCount('organizational_units', 9);
         $this->assertDatabaseCount('rooms', 3);
     }
 
