@@ -33,7 +33,23 @@ Seluruh kolom `users`, termasuk role dan unit kerja, didefinisikan dalam satu fi
 
 ## Data contoh development
 
-Ada 3 unit berjenjang, 8 lantai, 7 fasilitas, dan 4 ruang. Selat Malaka berada di Lantai 7. Ruang contoh mencakup semua kombinasi akses terbuka/terbatas dan perlu/tidak perlu approval.
+Ada 9 unit berjenjang, 8 lantai, 7 fasilitas, dan 4 ruang. Selat Malaka berada di Lantai 7. Ruang contoh mencakup semua kombinasi akses terbuka/terbatas dan perlu/tidak perlu approval.
+
+Unit kerja dummy untuk pengujian user:
+
+```text
+Direktorat SDM
+├── Divisi Layanan SDM dan Umum
+│   └── Departemen Pengadaan
+└── Divisi Teknologi Informasi
+    └── Departemen Pengembangan Sistem
+Direktorat Operasi
+└── Divisi Operasional Terminal
+    ├── Departemen Perencanaan Operasi
+    └── Departemen Pelayanan Terminal
+```
+
+Unit baru dibuat aktif. Seed ulang memakai `firstOrCreate`, sehingga tidak menggandakan unit dengan nama/type/parent yang sama dan tidak menimpa perubahan unit existing. ID unit dihasilkan database; gunakan ID dari tabel `organizational_units` saat memasukkan `organizational_unit_id` user uji coba. Form Tambah User Tahap 3 masih skeleton: dropdown belum mengambil unit database dan tombol Simpan belum aktif.
 
 **Semua struktur organisasi dan rincian ruang adalah dummy, bukan data resmi perusahaan.**
 
