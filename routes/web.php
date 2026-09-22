@@ -1,47 +1,62 @@
 <?php
 
+use App\Http\Controllers\Admin\FacilityController;
+use App\Http\Controllers\Admin\FloorController;
+use App\Http\Controllers\Admin\OrganizationalUnitController;
+use App\Http\Controllers\Admin\RoomAccessController;
+use App\Http\Controllers\Admin\RoomController;
+use App\Http\Controllers\Admin\RoomPicController;
+use App\Http\Controllers\Admin\UserController;
 use App\Http\Controllers\DashboardController;
+use App\Http\Controllers\FrontendSkeletonController;
 use Illuminate\Support\Facades\Route;
 
-/*
-|--------------------------------------------------------------------------
-| Web Routes
-|--------------------------------------------------------------------------
-|
-| Here is where you can register web routes for your application. These
-| routes are loaded by the RouteServiceProvider and all of them will
-| be assigned to the "web" middleware group. Make something great!
-|
-*/
+Route::view('/', 'welcome');
 
-Route::get('/', function () {
-    return view('welcome');
+Route::middleware(['auth', 'can:access-employee'])->group(function () {
+    Route::get('/rooms/search', FrontendSkeletonController::class)->defaults('view', 'user.rooms.search')->name('rooms.search');
+    Route::get('/my-bookings', FrontendSkeletonController::class)->defaults('view', 'user.bookings.index')->name('my-bookings.index');
+    Route::get('/my-bookings/create', FrontendSkeletonController::class)->defaults('view', 'user.bookings.create')->name('my-bookings.create');
+    Route::get('/my-bookings/{booking}', FrontendSkeletonController::class)->defaults('view', 'user.bookings.show')->name('my-bookings.show');
 });
 
 Route::middleware(['auth', 'can:access-general'])->group(function () {
     Route::get('/dashboard', DashboardController::class)->defaults('title', 'Dashboard Pegawai')->name('dashboard');
-    Route::view('/rooms', 'placeholder', ['title' => 'Daftar Ruangan', 'message' => 'Modul daftar ruangan akan dikembangkan pada tahap berikutnya.'])->name('rooms.index');
-    Route::view('/schedule', 'placeholder', ['title' => 'Jadwal Ruangan', 'message' => 'Modul jadwal ruangan akan dikembangkan pada tahap berikutnya.'])->name('schedule.index');
-});
-
-Route::middleware(['auth', 'can:access-employee'])->group(function () {
-    Route::view('/my-bookings', 'placeholder', ['title' => 'My Booking', 'message' => 'Modul booking belum tersedia.'])->name('my-bookings.index');
+    Route::get('/rooms', FrontendSkeletonController::class)->defaults('view', 'user.rooms.index')->name('rooms.index');
+    Route::get('/rooms/{room}', FrontendSkeletonController::class)->defaults('view', 'user.rooms.show')->name('rooms.show');
+    Route::get('/schedule', FrontendSkeletonController::class)->defaults('view', 'shared.schedule')->name('schedule.index');
 });
 
 Route::prefix('pic')->name('pic.')->middleware(['auth', 'can:access-pic'])->group(function () {
     Route::get('/dashboard', DashboardController::class)->defaults('title', 'Dashboard PIC')->name('dashboard');
-    Route::view('/rooms', 'placeholder', ['title' => 'Ruangan Saya', 'message' => 'Modul ruangan yang dikelola PIC akan dikembangkan pada tahap berikutnya.'])->name('rooms.index');
-    Route::view('/approvals', 'placeholder', ['title' => 'Permintaan Approval', 'message' => 'Modul approval akan dikembangkan pada tahap berikutnya.'])->name('approvals.index');
+    Route::get('/rooms', FrontendSkeletonController::class)->defaults('view', 'pic.rooms.index')->name('rooms.index');
+    Route::get('/approvals', FrontendSkeletonController::class)->defaults('view', 'pic.approvals.index')->name('approvals.index');
+    Route::get('/approvals/history', FrontendSkeletonController::class)->defaults('view', 'pic.approvals.history')->name('approvals.history');
+    Route::get('/approvals/{approval}', FrontendSkeletonController::class)->defaults('view', 'pic.approvals.show')->name('approvals.show');
 });
 
 Route::prefix('admin')->name('admin.')->middleware(['auth', 'can:access-admin'])->group(function () {
     Route::get('/dashboard', DashboardController::class)->defaults('title', 'Dashboard Super Admin')->name('dashboard');
-    Route::view('/users', 'placeholder', ['title' => 'Kelola User', 'message' => 'Modul User Management akan dikembangkan pada Tahap 3.'])->name('users.index');
-    Route::view('/organizational-units', 'placeholder', ['title' => 'Unit Organisasi', 'message' => 'Modul unit organisasi akan dikembangkan pada Tahap 3.'])->name('organizational-units.index');
-    Route::view('/floors', 'placeholder', ['title' => 'Lantai', 'message' => 'Modul lantai akan dikembangkan pada Tahap 3.'])->name('floors.index');
-    Route::view('/facilities', 'placeholder', ['title' => 'Fasilitas', 'message' => 'Modul fasilitas akan dikembangkan pada Tahap 3.'])->name('facilities.index');
-    Route::view('/rooms', 'placeholder', ['title' => 'Ruang Rapat', 'message' => 'Modul pengelolaan ruang rapat akan dikembangkan pada Tahap 3.'])->name('rooms.index');
-    Route::view('/bookings', 'placeholder', ['title' => 'Semua Booking', 'message' => 'Modul booking belum tersedia.'])->name('bookings.index');
+    Route::patch('/users/{user}/status', [UserController::class, 'status'])->whereNumber('user')->name('users.status');
+    Route::patch('/users/{user}/password', [UserController::class, 'resetPassword'])->whereNumber('user')->name('users.reset-password');
+    Route::resource('users', UserController::class)->whereNumber('user')->except('destroy');
+    Route::patch('/organizational-units/{unit}/status', [OrganizationalUnitController::class, 'status'])->whereNumber('unit')->name('organizational-units.status');
+    Route::resource('organizational-units', OrganizationalUnitController::class)
+        ->parameters(['organizational-units' => 'unit'])->whereNumber('unit')->except('destroy');
+    Route::patch('/floors/{floor}/status', [FloorController::class, 'status'])->whereNumber('floor')->name('floors.status');
+    Route::resource('floors', FloorController::class)->whereNumber('floor')->except('destroy');
+    Route::patch('/facilities/{facility}/status', [FacilityController::class, 'status'])->whereNumber('facility')->name('facilities.status');
+    Route::resource('facilities', FacilityController::class)->whereNumber('facility')->except('destroy');
+    Route::patch('/rooms/{room}/status', [RoomController::class, 'status'])->whereNumber('room')->name('rooms.status');
+    Route::resource('rooms', RoomController::class)->whereNumber('room')->except('destroy');
+    Route::get('/rooms/{room}/pics', [RoomPicController::class, 'edit'])->whereNumber('room')->name('rooms.pics');
+    Route::put('/rooms/{room}/pics', [RoomPicController::class, 'update'])->whereNumber('room')->name('rooms.pics.update');
+    Route::delete('/rooms/{room}/pics/{pic}', [RoomPicController::class, 'destroy'])->whereNumber(['room', 'pic'])->name('rooms.pics.destroy');
+    Route::get('/rooms/{room}/access', [RoomAccessController::class, 'edit'])->whereNumber('room')->name('rooms.access');
+    Route::put('/rooms/{room}/access', [RoomAccessController::class, 'update'])->whereNumber('room')->name('rooms.access.update');
+    Route::get('/bookings', FrontendSkeletonController::class)->defaults('view', 'admin.bookings.index')->name('bookings.index');
+    Route::get('/bookings/{booking}', FrontendSkeletonController::class)->defaults('view', 'admin.bookings.show')->name('bookings.show');
+    Route::get('/schedule', FrontendSkeletonController::class)->defaults('view', 'shared.schedule')->name('schedule.index');
 });
 
 require __DIR__.'/auth.php';
