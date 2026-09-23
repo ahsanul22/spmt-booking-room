@@ -154,9 +154,9 @@ Tidak perlu email, WhatsApp, atau SMS saat ini.
 
 ## Frontend
 
-Frontend development dibuat sangat sederhana menggunakan Blade/HTML untuk memastikan seluruh fungsi dapat diuji. Semua tombol, form, tabel, filter, dan navigasi yang dibutuhkan harus tersedia. Data berasal dari Laravel dan tidak hardcoded di HTML.
+Frontend dikembangkan tim menggunakan Blade + Tailwind CSS melalui Vite. Halaman Jadwal Ruangan menjadi acuan visual utama untuk layout, tipografi, komponen, responsivitas, dan palet warna pada `tailwind.config.js`. Panduan kerja CLI dan integrasi HTML ada di `docs/FRONTEND_GUIDE.md`.
 
-Tidak perlu desain kompleks atau CSS custom berlebihan. Frontend final akan dikembangkan oleh anggota tim lain menggunakan HTML dan Tailwind CSS. Prioritaskan functionality dan struktur Blade yang mudah diganti tanpa mengubah backend.
+Aturan awal yang membatasi frontend ke HTML sederhana untuk testing sudah digantikan oleh instruksi pengembangan frontend setelah 4E. Semua fungsi backend yang aktif harus tetap berfungsi; data berasal dari Laravel. Halaman yang backend-nya belum tersedia boleh didesain dengan empty state dan penanda pratinjau. Task frontend tidak otomatis mengizinkan implementasi backend tahap berikutnya.
 
 ## Requirement yang Perlu Diklarifikasi Sebelum Implementasi Terkait
 

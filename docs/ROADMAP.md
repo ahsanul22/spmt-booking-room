@@ -1,6 +1,6 @@
 # Roadmap
 
-Urutan berikut mengikuti instruksi terbaru pengguna. Tahap 3 hanya frontend skeleton; backend modul dikerjakan setelah instruksi berikutnya.
+Urutan backend tetap mengikuti tabel berikut. Setelah 4E, pengembangan frontend tim aktif per halaman yang ditugaskan, memakai Jadwal Ruangan dan palet Tailwind sebagai referensi (lihat `FRONTEND_GUIDE.md`). Tahap 3 adalah riwayat pembuatan skeleton; batasan tampilannya tidak lagi berlaku untuk pekerjaan frontend baru. Backend tahap 5-7 tetap menunggu penugasan tersendiri.
 
 | Tahap | Cakupan | Status |
 | --- | --- | --- |

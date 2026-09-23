@@ -2,13 +2,84 @@
 
 ## Last Update
 
-2026-09-22 - Referensi frontend Jadwal Ruangan dibuat setelah Tahap 4E.
+2026-09-23 - Verifikasi dan pengelompokan commit perubahan dashboard, login, Livewire, serta dokumentasi untuk origin/main.
+
+## Verifikasi Sebelum Push
+
+- Permintaan pengguna: push perubahan ke repository dengan commit terpisah. Kelompok commit: dashboard/controller admin dan layout bersama; desain login; komponen/dependency katalog Livewire; dashboard user/PIC dan navbar beserta pengujian; dokumentasi/panduan frontend.
+- Review menemukan typo existing pada constraint route lantai (`flyangoor`), menyebabkan `/admin/floors/preview` menghasilkan 500. Dikembalikan ke `floor`; test FloorFacilityManagementTest **12 passed, 365 assertions**. Pengujian lengkap sesudah perbaikan: **99 passed, 2631 assertions**. Pengujian lengkap awal gagal pada satu kasus route tersebut; tidak ada kegagalan tersisa pada pengujian ulang.
+- `git fetch origin` berhasil; sebelum commit, main lokal sama dengan origin/main. `git diff --check` berhasil. Build terakhir dan kompilasi Blade berhasil pada verifikasi UI sebelumnya; tidak diulang karena perubahan publikasi hanya perbaikan route dan dokumentasi. Tidak menyertakan .env, node_modules, vendor, atau public/build. Publikasi ditujukan ke origin/main sesuai instruksi pengguna.
+
+## Dashboard User dan Katalog Livewire
+
+- Atas koreksi pengguna, ketiga tombol filter dikembalikan rata kiri dengan menghapus `justify-center`. RoomCatalogTest **6 passed, 42 assertions**; diff check file berhasil. Build tidak diulang karena hanya menghapus class alignment; seluruh utility tersisa sudah tersedia pada build sebelumnya.
+
+- Penyesuaian lanjutan: ketiga tombol filter dipusatkan dengan `justify-center`, tetap membungkus pada mobile dan mempertahankan garis bawah aktif. Build berhasil (eskalasi esbuild EPERM), RoomCatalogTest **6 passed, 42 assertions**, serta view:cache/view:clear berhasil. Visual browser belum diperiksa karena tool browser tidak tersedia.
+
+- Container layout user diperlebar dari 1280 menjadi maksimum 1800 px; dashboard PIC/admin pada layout schedule juga maksimum 1800 px, sementara jadwal PIC/admin tetap 1600 px. Navbar, main, dan footer user sejajar. Pengantar user memakai minimum 58vh, headline besar, penjelasan sistem, serta tiga langkah penggunaan; katalog langsung berada setelah pengantar.
+- Atas permintaan eksplisit pengguna, menambah `livewire/livewire` **3.8.9** (constraint `~3.6`, kompatibel Laravel 10) lewat Composer. Lock hanya menambah satu paket; dependency existing tidak di-update. Instalasi memerlukan eskalasi karena koneksi Composer diblokir sandbox. Aset Livewire menggunakan injeksi otomatis resmi, bukan CDN/Alpine tambahan.
+- `app/Livewire/RoomCatalog.php` dan `resources/views/livewire/room-catalog.blade.php` membaca ruangan aktif beserta lantai/fasilitas dari database saat halaman pertama dibuka, tanpa lazy loading. Tiga tombol filter tanpa latar warna memakai garis bawah dan aria-pressed; filter/pagination memperbarui kartu melalui Livewire. Sembilan kartu per halaman, state loading/offline/empty, focus keyboard, serta tampilan 1/2/3 kolom tersedia.
+- Belum ada kategori pada schema. Pertanyaan klarifikasi dikirim; selama belum ada jawaban, asumsi sementara adalah Selat Malaka dicocokkan dengan nama (case-insensitive, trim), Ruang Rapat Lainnya adalah sisanya. Nama khusus disimpan pada `config/room-catalog.php`; tidak hardcode ID, data kartu, atau membuat kategori baru. Jika nama ruangan berubah, konfigurasi perlu disesuaikan.
+- Katalog hanya informasi: ruangan nonaktif disembunyikan; maintenance/unavailable tetap diberi label operasional yang benar. Akses restricted dilabeli Unit tertentu, bukan klaim user berhak booking. Pengecekan jadwal, inheritance akses, pengajuan, dan approval belum diimplementasikan; tombol booking nonaktif dan penjelasan terlihat. Tidak mengubah migration, seeder, atau data development.
+- Gate access-employee diperiksa setiap request komponen, properti filter Locked, pilihan action whitelist, relasi eager-loaded, output Blade escaped. Menambah enam RoomCatalogTest: data awal/escaping/nonaktif, ketiga filter dan empty, pagination/reset, input invalid, properti terkunci, authorization awal/lanjutan.
+- Hasil aktual: RoomCatalogTest + AuthenticationTest + AuthorizationTest + FrontendSkeletonTest **37 passed, 1153 assertions**. `npm run build` berhasil setelah eskalasi esbuild EPERM; `view:cache`, `view:clear`, dan Pint empat file PHP terkait berhasil. Browser visual/interaksi desktop-mobile belum diuji karena tool browser tidak tersedia; responsivitas dan keyboard ditinjau pada kode, filter diuji melalui Livewire test.
+- `composer audit --locked`: tiga entri advisory pada laravel/framework existing (signed URL dan aturan validasi email), tidak ada advisory Livewire pada hasil audit. Tidak menaikkan Laravel di task UI ini; pembaruan framework memerlukan pekerjaan terpisah. Review halaman di `/dashboard` sebagai pegawai.
+
+## Revisi Alur Dashboard dan Navbar Pegawai
+
+- Mengoreksi desain sebelumnya sesuai arahan pengguna: referensi dashboard admin berlaku untuk gaya visual, bukan penyamaan susunan konten dan navigasi seluruh role. Dashboard PIC mendahulukan Permintaan Approval/antrean tinjauan, Ruangan Saya dan jadwal, lalu Riwayat Approval. Booking pribadi menjadi akses sekunder. Dashboard pegawai mendahulukan Cari Ruangan dan Booking Saya; penjelasan sistem ringkas dan panduan rinci dapat dibuka melalui disclosure native.
+- `dashboard.blade.php` menjadi wrapper bersama yang memilih konten `user/dashboard.blade.php` atau `pic/dashboard.blade.php` sesuai Gate. Identitas akun dipakai ulang melalui `shared/dashboard-account.blade.php`. Controller, route, autentikasi, dan authorization tetap; akses admin ke URL umum/PIC sesuai Gate existing tidak diubah.
+- Role user memakai `layouts/user.blade.php`: navbar horizontal yang membungkus pada layar kecil, menu aktif, identitas, skip-link, dan logout POST/CSRF; tanpa sidebar atau ketergantungan JavaScript untuk membuka menu. Layout ini juga dipakai role user pada jadwal, pencarian/daftar/detail ruangan, serta My Booking/form/detail agar navigasi konsisten. Konten modul di luar dashboard tetap existing; CSS `.user-module` menjaga form dan tabel tetap terbaca setelah Tailwind reset, dengan scroll tabel lokal.
+- PIC/admin tetap memakai sidebar. Menu PIC pada layout schedule kini mendahulukan permintaan, ruangan tanggung jawab, dan riwayat; menu admin tetap. Statistik, antrean approval, booking pribadi, dan penugasan ruangan pada dashboard tidak dipalsukan. Penanda pratinjau menjelaskan data/proses yang belum tersedia; belum mengaktifkan backend tahap 5-7.
+- Hasil aktual: AuthenticationTest + AuthorizationTest + FrontendSkeletonTest **31 passed, 1113 assertions**. Assertion tambahan memeriksa konten sesuai role dan ketiadaan sidebar pada dashboard/jadwal user. `npm run build` berhasil setelah eskalasi spawn EPERM; `view:cache`, `view:clear`, dan Pint test AuthorizationTest berhasil. Tidak menambah dependency.
+- Responsivitas navbar yang membungkus, urutan konten, fokus keyboard, disclosure native, target klik, serta empty state ditinjau pada kode. Visual desktop/mobile, keyboard aktual, dan kontras browser belum diuji karena tidak tersedia tool browser dalam sesi. Review di `/dashboard` sebagai pegawai dan `/pic/dashboard` sebagai PIC.
+
+## Frontend Dashboard Pegawai dan PIC
+
+Catatan di bawah adalah implementasi awal, disempurnakan oleh revisi alur dan navbar di atas.
+
+- Review setelah login pegawai di `/dashboard` dan PIC di `/pic/dashboard`. View bersama `resources/views/dashboard.blade.php` kini memakai `layouts.schedule`, mengikuti dashboard admin: sidebar biru gelap, header akun, card putih, spacing, tipografi, dan token Tailwind existing.
+- Bagian awal menjelaskan tujuan Booking Room, kebutuhan rapat, serta aturan approval secara umum. Panduan tiga langkah menjelaskan pencarian, pengajuan, dan pemantauan status. PIC mendapat panel penjelasan tanggung jawab serta akses Ruangan Saya, Permintaan Approval, dan Riwayat Approval; pegawai tidak melihat area PIC.
+- Partial `shared/dashboard-shortcuts.blade.php` memakai komponen `dashboard-shortcut` existing dengan Gate. Aktivitas booking menampilkan empty state dan penanda pratinjau tanpa statistik/data palsu. Identitas akun/unit, flash, route, controller, authorization, serta logout POST/CSRF tetap memakai Laravel existing. Tidak mengaktifkan backend tahap 5-7.
+- Perubahan terbatas pada layout bersama: menu Dashboard aktif pada ketiga route dashboard. Judul/breadcrumb dashboard ditetapkan oleh view sehingga tidak tertinggal Jadwal Ruangan. Struktur konten satu kolom pada mobile, kartu dua kolom mulai sm, panel samping mulai xl; nama/unit panjang memakai break-words pada konten.
+- Hasil aktual: AuthenticationTest + AuthorizationTest + FrontendSkeletonTest **31 passed, 1099 assertions**; `npm run build` berhasil setelah eskalasi karena esbuild ditolak sandbox (spawn EPERM); `php artisan view:cache` dan `view:clear` berhasil. Test termasuk matriks akses role, seluruh tautan dashboard, unit kosong, login/logout, dan halaman jadwal/pratinjau. Tidak menambah dependency atau form proses baru.
+- Responsivitas, heading, warna, fokus keyboard, empty state, dan escaping ditinjau dari kode. Pemeriksaan visual desktop/mobile, keyboard aktual, serta pengukuran kontras di browser belum dilakukan karena tool browser tidak tersedia dalam sesi.
+
+## Frontend Login
+
+- Review di `/login` sebagai guest. `resources/views/auth/login.blade.php` kini memakai Tailwind/Vite existing, panel merek primaryDark, header surface, kartu form putih, tipografi, border, spacing, dan tombol mengikuti dashboard admin/Jadwal Ruangan. Ikon memakai komponen `schedule-icon` existing; tanpa dependency baru atau perubahan layout halaman lain.
+- Desktop memakai dua kolom; mobile menampilkan merek ringkas di atas form. Form memiliki label, autocomplete, fokus keyboard, target tombol/label checkbox yang cukup besar, ringkasan error dan pesan per field terhubung melalui aria-describedby/aria-invalid. Flash status tersedia; email/Remember Me mempertahankan old input dan password tidak diisi ulang. POST login, CSRF, validasi, autentikasi, dan redirect role existing tetap.
+- Hasil aktual: `npm run build` berhasil setelah eskalasi karena sandbox memblokir esbuild dengan spawn EPERM; `php artisan view:cache` dan `view:clear` berhasil; `php artisan test --filter=AuthenticationTest` **16 passed, 166 assertions** (termasuk login/logout tiga role, input invalid, CSRF, throttle, akun nonaktif, dan Remember Me).
+- Responsivitas, label, fokus, warna, serta kondisi form kosong/error ditinjau pada kode. Pemeriksaan visual desktop/mobile, keyboard aktual, dan pengukuran kontras di browser belum dilakukan karena tool browser tidak tersedia dalam sesi. Halaman login aktif; tidak menambah backend Booking/Approval/Kalender atau data pratinjau.
+
+## Perapian Return View Admin
+
+- Semua route admin kini mengarah ke controller namespace Admin. Menambah `Admin/BookingController` (index/show) dan `Admin/ScheduleController` (index), menggantikan tiga default view pada route booking/jadwal. Controller admin lainnya sudah menangani view masing-masing dan tidak diubah.
+- Scope hanya return view: Blade, URL/nama route, authorization, query/proses master data existing tetap. Booking/detail dan jadwal masih pratinjau; belum menambah backend, data, atau model binding booking. FrontendSkeletonController kini menangani 11 route non-admin; total halaman pratinjau yang diuji tetap 14.
+- Hasil aktual: FrontendSkeletonTest + AuthorizationTest **15 passed, 935 assertions**; Pint empat file PHP terkait berhasil; route list mengonfirmasi semua action admin ada dalam namespace Admin. Build/browser tidak diulang karena tidak ada perubahan tampilan atau aset.
+
+## Frontend Dashboard Super Admin
+
+- Verifikasi setelah pemisahan controller admin (2026-09-23): AuthenticationTest + AuthorizationTest **25 passed, 427 assertions**; Pint tiga file PHP terkait berhasil; route list mengonfirmasi `Admin\DashboardController@index` dengan auth + access-admin; `git diff --check` berhasil. Build tidak diulang karena perapian hanya controller/route dan dokumentasi, tanpa perubahan aset atau Blade.
+- Review di `/admin/dashboard` setelah login admin. View `admin/dashboard.blade.php` berisi akses cepat master data, tombol Tambah Ruangan aktif, ringkasan/aktivitas booking pratinjau, panel informasi, dan identitas akun dari Laravel. Tidak menambah statistik palsu, query modul, endpoint, dependency, atau backend tahap 5-7.
+- Dashboard admin ditangani `Admin/DashboardController::index`: view, judul, dan data akun berada di controller khusus admin. Route `/admin/dashboard` hanya mengarah ke action, tanpa default judul atau pemilihan view berdasarkan nama route. Controller dashboard pegawai/PIC tetap existing. Komponen `dashboard-shortcut` dipakai ulang untuk kartu navigasi. Flash session, unit kosong, escaping, Gate, dan logout POST/CSRF tetap tersedia.
+- File bersama `layouts/schedule.blade.php` kini menerima section title/breadcrumb dan menentukan menu aktif berdasarkan route. Default judul tetap Jadwal Ruangan; navigasi, kalender, dan akses role existing dipertahankan.
+- Pemeriksaan kode: grid kartu satu kolom di mobile, tiga kolom ringkasan mulai sm, panel samping mulai xl, navigasi mobile existing, fokus keyboard, heading, empty state, dan pembungkusan nama/unit panjang. Tidak ada form input baru; validasi/old input master data tetap di halaman masing-masing. Pemeriksaan visual desktop/mobile, keyboard aktual, dan kontras di browser belum dilakukan karena tool browser/Playwright tidak tersedia dalam sesi.
+- Hasil aktual: `npm run build` berhasil (esbuild memerlukan eskalasi setelah sandbox menolak spawn EPERM); `php artisan view:cache` dan `view:clear` berhasil; AuthenticationTest + AuthorizationTest + FrontendSkeletonTest **31 passed, 1098 assertions**. Setelah menambahkan assertion view/pratinjau, test akses admin dijalankan ulang: **1 passed, 30 assertions**. Pint kedua file PHP berubah berhasil. `git diff --check` berhasil, hanya warning normalisasi CRLF/LF pada dokumentasi existing.
+- Test navigasi diperbarui untuk membaca anchor halaman saja, melewati skip-link dan aset Vite, mengikuti pola FrontendSkeletonTest. Pengujian awal menemukan syntax Blade pada directive yang menempel teks; diperbaiki sebelum pengujian ulang berhasil. Test database memakai schema PostgreSQL sementara existing.
 
 ## Tahap Saat Ini
 
 Verifikasi sebelum publikasi commit terpisah (2026-09-22): `php artisan test` **93 passed, 2573 assertions**. Perubahan dikelompokkan menjadi commit unit organisasi, user, lantai/fasilitas, room, assignment PIC/akses, integrasi route/frontend, desain jadwal Tailwind, dan dokumentasi. Publikasi ditujukan ke origin/main sesuai instruksi pengguna; file .env, node_modules, dan public/build diabaikan Git.
 
-Tahap 1, 2A, 2B, 3, dan 4A-4E selesai. Atas permintaan pengguna, membuat satu referensi desain Jadwal Ruangan untuk diskusi tim; backend Tahap 5/7 belum dilanjutkan.
+Tahap 1, 2A, 2B, 3, dan 4A-4E selesai. Pengembangan frontend tim aktif per halaman yang ditugaskan, dengan Jadwal Ruangan sebagai acuan utama. Backend tahap 5-7 belum dilanjutkan.
+
+## Pembaruan Aturan Frontend Tim
+
+- AGENTS.md mengganti batasan HTML sederhana untuk testing dengan Blade + Tailwind/Vite dan referensi Jadwal Ruangan. Palet sembilan warna, penggunaan komponen, kontrak form/authorization, dan batas scope frontend dicantumkan.
+- Menambah docs/FRONTEND_GUIDE.md: peta file referensi, tabel token warna, pola visual/responsif/aksesibilitas, integrasi HTML dari AI web, langkah CLI, verifikasi, dan contoh instruksi task untuk anggota tim.
+- PROJECT_CONTEXT, ROADMAP, FRONTEND, dan DEC-020 diselaraskan. Aturan tahap lama ditandai sebagai riwayat; frontend baru boleh dikembangkan tanpa otomatis melanjutkan backend Booking/Approval/Kalender.
+- Perubahan hanya dokumentasi; tidak mengubah kode aplikasi atau dependency. Test aplikasi/build tidak dijalankan karena tidak ada perubahan executable. Verifikasi dokumentasi: konsistensi palet dengan tailwind.config.js, keberadaan file referensi, dan git diff --check.
 
 ## Referensi Frontend - Jadwal Ruangan
 

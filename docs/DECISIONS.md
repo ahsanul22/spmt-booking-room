@@ -1,5 +1,43 @@
 # Decisions
 
+## DEC-025 - Katalog Ruangan Livewire pada Dashboard User
+
+- Pengguna meminta pengantar sistem dominan, container lebar, tiga filter bergaris bawah, dan kartu ruangan yang langsung tampil melalui Livewire. Menggantikan prioritas layout user sebelumnya; PIC tetap berfokus pada approval.
+- Menambah Livewire 3.8.9 melalui Composer pada Laravel 10 existing. Katalog membaca master ruangan secara read-only dan memakai server-render awal, filter, serta pagination Livewire. Ini aktivasi katalog khusus dashboard sesuai task, bukan backend booking/approval/ketersediaan.
+- Karena schema belum punya kategori, asumsi sementara selama klarifikasi belum dijawab: filter Selat Malaka mencocokkan nama terkonfigurasi, dan Ruang Rapat Lainnya adalah komplemennya. Tidak menetapkan klasifikasi bisnis permanen atau menambah migration. Konfigurasi `room-catalog.featured_room_name` menjadi sumber pemetaan nama.
+- Katalog menampilkan ruangan aktif kepada access-employee dengan label akses dan operasional; tidak menyatakan ketersediaan jadwal atau kelayakan booking user. Semua request komponen tetap diotorisasi. Ruangan restricted dapat dikenali sebagai informasi; enforcement booking dan inheritance tetap belum diputuskan.
+- Integrasi aset menggunakan injeksi otomatis [Livewire 3](https://livewire.laravel.com/docs/3.x/installation), tanpa memasang Alpine terpisah. Dashboard memakai maksimum 1800 px; pengantar user minimum 58vh dengan tinggi mengikuti konten pada mobile.
+
+## DEC-024 - Navigasi dan Prioritas Dashboard Mengikuti Role
+
+- Arahan pengguna mengoreksi DEC-023: referensi dashboard admin dipakai untuk warna, tipografi, kartu, dan spacing; struktur informasi mengikuti tugas role. PIC mendahulukan approval, ruangan tanggung jawab/jadwal, dan riwayat keputusan. Booking pribadi sekunder. Pegawai mendahulukan pencarian ruangan serta pemantauan booking; panduan tidak mendominasi dashboard.
+- Pegawai (`user`) memakai navbar `layouts.user`, termasuk ketika berpindah ke jadwal dan halaman ruangan/booking pribadi. PIC/admin mempertahankan navigasi existing; sidebar PIC mengutamakan tugas PIC. Navbar mobile membungkus tanpa menu tersembunyi sehingga tetap dapat dipakai tanpa JavaScript.
+- Controller dashboard bersama dipertahankan; wrapper view memilih partial konten berdasarkan Gate dan layout berdasarkan role. Tidak mengubah izin akses, route, penugasan PIC, atau kebijakan booking/approval. Semua modul yang belum aktif tetap pratinjau tanpa data dummy.
+
+## DEC-023 - Dashboard Pegawai/PIC dengan Panduan Penggunaan
+
+- Dashboard pegawai dan PIC tetap memakai `DashboardController` serta view `dashboard` bersama, dengan konten sesuai Gate. Tampilan kini memakai `layouts.schedule` seperti dashboard admin; menu Dashboard aktif pada ketiga route dashboard. Route, judul role, dan authorization existing dipertahankan.
+- Atas permintaan pengguna, pengantar sistem dan panduan booking tampil langsung pada dashboard, dengan penjelasan tugas tambahan untuk PIC. Kartu akses cepat menggunakan komponen dashboard admin existing. Booking, approval, dan data jadwal tetap pratinjau; panduan tidak berarti proses tersebut sudah aktif.
+
+## DEC-022 - Return View Admin per Controller Modul
+
+- Atas permintaan pengguna, seluruh route admin memakai controller dalam namespace Admin. Tiga route pratinjau yang tersisa dipindahkan dari FrontendSkeletonController: daftar/detail booking ke BookingController::index/show, jadwal ke ScheduleController::index.
+- Perubahan hanya pemindahan return view dari default route ke action eksplisit. Booking dan jadwal tetap pratinjau tanpa query, model binding booking, atau proses baru. URL, nama route, middleware, dan view dipertahankan; controller master data aktif tidak diubah.
+- FrontendSkeletonController masih digunakan area pegawai/PIC. Pengujian 14 halaman pratinjau tetap mencakup tiga route admin meskipun kini memakai controller khusus.
+
+## DEC-021 - View Dashboard Admin dengan Layout Referensi
+
+- Dashboard admin memakai `Admin/DashboardController::index` khusus sesuai arahan pengguna untuk memisahkan controller admin. Controller menetapkan view `admin.dashboard`, judul, dan data akun; route hanya memetakan URL ke action dengan middleware existing. Controller/view dashboard pegawai/PIC tetap existing. Ini memperbarui penggunaan satu controller/view dashboard pada DEC-012 untuk admin.
+- Layout `layouts.schedule` digunakan bersama secara terbatas: title dan breadcrumb memakai section dengan default Jadwal Ruangan, menu aktif mengikuti route. Komponen kartu akses cepat terpisah, tanpa memigrasi halaman lain atau menambah dependency.
+- Ringkasan dan aktivitas booking tetap pratinjau tanpa query/statistik hingga backend dashboard ditugaskan. Tautan pengelolaan menuju modul existing yang sudah aktif.
+
+## DEC-020 - Aturan Frontend Tim dengan Referensi Jadwal
+
+- Pengguna menetapkan Jadwal Ruangan dan palet existing sebagai acuan pengembangan frontend tim melalui CLI maupun integrasi HTML. Menggantikan batasan frontend sederhana untuk testing pada DEC-006/DEC-013 serta status kandidat saja pada DEC-019; catatan tahap sebelumnya tetap dipertahankan sebagai riwayat.
+- Gunakan Blade + Tailwind/Vite existing, token tailwind.config.js, dan komponen/partial yang dapat dipakai ulang. Gaya layout, tipografi, card, tombol, dan mobile mengikuti referensi jadwal dengan penyesuaian konten per halaman.
+- Scope tetap per halaman yang ditugaskan. Frontend boleh dikembangkan setelah 4E tanpa mengaktifkan backend tahap 5-7. Kontrak form, route, data, dan authorization existing wajib dipertahankan; modul tanpa backend menampilkan pratinjau/empty state tanpa data bisnis hardcoded.
+- Panduan operasional berada di docs/FRONTEND_GUIDE.md dan dirujuk AGENTS.md, PROJECT_CONTEXT, ROADMAP, serta FRONTEND. Perubahan ini hanya dokumentasi; generalisasi layout dan penerapan visual dilakukan dalam task frontend berikutnya.
+
 ## DEC-019 - Referensi Desain Jadwal Ruangan
 
 - Atas instruksi pengguna setelah 4E, satu halaman Jadwal Ruangan dibuat sebagai referensi visual untuk membandingkan desain tim. Ini pengecualian terarah dari frontend skeleton sederhana, bukan aktivasi backend Tahap 5/7.

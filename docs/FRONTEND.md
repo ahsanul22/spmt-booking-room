@@ -1,12 +1,16 @@
 # Frontend Skeleton â€” Tahap 3
 
-Halaman menggunakan Blade/HTML sederhana dan layout existing, tanpa dependency, CSS custom, atau build frontend baru. Login/logout tetap berfungsi. Modul baru menampilkan empty state sampai backend tersedia.
+Aturan frontend aktif ada di [FRONTEND_GUIDE.md](FRONTEND_GUIDE.md) dan `AGENTS.md`: gunakan Blade + Tailwind/Vite, palet proyek, dan Jadwal Ruangan sebagai acuan visual. Batasan HTML sederhana untuk testing pada Tahap 3 sudah digantikan. Bagian Tahap 3/4 di bawah disimpan sebagai riwayat; status backend terkini mengikuti `PROGRESS.md`.
 
 ## Referensi Desain Jadwal (Setelah 4E)
 
+Pembaruan DEC-025: dashboard user kini memiliki pengantar besar dan katalog `RoomCatalog` Livewire (kartu database aktif, filter Semua/Selat Malaka/Ruang Rapat Lainnya, pagination). Pemetaan Selat Malaka sementara berdasarkan nama di config room-catalog, bukan kategori schema. Informasi ruangan sudah aktif pada dashboard; pengecekan ketersediaan dan proses booking tetap belum tersedia. Container user dan dashboard PIC/admin maksimum 1800 px.
+
+Pembaruan DEC-024: role user memakai navbar `layouts/user.blade.php` pada dashboard, jadwal, dan halaman ruangan/booking pribadi. PIC/admin mempertahankan sidebar pada layout schedule. Dashboard menggunakan wrapper `dashboard.blade.php` dengan partial user/PIC terpisah: pegawai fokus pencarian dan booking pribadi; PIC fokus antrean approval, ruangan tanggung jawab, dan riwayat keputusan. Referensi visual tidak berarti isi atau navigasi semua role disamakan. Backend booking/approval tetap pratinjau.
+
 Buka `/schedule` atau `/admin/schedule` setelah login untuk referensi desain Tailwind. File utama `resources/views/shared/schedule.blade.php`, layout `resources/views/layouts/schedule.blade.php`, ikon `components/schedule-icon.blade.php`, interaksi `resources/js/schedule.js`, dan palet `tailwind.config.js`. Jalankan `npm run dev` saat mengembangkan atau `npm run build` untuk aset build.
 
-Desain mencakup sidebar, header akun, kalender bulanan interaktif, panel agenda kosong, dan versi mobile. Navigasi bulan/Hari Ini/pilihan tanggal aktif di browser; data booking serta filter ruangan/lantai menunggu backend, tanpa contoh booking hardcoded. Desain ini kandidat untuk diskusi tim, belum diterapkan ke halaman lainnya. Merek masih berupa teks sementara, bukan logo resmi.
+Desain mencakup sidebar, header akun, kalender bulanan interaktif, panel agenda kosong, dan versi mobile. Navigasi bulan/Hari Ini/pilihan tanggal aktif di browser; data booking serta filter ruangan/lantai menunggu backend, tanpa contoh booking hardcoded. Sesuai instruksi terbaru, desain ini menjadi acuan frontend tim; penerapan ke halaman lain dilakukan per task, bukan otomatis. Merek masih berupa teks sementara, bukan logo resmi.
 
 ## Pembaruan Tahap 4E
 
