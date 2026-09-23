@@ -1,4 +1,5 @@
-@extends('layouts.schedule')
+@extends(auth()->user()->role === \App\Models\User::ROLE_USER ? 'layouts.user' : 'layouts.schedule')
+@section('title', 'Jadwal Ruangan')
 @section('content')
 <div data-schedule>
     <div class="mb-7 flex flex-wrap items-center justify-between gap-5">

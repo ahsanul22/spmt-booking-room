@@ -1,4 +1,4 @@
-@extends('layouts.base')
+@extends(auth()->user()->role === \App\Models\User::ROLE_USER ? 'layouts.user' : 'layouts.base')
 @section('title', 'Cari Ruangan')
 @section('content')
     <h1>Cari Ruangan</h1>
