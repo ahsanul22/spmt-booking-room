@@ -1,11 +1,14 @@
 <?php
 
+use App\Http\Controllers\Admin\BookingController;
+use App\Http\Controllers\Admin\DashboardController as AdminDashboardController;
 use App\Http\Controllers\Admin\FacilityController;
 use App\Http\Controllers\Admin\FloorController;
 use App\Http\Controllers\Admin\OrganizationalUnitController;
 use App\Http\Controllers\Admin\RoomAccessController;
 use App\Http\Controllers\Admin\RoomController;
 use App\Http\Controllers\Admin\RoomPicController;
+use App\Http\Controllers\Admin\ScheduleController;
 use App\Http\Controllers\Admin\UserController;
 use App\Http\Controllers\DashboardController;
 use App\Http\Controllers\FrontendSkeletonController;
@@ -36,7 +39,7 @@ Route::prefix('pic')->name('pic.')->middleware(['auth', 'can:access-pic'])->grou
 });
 
 Route::prefix('admin')->name('admin.')->middleware(['auth', 'can:access-admin'])->group(function () {
-    Route::get('/dashboard', DashboardController::class)->defaults('title', 'Dashboard Super Admin')->name('dashboard');
+    Route::get('/dashboard', [AdminDashboardController::class, 'index'])->name('dashboard');
     Route::patch('/users/{user}/status', [UserController::class, 'status'])->whereNumber('user')->name('users.status');
     Route::patch('/users/{user}/password', [UserController::class, 'resetPassword'])->whereNumber('user')->name('users.reset-password');
     Route::resource('users', UserController::class)->whereNumber('user')->except('destroy');
@@ -54,9 +57,9 @@ Route::prefix('admin')->name('admin.')->middleware(['auth', 'can:access-admin'])
     Route::delete('/rooms/{room}/pics/{pic}', [RoomPicController::class, 'destroy'])->whereNumber(['room', 'pic'])->name('rooms.pics.destroy');
     Route::get('/rooms/{room}/access', [RoomAccessController::class, 'edit'])->whereNumber('room')->name('rooms.access');
     Route::put('/rooms/{room}/access', [RoomAccessController::class, 'update'])->whereNumber('room')->name('rooms.access.update');
-    Route::get('/bookings', FrontendSkeletonController::class)->defaults('view', 'admin.bookings.index')->name('bookings.index');
-    Route::get('/bookings/{booking}', FrontendSkeletonController::class)->defaults('view', 'admin.bookings.show')->name('bookings.show');
-    Route::get('/schedule', FrontendSkeletonController::class)->defaults('view', 'shared.schedule')->name('schedule.index');
+    Route::get('/bookings', [BookingController::class, 'index'])->name('bookings.index');
+    Route::get('/bookings/{booking}', [BookingController::class, 'show'])->name('bookings.show');
+    Route::get('/schedule', [ScheduleController::class, 'index'])->name('schedule.index');
 });
 
 require __DIR__.'/auth.php';

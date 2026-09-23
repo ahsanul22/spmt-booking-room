@@ -125,7 +125,9 @@ class FrontendSkeletonTest extends PostgresTestCase
     {
         $pages = [];
         foreach (Route::getRoutes() as $route) {
-            if (! str_starts_with($route->getActionName(), FrontendSkeletonController::class)) {
+            // Admin preview pages now have module controllers, but remain placeholders.
+            if (! str_starts_with($route->getActionName(), FrontendSkeletonController::class)
+                && ! in_array($route->getName(), ['admin.bookings.index', 'admin.bookings.show', 'admin.schedule.index'], true)) {
                 continue;
             }
             $abilities = array_values(array_filter($route->middleware(), fn ($middleware) => str_starts_with($middleware, 'can:')));
