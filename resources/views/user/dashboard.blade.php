@@ -1,9 +1,9 @@
 <section aria-labelledby="booking-intro" class="relative mb-12 grid min-h-[58vh] items-center gap-10 overflow-hidden rounded-3xl border border-slate-200/80 bg-surface p-6 sm:p-10 lg:grid-cols-[minmax(0,1.3fr)_minmax(320px,0.7fr)] lg:p-12 xl:p-16">
     <div class="relative max-w-3xl">
         <p class="text-[11px] font-bold uppercase tracking-[0.24em] text-primary">Ruang untuk berkolaborasi</p>
-        <h2 id="booking-intro" class="mt-5 text-4xl font-bold leading-tight tracking-tight text-primaryDark sm:text-5xl xl:text-6xl">Pertemuan yang baik<br>dimulai dari ruang<br class="hidden xl:block"> yang tepat.</h2>
-        <p class="mt-6 max-w-2xl text-base leading-8 text-slate-600">Selamat datang di Booking Room PT Pelindo Multi Terminal. Kenali ruang rapat yang sesuai kebutuhan tim, rencanakan waktu pertemuan, dan pantau pengajuan Anda dalam satu tempat.</p>
-        <p class="mt-3 max-w-2xl text-sm leading-7 text-slate-600">Mulai dengan melihat kapasitas dan fasilitas ruangan di bawah. Saat mengajukan booking, siapkan tanggal, waktu, jumlah peserta, dan agenda rapat. Ruangan tertentu memerlukan persetujuan PIC.</p>
+        <h2 id="booking-intro" class="mt-5 text-3xl font-bold leading-tight tracking-tight text-primaryDark sm:text-4xl xl:text-5xl">Pertemuan yang baik<br>dimulai dari ruang<br class="hidden xl:block"> yang tepat.</h2>
+        <p class="mt-6 max-w-2xl text-sm leading-8 text-slate-600">Selamat datang di Booking Room PT Pelindo Multi Terminal. Kenali ruang rapat yang sesuai kebutuhan tim, rencanakan waktu pertemuan, dan pantau pengajuan Anda dalam satu tempat.</p>
+        <p class="mt-3 max-w-2xl text-xs leading-7 text-slate-600">Mulai dengan melihat kapasitas dan fasilitas ruangan di bawah. Saat mengajukan booking, siapkan tanggal, waktu, jumlah peserta, dan agenda rapat. Ruangan tertentu memerlukan persetujuan PIC.</p>
         <div class="mt-8 flex flex-wrap items-center gap-5">
             <a href="#room-catalog" class="inline-flex items-center gap-2 rounded-xl bg-primary px-5 py-3 text-sm font-semibold text-white transition hover:bg-primaryDark">Jelajahi ruangan<x-schedule-icon name="arrow" class="h-4 w-4 rotate-90" /></a>
             <a href="{{ route('my-bookings.index') }}" class="inline-flex items-center gap-2 py-3 text-sm font-semibold text-primaryDark hover:underline">My Booking<x-schedule-icon name="arrow" class="h-4 w-4" /></a>
