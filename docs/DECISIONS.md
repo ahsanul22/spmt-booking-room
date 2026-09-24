@@ -1,5 +1,12 @@
 # Decisions
 
+## DEC-026 - Navigasi Administrasi Tanpa Menu Lantai
+
+- Pengguna meminta frontend Kelola User, Unit Organisasi, dan Fasilitas serta penghapusan bagian Lantai. Ketiga modul memakai layout schedule pada daftar, tambah, edit, dan detail, dengan seluruh proses backend existing dipertahankan.
+- Menu Lantai di kedua navigasi dan shortcut dashboard admin dihapus. Cakupan sementara, sesuai asumsi yang disampaikan sambil meminta klarifikasi, adalah penghapusan dari tampilan administrasi; bukan penghapusan data atau atribut lantai. Ruangan masih bergantung pada floor_id, sehingga route/backend/model/schema Lantai dipertahankan. Klarifikasi penghapusan menyeluruh belum dijawab; tidak menetapkan bahwa data lantai tidak lagi dibutuhkan.
+- Tidak mengubah aturan organisasi, akses akun, relasi fasilitas, atau kewenangan role. Halaman form menggunakan komponen workspace baru agar desain dan aksesibilitas konsisten tanpa mengubah komponen skeleton modul lain.
+
+
 ## DEC-025 - Katalog Ruangan Livewire pada Dashboard User
 
 - Pengguna meminta pengantar sistem dominan, container lebar, tiga filter bergaris bawah, dan kartu ruangan yang langsung tampil melalui Livewire. Menggantikan prioritas layout user sebelumnya; PIC tetap berfokus pada approval.
