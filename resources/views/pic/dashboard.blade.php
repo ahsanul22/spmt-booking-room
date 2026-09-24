@@ -1,6 +1,6 @@
 <div class="mb-6 flex flex-wrap items-center justify-between gap-4 rounded-2xl bg-primaryDark p-6 text-white">
     <div class="max-w-2xl"><h2 class="text-xl font-bold">Prioritaskan permintaan yang perlu ditinjau.</h2><p class="mt-2 text-sm leading-6 text-secondaryLight">Sebagai PIC, fokus Anda adalah memeriksa pengajuan dan memberikan keputusan untuk ruangan yang menjadi tanggung jawab Anda.</p></div>
-    <a href="{{ route('pic.approvals.index') }}" class="inline-flex items-center gap-2 rounded-xl bg-surface px-5 py-3 text-sm font-semibold text-primaryDark hover:bg-secondaryLight">Permintaan Approval<x-schedule-icon name="arrow" class="h-4 w-4" /></a>
+    {{-- <a href="{{ route('pic.approvals.index') }}" class="inline-flex items-center gap-2 rounded-xl bg-surface px-5 py-3 text-sm font-semibold text-primaryDark hover:bg-secondaryLight">Permintaan Approval<x-schedule-icon name="arrow" class="h-4 w-4" /></a> --}}
 </div>
 <p role="note" class="mb-6 rounded-xl border border-secondaryLight bg-secondaryLight/20 px-4 py-3 text-xs leading-5 text-primaryDark"><strong>Pratinjau dashboard PIC</strong> · Antrean pengajuan, data ruangan PIC, dan riwayat keputusan belum terhubung. Persetujuan atau penolakan belum dapat diproses.</p>
 
