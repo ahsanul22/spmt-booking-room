@@ -21,7 +21,7 @@
                     <a @class(['schedule-nav', 'bg-white/10 text-white ring-1 ring-white/10' => request()->routeIs('dashboard', 'pic.dashboard', 'admin.dashboard')]) @if(request()->routeIs('dashboard', 'pic.dashboard', 'admin.dashboard')) aria-current="page" @endif href="{{ route(auth()->user()->dashboardRouteName()) }}"><x-schedule-icon name="grid" />Dashboard</a>
                     @can('access-pic')
                         @cannot('access-admin')
-                            <a class="schedule-nav" href="{{ route('pic.approvals.index') }}"><x-schedule-icon name="clock" />Permintaan Approval</a>
+                            <a @class(['schedule-nav', 'bg-white/10 text-white ring-1 ring-white/10' => request()->routeIs('pic.approvals.index', 'pic.approvals.show')]) @if(request()->routeIs('pic.approvals.index', 'pic.approvals.show')) aria-current="page" @endif href="{{ route('pic.approvals.index') }}"><x-schedule-icon name="clock" />Permintaan Approval</a>
                             <a class="schedule-nav" href="{{ route('pic.rooms.index') }}"><x-schedule-icon name="room" />Ruangan Saya</a>
                             <a class="schedule-nav" href="{{ route('pic.approvals.history') }}"><x-schedule-icon name="calendar" />Riwayat Approval</a>
                         @endcannot
@@ -32,24 +32,23 @@
                             <span class="ml-auto h-1.5 w-1.5 rounded-full bg-secondary"></span>
                         @endif
                     </a>
-                    <a class="schedule-nav" href="{{ route(auth()->user()->can('access-admin') ? 'admin.rooms.index' : 'rooms.index') }}"><x-schedule-icon name="room" />Daftar Ruangan</a>
+                    <a @class(['schedule-nav', 'bg-white/10 text-white ring-1 ring-white/10' => request()->routeIs('admin.rooms.*', 'rooms.index')]) @if(request()->routeIs('admin.rooms.*', 'rooms.index')) aria-current="page" @endif href="{{ route(auth()->user()->can('access-admin') ? 'admin.rooms.index' : 'rooms.index') }}"><x-schedule-icon name="room" />Daftar Ruangan</a>
                     @can('access-employee')
                         <a class="schedule-nav" href="{{ route('my-bookings.index') }}"><x-schedule-icon name="clock" />My Booking</a>
                     @endcan
                     @can('access-admin')
-                        <a class="schedule-nav" href="{{ route('admin.bookings.index') }}"><x-schedule-icon name="clock" />Semua Booking</a>
+                        <a @class(['schedule-nav', 'bg-white/10 text-white ring-1 ring-white/10' => request()->routeIs('admin.bookings.*')]) @if(request()->routeIs('admin.bookings.*')) aria-current="page" @endif href="{{ route('admin.bookings.index') }}"><x-schedule-icon name="clock" />Semua Booking</a>
                     @endcan
                     @can('access-admin')
-                        <a class="schedule-nav" href="{{ route('pic.approvals.index') }}"><x-schedule-icon name="grid" />Approval Ruangan</a>
+                        <a @class(['schedule-nav', 'bg-white/10 text-white ring-1 ring-white/10' => request()->routeIs('pic.approvals.*')]) @if(request()->routeIs('pic.approvals.*')) aria-current="page" @endif href="{{ route('pic.approvals.index') }}"><x-schedule-icon name="grid" />Approval Ruangan</a>
                     @endcan
                 </nav>
                 @can('access-admin')
                     <p class="px-3 pb-3 pt-8 text-[10px] font-semibold uppercase tracking-[0.2em] text-secondaryLight">Administrasi</p>
                     <nav aria-label="Master data" class="space-y-1">
-                        <a class="schedule-nav" href="{{ route('admin.users.index') }}">Kelola User</a>
-                        <a class="schedule-nav" href="{{ route('admin.organizational-units.index') }}">Unit Organisasi</a>
-                        <a class="schedule-nav" href="{{ route('admin.floors.index') }}">Lantai</a>
-                        <a class="schedule-nav" href="{{ route('admin.facilities.index') }}">Fasilitas</a>
+                        <a @class(['schedule-nav', 'bg-white/10 text-white ring-1 ring-white/10' => request()->routeIs('admin.users.*')]) @if(request()->routeIs('admin.users.*')) aria-current="page" @endif href="{{ route('admin.users.index') }}"><x-schedule-icon name="grid" />Kelola User</a>
+                        <a @class(['schedule-nav', 'bg-white/10 text-white ring-1 ring-white/10' => request()->routeIs('admin.organizational-units.*')]) @if(request()->routeIs('admin.organizational-units.*')) aria-current="page" @endif href="{{ route('admin.organizational-units.index') }}"><x-schedule-icon name="grid" />Unit Organisasi</a>
+                        <a @class(['schedule-nav', 'bg-white/10 text-white ring-1 ring-white/10' => request()->routeIs('admin.facilities.*')]) @if(request()->routeIs('admin.facilities.*')) aria-current="page" @endif href="{{ route('admin.facilities.index') }}"><x-schedule-icon name="grid" />Fasilitas</a>
                     </nav>
                 @endcan
                 <div class="mt-auto pt-10">

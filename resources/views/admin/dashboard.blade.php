@@ -41,7 +41,6 @@
                     <x-dashboard-shortcut :href="route('admin.rooms.index')" title="Kelola Ruangan" icon="room">Kapasitas, status, PIC, dan akses ruangan.</x-dashboard-shortcut>
                     <x-dashboard-shortcut :href="route('admin.users.index')" title="Kelola User">Akun pegawai, role, dan status akses.</x-dashboard-shortcut>
                     <x-dashboard-shortcut :href="route('admin.organizational-units.index')" title="Unit Organisasi">Susunan direktorat, divisi, dan departemen.</x-dashboard-shortcut>
-                    <x-dashboard-shortcut :href="route('admin.floors.index')" title="Kelola Lantai" icon="room">Lokasi lantai untuk penempatan ruangan.</x-dashboard-shortcut>
                     <x-dashboard-shortcut :href="route('admin.facilities.index')" title="Kelola Fasilitas">Perlengkapan pendukung ruang rapat.</x-dashboard-shortcut>
                     <x-dashboard-shortcut :href="route('admin.schedule.index')" title="Jadwal Ruangan" icon="calendar">Buka pratinjau kalender ruang rapat.</x-dashboard-shortcut>
                 </div>
