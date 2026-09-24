@@ -1,6 +1,10 @@
-@extends('layouts.base')
-@section('title', 'Permintaan Approval')
+@extends(auth()->user()->can('access-admin') ? 'layouts.schedule' : 'layouts.base')
+@section('breadcrumb', 'Approval Ruangan')
+@section('title', auth()->user()->can('access-admin') ? 'Approval Ruangan' : 'Permintaan Approval')
 @section('content')
+    @can('access-admin')
+        @include('admin.approvals.index')
+    @else
     <h1>Permintaan Approval</h1>
     <x-skeleton-notice />
     <a href="{{ route('pic.approvals.show', 'preview') }}">Pratinjau Detail Approval</a>
@@ -25,4 +29,5 @@
             </tr>
         @endforelse
     </x-table>
+    @endcan
 @endsection
