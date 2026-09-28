@@ -8,7 +8,6 @@ use App\Models\Room;
 use App\Models\User;
 use App\Services\BookingService;
 use Carbon\CarbonImmutable;
-use Database\Seeders\BookingRoomsSeeder;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Str;
 use Illuminate\Validation\ValidationException;
@@ -165,8 +164,8 @@ class BookingWorkflowTest extends PostgresTestCase
 
     public function test_requested_room_seed_is_repeatable_and_matches_floor_and_approval_rules(): void
     {
-        $this->seed(BookingRoomsSeeder::class);
-        $this->seed(BookingRoomsSeeder::class);
+        $this->seed();
+        $this->seed();
         $active = Room::with('floor')->where('is_active', true)->get();
         $this->assertCount(10, $active);
         $this->assertSame([2 => 1, 3 => 2, 4 => 2, 6 => 2, 7 => 3], $active->groupBy('floor.floor_number')->map->count()->sortKeys()->all());

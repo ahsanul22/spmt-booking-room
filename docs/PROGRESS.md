@@ -2,6 +2,14 @@
 
 ## Last Update
 
+2026-09-28 - BookingRoomsSeeder didaftarkan ke DatabaseSeeder.
+
+- Seeder utama menjalankan FoundationSeeder lalu BookingRoomsSeeder agar PIC awal tersedia sebelum katalog ruangan diisi. Perintah db:seed kini mencakup keduanya.
+- Fixture dasar test tetap memanggil FoundationSeeder secara eksplisit; test katalog menjalankan DatabaseSeeder dua kali untuk memeriksa urutan dan idempotensi.
+- Verifikasi akhir: `php artisan test --compact --filter="DatabaseFoundationTest|BookingWorkflowTest"` berhasil, **24 passed, 253 assertions**. Run awal memiliki satu kegagalan pada fixture rollback sebelum penyesuaian fixture dimuat ulang. Database aplikasi tidak di-seed dalam pekerjaan ini.
+
+## Riwayat sebelum pendaftaran seeder ruangan
+
 2026-09-28 - Verifikasi untuk publikasi perubahan booking, jadwal, dan tampilan PIC/admin.
 
 - Seluruh suite terakhir: **143 passed, 2550 assertions** (`php artisan test --compact`). Build Vite dan kompilasi Blade terakhir berhasil pada verifikasi perubahan UI. Staged diff check bersih.

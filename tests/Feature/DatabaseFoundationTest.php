@@ -22,7 +22,7 @@ class DatabaseFoundationTest extends PostgresTestCase
         $this->assertTrue(Hash::check('password', $admin->password));
         $admin->password = Hash::make('changed-password');
         $admin->save();
-        $this->seed();
+        $this->seed(\Database\Seeders\FoundationSeeder::class);
 
         foreach (['organizational_units' => 9, 'users' => 3, 'floors' => 8, 'facilities' => 7,
             'rooms' => 4, 'room_pics' => 4, 'facility_room' => 12, 'room_unit_access' => 4] as $table => $count) {
@@ -165,7 +165,7 @@ class DatabaseFoundationTest extends PostgresTestCase
         $this->assertFalse(Schema::hasTable('rooms'));
         $this->assertFalse(Schema::hasTable('organizational_units'));
         $this->artisan('migrate', ['--force' => true])->assertSuccessful();
-        $this->seed();
+        $this->seed(\Database\Seeders\FoundationSeeder::class);
         $this->assertDatabaseCount('rooms', 4);
     }
 

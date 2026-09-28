@@ -19,7 +19,7 @@ abstract class PostgresTestCase extends TestCase
         config(['database.connections.pgsql.search_path' => $this->testSchema]);
         DB::purge('pgsql');
         $this->artisan('migrate', ['--force' => true])->assertSuccessful();
-        $this->seed();
+        $this->seed(\Database\Seeders\FoundationSeeder::class);
     }
 
     protected function tearDown(): void
