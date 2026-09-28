@@ -1,40 +1,14 @@
-@extends(auth()->user()->role === \App\Models\User::ROLE_USER ? 'layouts.user' : 'layouts.base')
+@extends(auth()->user()->role === \App\Models\User::ROLE_USER ? 'layouts.user' : 'layouts.schedule')
 @section('title', 'My Booking')
+@section('breadcrumb', 'My Booking')
 @section('content')
-    <h1>My Booking</h1>
-    <x-skeleton-notice />
-    <x-skeleton-form>
-        <x-select name="status" label="Status">
-            <option value="">Pilih Status</option>
-            <option value="" @selected(old('status') === '')>Semua</option>
-            <option value="pending" @selected(old('status') === 'pending')>Pending</option>
-            <option value="approved" @selected(old('status') === 'approved')>Approved</option>
-            <option value="completed" @selected(old('status') === 'completed')>Completed</option>
-            <option value="cancelled" @selected(old('status') === 'cancelled')>Cancelled</option>
-            <option value="rejected" @selected(old('status') === 'rejected')>Rejected</option>
-        </x-select>
-        <x-pending-action>Terapkan Filter</x-pending-action>
-        <a href="{{ route('my-bookings.index') }}">Batal</a>
-    </x-skeleton-form>
-    <a href="{{ route('my-bookings.create') }}">Ajukan Booking</a>
-    <a href="{{ route('my-bookings.show', 'preview') }}">Pratinjau Detail Booking</a>
-    <x-table :headers="['Ruangan', 'Agenda', 'Tanggal', 'Jam', 'Status', 'Aksi']">
-        @forelse($bookings ?? [] as $item)
-            <tr>
-                <td>{{ $item->room?->name ?? '—' }}</td>
-                <td>{{ $item->agenda }}</td>
-                <td>{{ $item->date }}</td>
-                <td>{{ ($item->start_time ?? '—').' – '.($item->end_time ?? '—') }}</td>
-                <td>{{ $item->status }}</td>
-                <td>
-                    <a href="{{ route('my-bookings.show', $item->id) }}">Detail</a>
-                    <x-pending-action>Batalkan</x-pending-action>
-                </td>
-            </tr>
-        @empty
-            <tr>
-                <td colspan="6">Belum ada booking.</td>
-            </tr>
-        @endforelse
-    </x-table>
+    <div class="mb-7 flex flex-wrap items-center justify-between gap-4">
+        <div><h1 class="text-3xl font-bold text-primaryDark">My Booking</h1><p class="mt-3 text-sm leading-6 text-slate-600">Pengajuan dan riwayat rapat Anda. Pending menunggu PIC; Approved sudah dikonfirmasi.</p></div>
+        <a href="{{ route('rooms.index') }}" class="workspace-button">Booking Ruangan<x-schedule-icon name="plus" class="h-4 w-4" /></a>
+    </div>
+    <div class="workspace-feedback"><x-form-feedback /></div>
+    <x-workspace-panel title="Pengajuan Saya">
+        @include('shared.bookings-table', ['detailRoute' => 'my-bookings.show'])
+        @if($bookings->isEmpty())<div class="pb-6 text-center"><a href="{{ route('rooms.index') }}" class="workspace-button">Pilih ruangan untuk rapat</a></div>@endif
+    </x-workspace-panel>
 @endsection

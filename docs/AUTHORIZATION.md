@@ -14,7 +14,7 @@ Pengguna meminta istilah Laravel dijelaskan singkat, memakai contoh dari project
 
 ## Siapa boleh membuka apa?
 
-| Area | User | Room PIC | Super Admin |
+| Area | User | Room PIC | Admin |
 | --- | --- | --- | --- |
 | Dashboard Pegawai, daftar ruang, jadwal | Ya | Ya | Ya |
 | My Booking | Ya | Ya | Belum |

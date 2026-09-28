@@ -6,6 +6,6 @@
     @include('shared.room-details')
     <a href="{{ route('rooms.index') }}">Kembali</a>
     @can('access-employee')
-        <a href="{{ route('my-bookings.create', ['room_id' => $room->id ?? null]) }}">Booking Ruangan</a>
+        <a href="{{ isset($room) ? route('my-bookings.create', ['room_id' => $room->id]) : route('rooms.index') }}">Booking Ruangan</a>
     @endcan
 @endsection

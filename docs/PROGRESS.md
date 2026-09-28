@@ -2,6 +2,114 @@
 
 ## Last Update
 
+2026-09-28 - Verifikasi untuk publikasi perubahan booking, jadwal, dan tampilan PIC/admin.
+
+- Seluruh suite terakhir: **143 passed, 2550 assertions** (`php artisan test --compact`). Build Vite dan kompilasi Blade terakhir berhasil pada verifikasi perubahan UI. Staged diff check bersih.
+- Publikasi ke origin/main atas permintaan pengguna. File .env, dependency, dan hasil build tidak disertakan. Perubahan existing berupa baris kosong akhir migration lantai tetap lokal.
+
+## Riwayat sebelum verifikasi publikasi
+
+2026-09-28 - Kapasitas dihapus dari UI dan label administratif menjadi Admin (DEC-033).
+
+- Kapasitas dihapus dari katalog/kartu/detail ruangan, form tambah/edit, ringkasan booking dan panduan dashboard. Form simpan menerima tanpa kapasitas: create default 0, edit mempertahankan nilai lama; kolom database tidak dihapus.
+- roleLabel memetakan identifier super_admin menjadi Admin pada header, ringkasan akun, tabel/detail user dan PIC. Judul dashboard, opsi role, nama akun demo untuk seeding baru, serta penyebutan dokumentasi menggunakan Admin. Nama akun existing dan identifier database tetap dipertahankan.
+- Run suite awal: 140 passed, 2 failed karena assertion label role lama. Assertion disesuaikan ke label tampilan dan record fresh setelah perubahan role. Verifikasi ulang seluruh kelompok yang berubah terakhir: **51 passed, 1164 assertions** (AuthenticationTest, UserManagementTest, RoomManagementTest, AuthorizationTest, FrontendSkeletonTest). Test tambahan membuktikan create/edit tanpa kapasitas berhasil dan nilai lama terjaga.
+- Build Vite, view:cache/view:clear dan diff check berhasil. Pencarian kode view tidak menemukan field kapasitas atau label Super Admin. Browser visual desktop/mobile belum diuji langsung karena tool browser tidak tersedia.
+
+## Riwayat sebelum penghapusan kapasitas
+
+2026-09-28 - Tampilan Kelola PIC admin di `/admin/rooms/{id}/pics`.
+
+- Mengganti layout base dengan layout schedule, heading/breadcrumb dan ringkasan room. Panel pilihan checkbox menggantikan multi-select agar penugasan beberapa PIC mudah digunakan di desktop/mobile; panel PIC tersimpan menampilkan nama/email/role/status serta form Lepas PIC. Ada empty state, bantuan penugasan, Simpan, Batal, dan Kembali ke Detail Ruangan.
+- Route, field pic_ids[], CSRF, PUT/DELETE, old input (termasuk kosong), validasi/flash dan backend assignment tetap dipertahankan. Error grup terhubung ke fieldset; akun nonaktif diberi label. Test selected option disesuaikan menjadi checked checkbox.
+- Verifikasi aktual: **24 passed, 581 assertions** pada RoomAssignmentTest, AuthorizationTest, FrontendSkeletonTest. Build Vite, view:cache/view:clear, dan diff check berhasil. Responsivitas, label, fokus keyboard, error dan empty state ditinjau dari kode; visual desktop/mobile serta interaksi keyboard browser belum diuji karena tool browser tidak tersedia.
+
+## Riwayat sebelum tampilan Kelola PIC
+
+2026-09-28 - Tampilan Ruangan Saya PIC aktif di `/pic/rooms`.
+
+- Mengganti tabel skeleton dengan layout schedule, judul/breadcrumb, menu aktif, ringkasan jumlah penugasan, kartu responsif, empty state, pagination 9 room, serta tautan Permintaan Approval dan jadwal per room. Memakai partial kartu existing tanpa aksi booking pribadi.
+- Pic/RoomController membaca managedRooms milik akun login dengan eager loading lantai/fasilitas. Room nonaktif/perawatan tetap tampil dengan status jelas. Tidak mengubah penugasan/master data atau Gate; admin yang membuka URL ini juga hanya melihat penugasan miliknya.
+- Kartu menampilkan nama, lantai, kapasitas, deskripsi, fasilitas, akses dan aturan approval. Pintasan dashboard terkait tidak lagi berlabel pratinjau. Tersisa satu route skeleton: detail room umum.
+- Verifikasi aktual: **40 passed, 641 assertions** pada PicRoomsTest, AuthorizationTest, FrontendSkeletonTest, RoomCatalogTest, HomeAndScheduleTest. Mencakup scope penugasan, pencabutan assignment, escaping, room nonaktif/perawatan, pagination, role, empty state, dan regresi kartu/jadwal.
+- Build Vite berhasil; view:cache/view:clear dan diff check berhasil. Layout grid, wrapping teks, fokus tautan, label status dan empty state diperiksa dari kode. Visual desktop/mobile dan keyboard browser belum diuji langsung karena tool browser tidak tersedia.
+
+## Riwayat sebelum tampilan Ruangan Saya
+
+2026-09-28 - Menu booking pribadi di tampilan PIC dihapus sesuai permintaan pengguna.
+
+- Menghapus Booking Ruangan/My Booking dari sidebar PIC, navigasi fallback, pintasan bersama, dan panel booking pribadi dashboard PIC. Tombol Booking Ruangan pada jadwal hanya tampil untuk pegawai. Dashboard, Approval, Ruangan Saya, Riwayat Approval, dan Jadwal PIC tetap tersedia.
+- Perubahan hanya presentasi navigasi; route/Gate akses pegawai yang diwarisi PIC tetap sesuai keputusan existing. Menu pegawai dan administrasi ruangan admin tetap tersedia.
+- Verifikasi akhir: **15 passed, 439 assertions** (AuthorizationTest dan FrontendSkeletonTest), termasuk ketiadaan kedua menu pada dashboard/ruangan/approval/riwayat/jadwal PIC. Run pertama menemukan pembungkus kondisi terlalu luas yang menyembunyikan menu Dashboard; sudah diperbaiki dan semua test ulang lulus.
+- Build Vite, view:cache/view:clear, dan diff check berhasil. Desktop/mobile memakai sidebar bersama; visual dan keyboard browser belum diuji langsung karena tool browser tidak tersedia.
+
+## Riwayat sebelum perubahan menu PIC
+
+2026-09-28 - Jadwal Ruangan pada beranda sebelum login (DEC-031).
+
+- Bagian Kenali pilihan ruangan/kartu di `/` diganti kalender dan jadwal harian yang memakai view pegawai. Navigasi/CTA menjadi Jadwal Ruangan; booking tetap melalui login.
+- PublicRoomSchedule memakai ulang navigasi bulan, tanggal, filter, warna status, dan refresh RoomSchedule. Pilihan dan booking dibatasi room aktif akses all pada setiap query. Query katalog HomeController dihapus; Gate kalender internal tetap berlaku.
+- Verifikasi aktual: **33 passed, 596 assertions** pada HomeAndScheduleTest, FrontendSkeletonTest, AuthorizationTest, dan ExampleTest. Mencakup privasi, escaping, empty state, navigasi/filter tamu, penolakan filter restricted, dan perubahan akses/nonaktif saat refresh.
+- `npm run build` berhasil setelah eskalasi esbuild spawn EPERM; `php artisan view:cache`, `view:clear`, dan diff check file task berhasil. Layout responsif, kalender scroll lokal, label, tombol keyboard, loading/offline/error memakai view bersama yang ditinjau dari kode. Visual desktop/mobile dan keyboard di browser belum diuji karena tool browser tidak tersedia.
+
+## Riwayat beranda sebelumnya
+
+2026-09-27 - Beranda tamu dan kalender/jadwal room terhubung ke booking.
+
+## Beranda Publik dan Jadwal Nyata
+
+- Review tamu di `/`: layout/gaya dashboard pegawai, Login, pengantar, kartu room publik dari database dengan pagination, empty state. Tombol Login untuk Booking membawa pilihan room melalui session; login user/PIC melanjutkan form, admin ke dashboard role. Tamu tidak melihat jadwal/agenda/pemohon. Kartu bersama diekstrak menjadi partial; komponen katalog pegawai tetap dilindungi Gate.
+- Review `/schedule` atau `/admin/schedule`: kalender server-rendered Livewire, navigasi bulan/Hari Ini/lompat tanggal, filter room, total booking dan warna per tanggal. Daftar harian menampilkan nama room dan jam mulai-selesai WIB, dengan label Pending/terjadwal/berlangsung/lewat. Pending menahan slot; Rejected/Cancelled dikecualikan. Auto refresh 30 detik, manual refresh, offline note, serta kondisi room nonoperasional ditampilkan.
+- Di form booking, panel Jadwal Ruangan Ini berada di atas Detail Pertemuan. Field tanggal bersama memakai Livewire dan memperbarui daftar jam room terpilih. Kalender lengkap terbuka tab baru; detail booking mempunyai tautan ke kalender pada tanggal/room terkait. Tidak membuka identitas/agenda/catatan rapat lain. Tidak mengubah validasi dua jam, otorisasi, idempotensi, atau transaksi konflik saat submit.
+- Verifikasi aktual: **78 passed, 1037 assertions** pada AuthenticationTest, AuthorizationTest, BookingPreparationTest, BookingWorkflowTest, FrontendSkeletonTest, HomeAndScheduleTest, RoomCatalogTest, serta ExampleTest. Termasuk 15 test baru: home/privasi/escaping, login continuation/gagal/admin/room berubah, query invalid, scope/filter kalender, tahun baru/tahun kabisat, WIB dan batas tepat mulai/akhir, pembaruan status, authorization saat refresh, dan pergantian tanggal pada form. Test skeleton disesuaikan karena jadwal sudah aktif (tersisa dua skeleton). Run awal gagal pada hitungan skeleton lama dan satu assertion jam yang juga muncul sebagai batas dua jam; coverage dipindah ke isi daySlots dan seluruh test terakhir lulus.
+- Build Vite berhasil setelah eskalasi esbuild spawn EPERM. `php artisan view:cache`, `view:clear`, dan diff check file task berhasil. Responsivitas, labels/error, keyboard links/buttons, kontras token, empty/loading/offline state ditinjau dari kode; visual browser desktop/mobile serta interaksi keyboard aktual belum diuji karena tool browser tidak tersedia.
+- Verifikasi read-only pada database lokal: **1 booking tersimpan pada 2026-09-29**, dan BookingSchedule membaca **1 slot** pada tanggal tersebut. Tidak membuat/menghapus/mengubah booking atau data room lokal.
+- DEC-030 dan panduan diperbarui. Calendar backend aktif; notifikasi, statistik dashboard, pembatalan/reschedule, dan lifecycle otomatis tetap di luar task. Perubahan migration create_floors_table existing tidak disentuh.
+
+## Riwayat sebelum beranda dan kalender aktif
+
+2026-09-27 - Sepuluh ruangan lokal dan booking/pengajuan serta keputusan PIC aktif.
+
+## Booking Aktif dan Data Ruangan
+
+- Pengguna meminta room menurut lantai dan booking/pengajuan berfungsi. Rincian 1+2+2+2+3 menghasilkan 10; klarifikasi angka 9/nama/PIC belum dijawab, maka mengikuti rincian dengan asumsi disampaikan. Nama sementara: Ruang Rapat Lantai 2 - 1; Lantai 3 - 1/2; Lantai 4 - 1/2; Lantai 6 - 1/2; Selat Malaka I/II/III di lantai 7. Kapasitas/fasilitas belum diisi. Tujuh room terbuka tanpa approval; tiga Selat Malaka terbuka untuk pengajuan dengan approval PIC existing Room PIC Demo.
+- Migration bookings dan BookingRoomsSeeder **sudah dijalankan pada database lokal**, tanpa fresh/reset. Verifikasi database: 10 room aktif, pembagian lantai sesuai rincian, tujuh requires_approval=false dan tiga true, semua access_type=all. Empat room demo lama nonaktif tetapi tidak dihapus; role/password/akun existing tidak diubah. Migration create_floors_table milik pengguna tidak disentuh.
+- Tombol form Livewire aktif: Booking Sekarang langsung Approved atau Ajukan Booking menjadi Pending. Pemeriksaan dan submit memvalidasi server minimal dua jam WIB, urutan waktu, akses/kondisi room, serta bentrok Pending/Approved. Pengajuan berhasil menuju detail record nyata. Lock room/transaksi dan token idempotensi mencegah overlap serta retry ganda. Unit disimpan sebagai snapshot nama.
+- My Booking hanya milik pemohon; admin melihat Semua Booking; PIC melihat pengajuan room penugasannya dan dapat approve/reject dengan alasan wajib untuk penolakan. Admin tidak diberi override. Keputusan kedua ditolak, penolakan melepas slot, keputusan dicatat beserta PIC/waktunya. List memakai eager loading/pagination dan shared table/detail/status.
+- Verifikasi aktual: **123 passed, 2448 assertions** (`php artisan test`). Termasuk 13 BookingWorkflowTest: submit Livewire/redirect/detail nyata, dua jam saat submit, overlap/bersebelahan, Pending/reject/approve, retry idempotent, privasi, assignment PIC, CSRF approval/Livewire, snapshot unit, seeder berulang/distribusi/booking tiap room, dan dua proses bersamaan dengan schema PostgreSQL terisolasi. Tidak meninggalkan booking test pada database lokal.
+- Build Vite berhasil setelah eskalasi karena esbuild spawn EPERM. `php artisan view:cache` dan `view:clear` berhasil. Review responsivitas, label/error, status, empty state/loading dilakukan dari kode; visual browser/keyboard aktual belum dilakukan karena tool browser tidak tersedia.
+- Review aplikasi: `/rooms`, klik kartu, isi waktu minimal dua jam ke depan; hasil di `/my-bookings`. Ruang Selat Malaka masuk `/pic/approvals` bagi PIC penugasan; history di `/pic/approvals/history`. Admin memantau `/admin/bookings`.
+- Batas: belum ada pembatalan/reschedule, Pending expiry/auto Completed, notifikasi, kalender nyata, atau statistik dashboard. Kartu status operasional tidak berarti slot waktu tersedia. Seluruh keputusan implementasi dan asumsi data ada pada DEC-029.
+
+## Riwayat sebelum aktivasi booking
+
+2026-09-27 - Perbaikan UX pilih kartu ruangan dan pemeriksaan rencana minimal dua jam.
+
+## Alur Katalog ke Form Booking (Koreksi Pengguna)
+
+- Review: `/dashboard` berisi tiga kartu ringkasan; `/rooms` katalog lengkap/filter/pagination dengan satu menu Booking Ruangan; klik kartu yang dapat dipilih menuju `/my-bookings/create?room_id={id}`. Seluruh area kartu dapat diklik dengan tautan keyboard berlabel. Form menampilkan identitas/fasilitas ruangan, tanpa dropdown. `/my-bookings` khusus pengajuan/riwayat dengan empty state dan tautan booking baru.
+- Menambah controller persiapan, komponen Livewire BookingPreparationForm, service BookingPreparation, dan config booking. RoomCatalog dipakai ulang untuk dashboard/katalog. Tidak menambah dependency, migration, query di Blade, penyimpanan booking, atau backend approval/kalender.
+- Periksa Rencana aktif untuk validasi server: minimal dua jam dari waktu pemeriksaan, tanggal/jam valid, akhir setelah awal pada hari yang sama, agenda wajib/batas panjang. WIB ditampilkan konsisten; batas presisi menit dibulatkan naik. ID ruangan dikunci; status/akses terkini diperiksa ulang. Isian bertahan ketika validasi gagal; pesan pemeriksaan lama disembunyikan saat input berubah. Pengajuan tetap nonaktif dan tidak memberi kesan ruangan telah dipesan.
+- Room nonaktif/perawatan/unit tidak berhak tidak dapat dipilih; akses langsung menampilkan alasan. Query ID invalid/array/terlalu besar dan ID tidak ditemukan menghasilkan 404; tanpa ID kembali ke katalog. PIC mengikuti akses pegawai; admin hanya membaca katalog tanpa hak pengajuan pribadi.
+- Verifikasi aktual: **32 passed, 944 assertions** (BookingPreparationTest, FrontendSkeletonTest, AuthorizationTest, RoomCatalogTest). Termasuk tepat/kurang dua jam, detik, tanggal lampau/tidak valid, pergantian hari WIB, form lama, perubahan kondisi/akses room, pemalsuan ID Livewire, dan pemisahan katalog/My Booking. Run awal menemukan satu tautan preview menuju form tanpa ID (302); tautan diperbaiki dan seluruh test ulang lulus.
+- `npm run build` berhasil setelah eskalasi esbuild spawn EPERM; `php artisan view:cache` dan `view:clear` berhasil. Responsivitas grid, label/error, keyboard link/focus, offline/loading, dan empty state ditinjau dari kode. Browser visual desktop/mobile dan interaksi keyboard aktual belum diuji karena tool browser tidak tersedia.
+- Risiko yang belum selesai dicatat dalam DEC-028: bentrok dan transaksi booking bersamaan, pengiriman ulang, perubahan izin/status setelah booking. Harus ditangani saat backend submit diaktifkan; pemeriksaan rencana saat ini tidak menjamin ketersediaan.
+- Perubahan existing migration create_floors_table tetap tidak disentuh.
+
+## Riwayat perubahan sebelumnya
+
+2026-09-27 - Penyederhanaan booking user: tanpa jumlah peserta dan halaman Cari Ruangan.
+
+## Booking Ruangan User
+
+- Menghapus halaman/route Cari Ruangan beserta seluruh tautannya; URL lama `/rooms/search` menghasilkan 404 dan tidak ditangkap detail ruangan. Navigasi, shortcut PIC, dan tombol jadwal menuju `/my-bookings/create`.
+- Menu Booking Ruangan tersedia di navbar user dan tombol dashboard. Form mengikuti layout user/schedule, card workspace, grid responsif, label/error/old input, CSRF, dan penanda pratinjau. Menu aktif dibedakan dari My Booking. Submit tetap nonaktif karena backend tahap 5 belum tersedia.
+- Jumlah peserta dihapus dari form, detail bersama, tabel approval admin/PIC, dan panduan dashboard. Kapasitas master ruangan tetap. Konteks dan DEC-027 diperbarui.
+- Verifikasi aktual: FrontendSkeletonTest, AuthorizationTest, RoomCatalogTest **21 passed, 935 assertions**. Build Vite berhasil setelah eskalasi karena sandbox memblokir esbuild (spawn EPERM). `php artisan view:cache` dan `view:clear` berhasil. Desktop/mobile, label/error, fokus, dan empty state ditinjau dari kode; pengujian visual browser/keyboard aktual belum dilakukan karena tool browser tidak tersedia.
+- Diff check file task berhasil; diff check global masih melaporkan blank line EOF pada perubahan existing migration create_floors_table yang tidak disentuh.
+
+## Pembaruan sebelumnya
+
 2026-09-24 - Verifikasi publikasi frontend admin dalam commit terpisah ke origin/main.
 
 ## Verifikasi Publikasi Frontend Admin
@@ -10,7 +118,7 @@
 - `git fetch origin` berhasil setelah eskalasi izin metadata .git. Sebelum commit, main lokal sama dengan origin/main (0 ahead, 0 behind), tidak ada staged change dari pengguna. `git diff --check` berhasil. Pengujian lengkap `php artisan test`: **99 passed, 2620 assertions**.
 - Build Vite dan view:cache/view:clear sudah berhasil pada verifikasi terakhir Detail/Edit Ruangan; tidak diulang karena persiapan publikasi hanya dokumentasi dan pengelompokan commit. Tidak memasukkan .env, vendor, node_modules, atau public/build. Target publikasi: origin/main pada repository ahsanul22/spmt-booking-room; push biasa tanpa force.
 
-## Frontend Detail dan Edit Ruangan Superadmin
+## Frontend Detail dan Edit Ruangan Admin
 
 - Review melalui tombol Detail/Edit pada `/admin/rooms`, atau `/admin/rooms/{id}` dan `/admin/rooms/{id}/edit` dengan ID existing. Keduanya memakai layout schedule, breadcrumb sesuai halaman, heading, dan komponen workspace dari administrasi.
 - Detail menampilkan ringkasan identitas/kode, lantai, kapasitas, kondisi operasional, deskripsi, seluruh fasilitas, PIC, serta unit akses. Badge aktif/nonaktif tersedia untuk record terkait. Akses all tetap menjelaskan bahwa unit tersimpan tidak dipakai; daftar restricted hanya pilihan eksplisit. Edit, Kelola PIC/Akses, Kembali, jadwal pratinjau, dan form status existing tetap aktif.
@@ -27,16 +135,16 @@
 
 ## Frontend Administrasi User, Unit Organisasi, dan Fasilitas
 
-- Review sebagai superadmin di `/admin/users`, `/admin/organizational-units`, dan `/admin/facilities`, termasuk halaman tambah, edit, dan detail masing-masing. Mengikuti layout Jadwal Ruangan/dashboard dengan sidebar aktif, breadcrumb, heading, card putih, tabel yang dapat digeser lokal, empty state, dan pagination. Jumlah record berasal dari paginator Laravel.
+- Review sebagai Admin di `/admin/users`, `/admin/organizational-units`, dan `/admin/facilities`, termasuk halaman tambah, edit, dan detail masing-masing. Mengikuti layout Jadwal Ruangan/dashboard dengan sidebar aktif, breadcrumb, heading, card putih, tabel yang dapat digeser lokal, empty state, dan pagination. Jumlah record berasal dari paginator Laravel.
 - Form aktif mempertahankan action, method, CSRF, nama field, pilihan database, old input, dan aturan validasi. Detail User menyertakan reset password; detail Unit menampilkan unit induk dan turunan; detail Fasilitas menampilkan deskripsi serta aksi status. Password tidak diisi ulang. Tidak mengubah controller, service, route, schema, dependency, atau otorisasi.
 - Menambah komponen `workspace-field`, `workspace-panel`, dan `workspace-status`, memakai heading/empty state existing. Input/select/textarea memiliki label, penanda wajib, aria-invalid, pesan error per field yang terhubung melalui aria-describedby, serta fokus keyboard. Partial feedback User/Unit memakai `form-feedback` existing. CSS baru dibatasi class workspace; komponen field/select/textarea lama untuk modul lain tetap.
 - Permintaan penghapusan Lantai diterapkan pada menu administrasi di layout schedule dan navigation lama, serta shortcut dashboard admin. Karena konteks task frontend dan floor_id masih dibutuhkan ruangan, asumsi yang disampaikan selama klarifikasi belum dijawab adalah menghapus navigasi saja. Data, model, route/backend Lantai, dan atribut lantai pada ruangan tetap; tidak menghapus data atau mengubah schema. Cakupan ini dicatat di DEC-026.
 - Verifikasi aktual: UserManagementTest + OrganizationalUnitTest + FloorFacilityManagementTest + FrontendSkeletonTest + AuthorizationTest **46 passed, 1835 assertions**. Mencakup penyimpanan, validasi/old input, reset password/login, status, hierarki unit, relasi ruangan, CSRF, escaping, dan matriks akses. `npm run build` berhasil setelah eskalasi karena esbuild ditolak sandbox (spawn EPERM). `php artisan view:cache`, `view:clear`, dan `git diff --check` berhasil.
 - Responsivitas layout/form, label input, fokus, empty state, dan error diperiksa dari kode. Visual desktop/mobile, interaksi keyboard aktual, serta pengukuran kontras browser belum diuji karena tool browser tidak tersedia. Perubahan existing Dashboard PIC tidak disentuh. Backend Booking/Approval/Kalender tetap pada tahap sebelumnya.
 
-## Frontend Daftar Ruangan, Semua Booking, dan Approval Superadmin
+## Frontend Daftar Ruangan, Semua Booking, dan Approval Admin
 
-- Review sebagai superadmin di `/admin/rooms`, `/admin/bookings`, dan `/pic/approvals` (URL existing menu Approval Ruangan). Mengikuti layout Jadwal Ruangan/dashboard: sidebar, breadcrumb dan menu aktif, heading, card putih, token warna, serta mobile navigation existing.
+- Review sebagai Admin di `/admin/rooms`, `/admin/bookings`, dan `/pic/approvals` (URL existing menu Approval Ruangan). Mengikuti layout Jadwal Ruangan/dashboard: sidebar, breadcrumb dan menu aktif, heading, card putih, token warna, serta mobile navigation existing.
 - Daftar Ruangan memakai kartu responsif berisi data Laravel: nama/kode, lantai, kapasitas, fasilitas, akses, kebutuhan approval, status operasional dan aktif. Navigasi tambah/detail/edit/PIC/akses, form status POST/PATCH + CSRF, flash/error, serta pagination tetap aktif. Status operasional tidak menyatakan ketersediaan jadwal. Halaman form/detail di luar tiga halaman daftar tetap existing.
 - Semua Booking memakai panel filter berlabel, aksi filter nonaktif, tautan pratinjau detail, dan tabel saat data tersedia. Approval admin memakai partial terpisah dengan daftar permintaan, empty state, dan panduan alur. Cabang PIC tetap memakai tampilan existing; akses admin ke route PIC tidak menambah kewenangan override. Tidak menambah backend Booking/Approval, route, dependency, query Blade, atau data dummy.
 - Komponen `workspace-heading` dan `workspace-empty` dipakai ulang. CSS form/tabel/feedback dibatasi class workspace; layout schedule hanya disesuaikan penanda menu aktif. Empty state berada di luar tabel agar terbaca utuh pada mobile; tabel berisi data dapat digeser lokal dengan fokus keyboard. Perubahan Dashboard PIC yang sudah ada di workspace tidak disentuh.
@@ -97,7 +205,7 @@ Catatan di bawah adalah implementasi awal, disempurnakan oleh revisi alur dan na
 - Scope hanya return view: Blade, URL/nama route, authorization, query/proses master data existing tetap. Booking/detail dan jadwal masih pratinjau; belum menambah backend, data, atau model binding booking. FrontendSkeletonController kini menangani 11 route non-admin; total halaman pratinjau yang diuji tetap 14.
 - Hasil aktual: FrontendSkeletonTest + AuthorizationTest **15 passed, 935 assertions**; Pint empat file PHP terkait berhasil; route list mengonfirmasi semua action admin ada dalam namespace Admin. Build/browser tidak diulang karena tidak ada perubahan tampilan atau aset.
 
-## Frontend Dashboard Super Admin
+## Frontend Dashboard Admin
 
 - Verifikasi setelah pemisahan controller admin (2026-09-23): AuthenticationTest + AuthorizationTest **25 passed, 427 assertions**; Pint tiga file PHP terkait berhasil; route list mengonfirmasi `Admin\DashboardController@index` dengan auth + access-admin; `git diff --check` berhasil. Build tidak diulang karena perapian hanya controller/route dan dokumentasi, tanpa perubahan aset atau Blade.
 - Review di `/admin/dashboard` setelah login admin. View `admin/dashboard.blade.php` berisi akses cepat master data, tombol Tambah Ruangan aktif, ringkasan/aktivitas booking pratinjau, panel informasi, dan identitas akun dari Laravel. Tidak menambah statistik palsu, query modul, endpoint, dependency, atau backend tahap 5-7.
@@ -228,7 +336,7 @@ Tahap 1, 2A, 2B, 3, dan 4A-4E selesai. Pengembangan frontend tim aktif per halam
 - Akun nonaktif ditolak sebelum login; session/Remember Me akun yang dinonaktifkan juga dihentikan. Password salah tidak mengungkap status akun.
 - Route login memakai guest, dashboard/logout memakai auth; form POST memakai CSRF. Sejak Tahap 2B, redirect dashboard mengikuti role. Registrasi publik dan route profil/reset password/verifikasi email tidak tersedia.
 - Helper schema test dipindahkan ke `tests/PostgresTestCase.php` agar dipakai bersama oleh test fondasi dan authentication. Panduan menjalankan tersedia di `docs/AUTHENTICATION.md`.
-- Tahap 2B: empat Gate terpusat, middleware `can` pada kelompok route, dashboard Pegawai/PIC/Super Admin, navigasi `@can`, halaman 403, dan sebelas halaman placeholder melalui satu view bersama.
+- Tahap 2B: empat Gate terpusat, middleware `can` pada kelompok route, dashboard Pegawai/PIC/Admin, navigasi `@can`, halaman 403, dan sebelas halaman placeholder melalui satu view bersama.
 - Login dan guest redirect memakai mapping dashboard yang sama. Role tidak dikenal ditolak dengan 403. Unit organisasi hanya ditampilkan; tidak dipakai untuk authorization.
 - PIC dapat mengakses halaman pegawai; admin dapat mengakses administrasi, informasi umum, dan placeholder PIC tanpa mengubah assignment `room_pics`. Rincian route dan akses ada di `docs/AUTHORIZATION.md`.
 - Penjelasan percakapan tentang `can`, nama izin `access-employee`, awalan nama route `admin.`/`pic.`, pemisahan auth.php, dan alasan tidak membutuhkan NPM disimpan di `docs/AUTHORIZATION.md` untuk rujukan berikutnya.

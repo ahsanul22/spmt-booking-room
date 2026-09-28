@@ -1,26 +1,11 @@
-@extends(auth()->user()->role === \App\Models\User::ROLE_USER ? 'layouts.user' : 'layouts.base')
-@section('title', 'Daftar Ruangan')
+@extends(auth()->user()->role === \App\Models\User::ROLE_USER ? 'layouts.user' : 'layouts.schedule')
+@section('title', 'Booking Ruangan')
+@section('breadcrumb', 'Booking Ruangan')
 @section('content')
-    <h1>Daftar Ruangan</h1>
-    <x-skeleton-notice />
-    <a href="{{ route('rooms.show', 'preview') }}">Pratinjau Detail Ruangan</a>
-    <x-table :headers="['Nama Ruangan', 'Lantai', 'Kapasitas', 'Status Operasional', 'Akses', 'Approval', 'Aksi']">
-        @forelse($rooms ?? [] as $item)
-            <tr>
-                <td>{{ $item->name }}</td>
-                <td>{{ $item->floor?->name ?? '—' }}</td>
-                <td>{{ $item->capacity }}</td>
-                <td>{{ $item->status }}</td>
-                <td>{{ $item->access_type }}</td>
-                <td>{{ $item->requires_approval ? 'Ya' : 'Tidak' }}</td>
-                <td>
-                    <a href="{{ route('rooms.show', $item->id) }}">Detail</a>
-                </td>
-            </tr>
-        @empty
-            <tr>
-                <td colspan="7">Belum ada data ruangan.</td>
-            </tr>
-        @endforelse
-    </x-table>
+    <div class="mb-7 flex flex-wrap items-center justify-between gap-4">
+        <div><p class="mb-2 text-xs font-semibold text-primary">Langkah 1 dari 2 &middot; Pilih ruangan</p><h1 class="text-3xl font-bold text-primaryDark">Booking Ruangan</h1><p class="mt-3 text-sm leading-6 text-slate-600">Pilih kartu ruangan, lalu lengkapi waktu dan agenda. Tidak perlu memilih ruangan lagi.</p></div>
+        @can('access-employee')<a href="{{ route('my-bookings.index') }}" class="workspace-button-secondary">Lihat My Booking</a>@endcan
+    </div>
+    <div class="workspace-notice">Rencanakan rapat minimal {{ config('booking.minimum_notice_hours') }} jam sebelumnya. Semua waktu menggunakan WIB. Ketersediaan diperiksa kembali saat pengajuan dikirim.</div>
+    <livewire:room-catalog />
 @endsection

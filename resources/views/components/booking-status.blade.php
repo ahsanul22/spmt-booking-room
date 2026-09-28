@@ -1,0 +1,2 @@
+@props(['status'])
+<span @class(['inline-flex rounded-full border px-3 py-1 text-xs font-semibold', 'border-secondaryLight bg-secondaryLight/20 text-primaryDark' => in_array($status, ['pending', 'approved']), 'border-slate-200 bg-background text-slate-600' => ! in_array($status, ['pending', 'approved'])])>{{ match($status) { 'approved' => 'Approved', 'pending' => 'Pending', 'rejected' => 'Rejected', 'cancelled' => 'Cancelled', 'completed' => 'Completed', default => $status } }}</span>

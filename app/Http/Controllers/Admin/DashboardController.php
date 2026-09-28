@@ -12,7 +12,7 @@ class DashboardController extends Controller
     {
         return view('admin.dashboard', [
             'user' => $request->user()->load('organizationalUnit'),
-            'title' => 'Dashboard Super Admin',
+            'title' => 'Dashboard Admin',
         ]);
     }
 }

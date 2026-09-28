@@ -34,6 +34,22 @@ class RoomManagementTest extends PostgresTestCase
         ], $overrides);
     }
 
+    public function test_room_forms_work_without_capacity_and_preserve_existing_values(): void
+    {
+        $this->admin();
+        $data = $this->data();
+        unset($data['capacity']);
+        $this->get($this->url('create'))->assertOk()->assertDontSee('name="capacity"', false);
+        $this->post($this->url('store'), $data)->assertSessionHasNoErrors();
+        $room = Room::where('code', 'TEST-ROOM')->firstOrFail();
+        $this->assertSame(0, $room->capacity);
+        $room->update(['capacity' => 25]);
+        $this->get($this->url('edit', $room))->assertOk()->assertDontSee('name="capacity"', false);
+        $this->put($this->url('update', $room), $data)->assertSessionHasNoErrors();
+        $this->assertSame(25, $room->fresh()->capacity);
+        $this->get($this->url('show', $room))->assertOk()->assertDontSee('Kapasitas');
+    }
+
     public function test_all_management_endpoints_require_authentication_and_super_admin(): void
     {
         $room = Room::firstOrFail();

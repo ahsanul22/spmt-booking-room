@@ -1,3 +1,11 @@
+> Pembaruan DEC-033: kapasitas dihapus dari semua tampilan/form ruangan. Role administratif ditampilkan sebagai Admin; identifier database tetap kompatibel dengan akun existing.
+
+> Pembaruan DEC-032: `/pic/rooms` aktif dengan kartu room penugasan, pagination, empty state, dan tautan jadwal. Memakai layout schedule serta partial kartu bersama dalam mode managed. Tersisa satu route skeleton: detail room umum.
+
+> Pembaruan DEC-031: kartu publik pada `/` diganti Jadwal Ruangan memakai PublicRoomSchedule dan view kalender pegawai. Tamu hanya membaca okupansi room aktif akses all; booking tetap memerlukan login.
+
+> Pembaruan DEC-030: `/` adalah beranda tamu bergaya dashboard pegawai dengan kartu publik dan Login untuk Booking. Kalender `/schedule` dan `/admin/schedule` memakai RoomSchedule Livewire dengan data tersimpan, warna status waktu, filter room, serta daftar jam. BookingSchedule juga memasok jadwal room di atas form booking. Tersisa dua route skeleton: detail room umum dan ruangan PIC. Kalender lama JavaScript dihapus; schedule.js hanya menangani sidebar mobile. Notifikasi/statistik/lifecycle otomatis tetap belum tersedia. Catatan di bawah merupakan riwayat.
+
 # Frontend Skeleton â€” Tahap 3
 
 Aturan frontend aktif ada di [FRONTEND_GUIDE.md](FRONTEND_GUIDE.md) dan `AGENTS.md`: gunakan Blade + Tailwind/Vite, palet proyek, dan Jadwal Ruangan sebagai acuan visual. Batasan HTML sederhana untuk testing pada Tahap 3 sudah digantikan. Bagian Tahap 3/4 di bawah disimpan sebagai riwayat; status backend terkini mengikuti `PROGRESS.md`.
@@ -20,7 +28,7 @@ Route `admin.rooms.pics` dan `.access` (GET) kini aktif dengan binding numerik/4
 
 ## Pembaruan Tahap 4D
 
-Room Management Super Admin aktif melalui `Admin/RoomController`, `SaveRoomRequest`, dan `RoomService`. Index menampilkan lantai, kapasitas, akses, approval, status operasional/aktif, serta fasilitas. Create/edit memuat pilihan lantai/fasilitas database dan menyimpan room beserta pivot secara atomik. Semua checkbox fasilitas dapat dikosongkan. Status operasional melalui edit; aktif/nonaktif melalui edit atau tombol index/detail. Form memakai CSRF, error, old input, dan flash.
+Room Management Admin aktif melalui `Admin/RoomController`, `SaveRoomRequest`, dan `RoomService`. Index menampilkan lantai, kapasitas, akses, approval, status operasional/aktif, serta fasilitas. Create/edit memuat pilihan lantai/fasilitas database dan menyimpan room beserta pivot secara atomik. Semua checkbox fasilitas dapat dikosongkan. Status operasional melalui edit; aktif/nonaktif melalui edit atau tombol index/detail. Form memakai CSRF, error, old input, dan flash.
 
 Prefix `admin.rooms.`: GET index/create/show/edit, POST store, PUT/PATCH update, PATCH status (`/{room}/status`), semuanya auth + access-admin, tanpa DELETE. Dua route pics/access tetap skeleton; hanya tautan kembali diperbaiki ke index. Tersisa 16 route skeleton. Room user/PIC, assignment PIC, restricted unit access, Booking, dan Approval belum aktif. `RoomManagementTest` memverifikasi HTTP, database, rendering, validasi, pivot, status, CSRF, serta rollback transaksi.
 
@@ -119,7 +127,7 @@ Tidak ada query modul di controller atau Blade dan tidak ada data dummy permanen
 | Approval | `$approvals` / `$approval` |
 | Jadwal | `$schedules`, `$rooms`, `$floors` |
 
-Objek booking/approval untuk presentasi menyediakan `id`, `applicant.name`, `organizationalUnit.name`, `room.name`, `agenda`, `date`, `start_time`, `end_time`, `participant_count`, `notes`, `status`, `rejection_reason`; riwayat approval juga `decided_at`. Backend nanti wajib memasok record yang sudah diotorisasi serta eager-load relasi yang ditampilkan. Data pilihan dan ID terpilih berasal dari backend, bukan aturan bisnis di view.
+Objek booking/approval untuk presentasi menyediakan `id`, `applicant.name`, `organizationalUnit.name`, `room.name`, `agenda`, `date`, `start_time`, `end_time`, `notes`, `status`, `rejection_reason`; riwayat approval juga `decided_at`. Backend nanti wajib memasok record yang sudah diotorisasi serta eager-load relasi yang ditampilkan. Data pilihan dan ID terpilih berasal dari backend, bukan aturan bisnis di view.
 
 ## Form dan Placeholder
 

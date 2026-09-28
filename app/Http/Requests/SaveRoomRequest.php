@@ -26,7 +26,7 @@ class SaveRoomRequest extends FormRequest
             'name' => ['required', 'string', 'max:255'],
             'code' => ['nullable', 'string', 'max:255', Rule::unique('rooms')->ignore($this->route('room'))],
             'floor_id' => ['required', 'integer', 'exists:floors,id'],
-            'capacity' => ['required', 'integer', 'between:0,2147483647'],
+            'capacity' => ['sometimes', 'integer', 'between:0,2147483647'],
             'description' => ['nullable', 'string', 'max:5000'],
             'access_type' => ['required', Rule::in(['all', 'restricted'])],
             'requires_approval' => ['required', 'boolean'],

@@ -38,7 +38,7 @@
                 <h2 id="management-title" class="text-lg font-bold text-primaryDark">Kelola Workspace</h2>
                 <p class="mt-1 text-xs leading-5 text-slate-600">Akses cepat ke data dan pengaturan ruang rapat.</p>
                 <div class="mt-5 grid gap-3 sm:grid-cols-2">
-                    <x-dashboard-shortcut :href="route('admin.rooms.index')" title="Kelola Ruangan" icon="room">Kapasitas, status, PIC, dan akses ruangan.</x-dashboard-shortcut>
+                    <x-dashboard-shortcut :href="route('admin.rooms.index')" title="Kelola Ruangan" icon="room">Status, PIC, dan akses ruangan.</x-dashboard-shortcut>
                     <x-dashboard-shortcut :href="route('admin.users.index')" title="Kelola User">Akun pegawai, role, dan status akses.</x-dashboard-shortcut>
                     <x-dashboard-shortcut :href="route('admin.organizational-units.index')" title="Unit Organisasi">Susunan direktorat, divisi, dan departemen.</x-dashboard-shortcut>
                     <x-dashboard-shortcut :href="route('admin.facilities.index')" title="Kelola Fasilitas">Perlengkapan pendukung ruang rapat.</x-dashboard-shortcut>
@@ -55,7 +55,7 @@
                     <span class="mx-auto flex h-14 w-14 items-center justify-center rounded-2xl bg-background text-primary"><x-schedule-icon name="clock" class="h-7 w-7" /></span>
                     <h3 class="mt-4 text-sm font-semibold text-primaryDark">Aktivitas booking belum tersedia</h3>
                     <p class="mx-auto mt-2 max-w-sm text-xs leading-6 text-slate-600">Ringkasan pengajuan dan status rapat akan muncul setelah data booking terhubung.</p>
-                    <a href="{{ route('admin.bookings.index') }}" class="mt-5 inline-flex items-center gap-2 text-sm font-semibold text-primary hover:underline">Pratinjau Semua Booking<x-schedule-icon name="arrow" class="h-4 w-4" /></a>
+                    <a href="{{ route('admin.bookings.index') }}" class="mt-5 inline-flex items-center gap-2 text-sm font-semibold text-primary hover:underline">Lihat Semua Booking<x-schedule-icon name="arrow" class="h-4 w-4" /></a>
                 </div>
             </section>
         </div>
@@ -73,7 +73,7 @@
                 <h2 id="account-title" class="font-bold text-primaryDark">Akun Anda</h2>
                 <dl class="mt-5 space-y-4 text-sm">
                     <div><dt class="text-xs text-slate-500">Login sebagai</dt><dd class="mt-1 break-words font-semibold">{{ $user->name }}</dd></div>
-                    <div><dt class="text-xs text-slate-500">Role</dt><dd class="mt-1">{{ $user->role }}</dd></div>
+                    <div><dt class="text-xs text-slate-500">Role</dt><dd class="mt-1">{{ $user->roleLabel() }}</dd></div>
                     <div><dt class="text-xs text-slate-500">Unit Kerja</dt><dd class="mt-1 break-words">{{ $user->organizationalUnit?->name ?? 'Belum ditentukan' }}</dd></div>
                 </dl>
             </section>

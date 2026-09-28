@@ -15,7 +15,7 @@
             @forelse($rooms ?? [] as $item)
                 @include('admin.rooms._card', ['item' => $item])
             @empty
-                <div class="col-span-full rounded-2xl border border-slate-200 bg-surface"><x-workspace-empty title="Belum ada data ruangan." description="Tambahkan ruangan pertama, lalu lengkapi kapasitas, fasilitas, PIC, dan aturan aksesnya." /></div>
+                <div class="col-span-full rounded-2xl border border-slate-200 bg-surface"><x-workspace-empty title="Belum ada data ruangan." description="Tambahkan ruangan pertama, lalu lengkapi fasilitas, PIC, dan aturan aksesnya." /></div>
             @endforelse
         </div>
         @if($rooms->hasPages())<div class="mt-6 rounded-2xl border border-slate-200 bg-surface p-5 sm:px-6">{{ $rooms->links() }}</div>@endif

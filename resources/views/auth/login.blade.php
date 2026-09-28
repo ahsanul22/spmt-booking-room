@@ -53,6 +53,9 @@
                             </ul>
                         </div>
                     @endif
+                    @if($selectedRoom ?? null)
+                        <p class="mt-5 rounded-xl border border-secondaryLight bg-secondaryLight/20 p-4 text-sm leading-6 text-primaryDark">Setelah login, lanjutkan booking <strong>{{ $selectedRoom->name }}</strong>.</p>
+                    @endif
                     <form method="POST" action="{{ route('login') }}" class="mt-7 space-y-5">
                         @csrf
                         <div>

@@ -59,21 +59,17 @@ class FrontendSkeletonTest extends PostgresTestCase
     public function test_empty_tables_and_forms_expose_expected_structure(): void
     {
         $this->actingAs(User::where('role', 'room_pic')->firstOrFail());
-        $this->get(route('rooms.index'))->assertSee('Belum ada data ruangan.')->assertDontSee('Kelola PIC');
-        $this->get(route('rooms.search'))->assertSee('Belum ada hasil pencarian.');
+        $this->get(route('rooms.index'))->assertSee('Pilih Ruangan')->assertDontSee('Kelola PIC');
+        $this->assertFalse(Route::has('rooms.search'));
+        $this->get('/rooms/search')->assertNotFound();
         $this->get(route('my-bookings.index'))->assertSee('Belum ada booking.')
-            ->assertSee(['Semua', 'Pending', 'Approved', 'Completed', 'Cancelled', 'Rejected']);
-        $this->get(route('pic.rooms.index'))->assertSee('Belum ada ruangan yang ditugaskan.');
+            ->assertSee('Pilih ruangan untuk rapat');
+        $this->get(route('pic.rooms.index'))->assertOk()->assertSee('ruangan ditugaskan kepada Anda');
         $this->get(route('pic.approvals.index'))->assertSee('Belum ada permintaan approval.');
         $this->get(route('pic.approvals.history'))->assertSee('Belum ada riwayat approval.');
         $this->get(route('schedule.index'))->assertSee('Belum ada jadwal ruangan.');
-        $this->get(route('my-bookings.create'))->assertSee([
-            'name="room_id"', 'name="date"', 'name="start_time"', 'name="end_time"',
-            'name="participant_count"', 'name="agenda"', 'name="notes"',
-            'onsubmit="event.preventDefault()"', 'type="button" disabled',
-        ], false);
-        $this->get(route('pic.approvals.show', 'preview'))
-            ->assertSee('name="rejection_reason"', false)->assertSee(['Approve', 'Reject']);
+        $this->get(route('my-bookings.create'))->assertRedirect(route('rooms.index'));
+        $this->get(route('pic.approvals.show', 'preview'))->assertNotFound();
 
         $this->actingAs(User::where('role', 'super_admin')->firstOrFail());
         $this->get(route('admin.users.create'))->assertSee([
@@ -81,7 +77,7 @@ class FrontendSkeletonTest extends PostgresTestCase
             'name="organizational_unit_id"', 'name="role"', 'name="is_active"',
         ], false);
         $this->get(route('admin.rooms.create'))->assertSee([
-            'name="name"', 'name="code"', 'name="floor_id"', 'name="capacity"',
+            'name="name"', 'name="code"', 'name="floor_id"',
             'name="description"', 'name="access_type"', 'name="requires_approval"',
             'name="status"', 'name="is_active"',
         ], false)->assertSee('name="facility_ids[]"', false);
@@ -101,7 +97,7 @@ class FrontendSkeletonTest extends PostgresTestCase
             ->assertSee($room->name)->assertDontSee($room->name, false)
             ->assertSee($room->floor->name)
             ->assertSee(route('admin.rooms.pics', $room->id), false);
-        $this->view('user.rooms.index', ['rooms' => collect([$room])])
+        $this->get(route('rooms.index'))
             ->assertSee($room->name)->assertDontSee('Belum ada data ruangan.');
     }
 
@@ -126,8 +122,7 @@ class FrontendSkeletonTest extends PostgresTestCase
         $pages = [];
         foreach (Route::getRoutes() as $route) {
             // Admin preview pages now have module controllers, but remain placeholders.
-            if (! str_starts_with($route->getActionName(), FrontendSkeletonController::class)
-                && ! in_array($route->getName(), ['admin.bookings.index', 'admin.bookings.show', 'admin.schedule.index'], true)) {
+            if (! str_starts_with($route->getActionName(), FrontendSkeletonController::class)) {
                 continue;
             }
             $abilities = array_values(array_filter($route->middleware(), fn ($middleware) => str_starts_with($middleware, 'can:')));
@@ -139,7 +134,7 @@ class FrontendSkeletonTest extends PostgresTestCase
                 'ability' => substr($abilities[0], 4),
             ];
         }
-        $this->assertCount(14, $pages);
+        $this->assertCount(1, $pages);
 
         return $pages;
     }

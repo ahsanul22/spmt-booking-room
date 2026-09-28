@@ -5,8 +5,6 @@
     <dd>{{ data_get($room ?? null, 'code') ?? '—' }}</dd>
     <dt>Lantai</dt>
     <dd>{{ data_get($room ?? null, 'floor.name') ?? '—' }}</dd>
-    <dt>Kapasitas</dt>
-    <dd>{{ data_get($room ?? null, 'capacity') ?? '—' }}</dd>
     <dt>Deskripsi</dt>
     <dd>{{ data_get($room ?? null, 'description') ?? '—' }}</dd>
     <dt>Status Operasional</dt>

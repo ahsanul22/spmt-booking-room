@@ -14,7 +14,7 @@
                     <div><dt>Nama</dt><dd>{{ $userRecord->name }}</dd></div>
                     <div><dt>Email</dt><dd>{{ $userRecord->email }}</dd></div>
                     <div><dt>Unit Kerja</dt><dd>{{ $userRecord->organizationalUnit?->name ?? 'Tanpa Unit Kerja' }}</dd></div>
-                    <div><dt>Role</dt><dd>{{ $userRecord->role }}</dd></div>
+                    <div><dt>Role</dt><dd>{{ $userRecord->roleLabel() }}</dd></div>
                 </dl>
                 <p class="mt-5 text-sm text-slate-600">Status Aktif: {{ $userRecord->is_active ? 'Aktif' : 'Nonaktif' }}</p>
                 <div class="mt-6 flex flex-wrap items-center gap-3 border-t border-slate-100 pt-5">

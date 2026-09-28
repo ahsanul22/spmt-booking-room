@@ -53,7 +53,7 @@ class FoundationSeeder extends Seeder
                 ]);
             }
 
-            $this->user('admin@example.test', 'Super Admin Demo', User::ROLE_SUPER_ADMIN, $directorate);
+            $this->user('admin@example.test', 'Admin Demo', User::ROLE_SUPER_ADMIN, $directorate);
             $pic = $this->user('pic@example.test', 'Room PIC Demo', User::ROLE_ROOM_PIC, $division);
             $this->user('pegawai@example.test', 'Pegawai Demo', User::ROLE_USER, $department);
 

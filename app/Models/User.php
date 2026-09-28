@@ -21,6 +21,11 @@ class User extends Authenticatable
 
     public const ROLE_SUPER_ADMIN = 'super_admin';
 
+    public function roleLabel(): string
+    {
+        return $this->role === self::ROLE_SUPER_ADMIN ? 'Admin' : str_replace('_', ' ', $this->role);
+    }
+
     public function dashboardRouteName(): string
     {
         return match ($this->role) {

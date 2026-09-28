@@ -12,7 +12,7 @@ Buka `/schedule` (pegawai/PIC) atau `/admin/schedule` (admin) setelah login. Pel
 | `resources/views/layouts/schedule.blade.php` | Sidebar, header akun, navigasi mobile, footer |
 | `resources/views/components/schedule-icon.blade.php` | Ikon SVG lokal |
 | `resources/css/app.css` | Entry Tailwind, komponen navigasi, fokus keyboard |
-| `resources/js/schedule.js` | Interaksi kalender dan menu mobile |
+| `resources/js/schedule.js` | Menu sidebar mobile; kalender kini Livewire RoomSchedule (DEC-030) |
 | `tailwind.config.js` | Sumber token warna dan font |
 
 Ikuti gaya visual referensi, bukan isi kalendernya. Layout jadwal saat ini mempunyai judul, breadcrumb, dan menu aktif khusus jadwal. Jangan langsung mewariskannya pada halaman lain tanpa menyesuaikan bagian tersebut. Jika perlu dipakai bersama, ekstrak/parameterkan bagian yang diperlukan dalam lingkup task, pertahankan tampilan jadwal, dan catat file bersama yang berubah. Tidak perlu migrasi semua halaman sekaligus.
@@ -29,7 +29,8 @@ Ikuti gaya visual referensi, bukan isi kalendernya. Layout jadwal saat ini mempu
 | surface | `#FFFFFF` | Card, header, form |
 | muted | `#A2A2A6` | Elemen nonaktif/dekoratif; hindari teks kecil penting di atas putih |
 | text | `#222424` | Teks utama |
-| danger | `#D4302C` | Error, aksi destruktif |
+| danger | `#D4302C` | Error, aksi destruktif, jadwal sedang berlangsung |
+| warning / warningDark | `#E5A000` / `#775000` | Jadwal Pending; token kuning sesuai DEC-030 |
 
 Gunakan `bg-primary`, `text-primaryDark`, `bg-surface`, `border-secondaryLight`, dan token lainnya, bukan hex berulang. Neutral slate yang sudah dipakai referensi boleh untuk border dan teks pendukung. Status harus memiliki label teks, bukan warna saja. Periksa kontras teks; opacity dan warna aksen tidak otomatis aman untuk semua ukuran teks.
 
@@ -49,7 +50,7 @@ Master data admin sampai assignment PIC/unit sudah aktif. Baca controller, Form 
 
 Menu/aksi mengikuti `@can` existing; keamanan server tetap ditangani middleware/Gate. Jangan mengganti authorization dengan penyembunyian tombol di JavaScript. Jangan menambah query database di Blade atau mengubah schema, role, dan kebijakan bisnis untuk keperluan styling.
 
-Booking, Approval, kalender dengan data nyata, dan dashboard statistik belum memiliki backend lengkap. Gunakan empty state dan penanda pratinjau, pertahankan aksi tulis yang belum tersedia sebagai nonaktif. Kalender kosong tidak berarti ruangan tersedia. Jangan membuat data bisnis contoh permanen, statistik palsu, atau endpoint baru hanya untuk mengisi desain.
+Booking/pengajuan dan approve/reject PIC sudah aktif sesuai DEC-029; pertahankan submit, validasi server, CSRF, authorization, idempotensi, status, dan pagination. Kalender data nyata sudah aktif sesuai DEC-030; pertahankan Gate, privasi field jadwal, waktu WIB, dan sinkronisasi tanggal form. Statistik, notifikasi, pembatalan, serta lifecycle lanjutan belum tersedia. Hanya modul yang belum aktif memakai penanda pratinjau dan aksi tulis nonaktif. Kalender kosong tidak berarti ruangan tersedia. Jangan membuat data bisnis contoh permanen, statistik palsu, atau endpoint baru hanya untuk mengisi desain.
 
 ## Alur kerja CLI
 

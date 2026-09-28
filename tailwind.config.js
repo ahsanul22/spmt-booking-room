@@ -7,7 +7,7 @@ module.exports = {
   ],
   theme: {
     extend: {
-      colors: { primary: '#216EAD', primaryDark: '#0E336A', secondary: '#5EA9D8', secondaryLight: '#AFCFE4', background: '#F2F4F5', surface: '#FFFFFF', muted: '#A2A2A6', text: '#222424', danger: '#D4302C' },
+      colors: { primary: '#216EAD', primaryDark: '#0E336A', secondary: '#5EA9D8', secondaryLight: '#AFCFE4', background: '#F2F4F5', surface: '#FFFFFF', muted: '#A2A2A6', text: '#222424', danger: '#D4302C', warning: '#E5A000', warningDark: '#775000' },
       fontFamily: { sans: ['Segoe UI', 'Arial', 'sans-serif'] },
     },
   },

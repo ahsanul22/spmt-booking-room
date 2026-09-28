@@ -16,7 +16,7 @@
                     <td><span class="font-semibold text-primaryDark">{{ $item->name }}</span></td>
                     <td>{{ data_get($item, 'email') ?? '—' }}</td>
                     <td>{{ data_get($item, 'organizationalUnit.name') ?? '—' }}</td>
-                    <td>{{ data_get($item, 'role') ?? '—' }}</td>
+                    <td>{{ $item->roleLabel() }}</td>
                     <td><x-workspace-status :active="$item->is_active" /></td>
                     <td><div class="workspace-record-actions">
                         <a href="{{ route('admin.users.show', $item->id) }}">Detail<span class="sr-only"> {{ $item->name }}</span></a>

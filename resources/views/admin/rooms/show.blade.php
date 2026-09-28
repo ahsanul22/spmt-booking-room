@@ -14,9 +14,8 @@
             </div>
             <x-workspace-status :active="$room->is_active" />
         </div>
-        <dl class="mt-6 grid gap-5 border-t border-secondaryLight/50 pt-5 sm:grid-cols-3">
+        <dl class="mt-6 grid gap-5 border-t border-secondaryLight/50 pt-5 sm:grid-cols-2">
             <div><dt class="text-xs text-slate-500">Lantai</dt><dd class="mt-2 break-words font-semibold text-primaryDark">{{ $room->floor?->name ?? 'Belum ditentukan' }}</dd></div>
-            <div><dt class="text-xs text-slate-500">Kapasitas</dt><dd class="mt-1 text-primaryDark"><span class="text-3xl font-bold tabular-nums">{{ $room->capacity }}</span> <span class="text-sm">orang</span></dd></div>
             <div><dt class="text-xs text-slate-500">Status Operasional</dt><dd class="mt-2 font-semibold text-primaryDark" title="{{ $room->status }}">{{ ['available' => 'Operasional', 'maintenance' => 'Dalam perawatan', 'unavailable' => 'Tidak dapat digunakan'][$room->status] ?? $room->status }}</dd></div>
         </dl>
     </section>

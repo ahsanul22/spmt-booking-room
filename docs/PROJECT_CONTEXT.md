@@ -16,7 +16,7 @@ Website internal perusahaan untuk membantu pegawai:
 - Mengelola approval untuk ruang tertentu.
 - Melihat status dan riwayat booking.
 
-Sistem hanya digunakan untuk kebutuhan internal perusahaan.
+Sistem digunakan untuk kebutuhan internal perusahaan. Beranda sebelum login memperkenalkan sistem dan menampilkan jadwal ruangan publik aktif (DEC-031); booking, jadwal internal lengkap, dan pengajuan tetap memerlukan akun pegawai.
 
 ## Scope yang Tidak Dikerjakan Saat Ini
 
@@ -55,7 +55,7 @@ PIC dapat:
 
 PIC tidak mengelola seluruh master data sistem.
 
-### Super Admin
+### Admin
 
 Dapat:
 
@@ -70,13 +70,12 @@ Dapat:
 
 ## Ruangan
 
-Untuk data development, gedung diasumsikan memiliki Lantai 1 sampai Lantai 8. Jangan menganggap semua lantai pasti mempunyai ruang rapat.
+Gedung memiliki master Lantai 1 sampai Lantai 8. Data ruangan sesuai rincian pengguna: lantai 2 satu, lantai 3 dua, lantai 4 dua, lantai 6 dua, lantai 7 tiga. Total rincian 10, masih menunggu koreksi atas angka awal 9. Lantai 7 sementara Selat Malaka I/II/III. Ruangan lain terbuka untuk seluruh pegawai tanpa approval; Selat Malaka menerima pengajuan dengan approval PIC (DEC-029).
 
 Informasi ruang minimal nantinya:
 
 - Nama.
 - Lantai.
-- Kapasitas.
 - Fasilitas.
 - Status operasional.
 - Aturan akses.
@@ -101,19 +100,19 @@ Setiap ruang memiliki pengaturan `requires_approval = true/false`.
 
 Validasi booking tetap berlaku untuk kedua alur.
 
-## Pencarian Ruangan
+## Pemilihan Ruangan
 
-User sebaiknya memasukkan tanggal, jam mulai, jam selesai, dan jumlah peserta terlebih dahulu. Sistem kemudian menampilkan ruangan yang sesuai dengan mempertimbangkan:
+Menu Booking Ruangan berisi katalog kartu ruangan. User memilih satu kartu, lalu mengisi tanggal, waktu, dan agenda tanpa dropdown ruangan. Dashboard menampilkan ringkasan tiga kartu dari katalog yang sama. My Booking khusus pengajuan dan riwayat pribadi. Halaman Cari Ruangan dihapus sesuai permintaan pengguna. Jumlah peserta dan kapasitas ruangan tidak ditampilkan atau dikumpulkan melalui UI. Pemeriksaan status operasional, hak akses, dan bentrok jadwal berjalan di server saat pemeriksaan dan submit booking.
 
-- Status aktif.
-- Maintenance.
-- Kapasitas.
-- Hak akses unit.
-- Jadwal booking yang sudah ada.
+## Jadwal Ruangan
+
+Kalender menampilkan booking tersimpan dengan ringkasan per tanggal dan daftar room/jam WIB. Pending berwarna kuning, Approved terjadwal biru, Approved yang waktunya sedang berjalan merah, dan waktu lewat abu-abu. Rejected/Cancelled tidak mengisi jadwal. Nama pemohon/agenda/catatan tidak ditampilkan di jadwal bersama. Panel yang sama tersedia di atas form booking untuk room dan tanggal terpilih. Pembaruan otomatis tetap disertai validasi konflik ulang saat submit.
 
 ## Booking
 
-Data booking minimal nantinya:
+Pengajuan harus dilakukan minimal dua jam sebelum jam mulai rapat. Pemeriksaan rencana saat ini memakai waktu server dengan WIB (`Asia/Jakarta`, asumsi konfigurasi untuk alur ini), dan mengulang pemeriksaan ketika tombol Periksa Rencana ditekan. Backend submit menegakkan aturan yang sama pada waktu submit, bukan mengandalkan hasil pemeriksaan sebelumnya. Form saat ini mendukung satu tanggal; akhir harus setelah awal, lintas hari belum tersedia.
+
+Data booking yang disimpan:
 
 - Pemohon.
 - Unit kerja pemohon.
@@ -122,7 +121,6 @@ Data booking minimal nantinya:
 - Tanggal.
 - Jam mulai.
 - Jam selesai.
-- Jumlah peserta.
 - Catatan opsional.
 - Status.
 
@@ -162,11 +160,11 @@ Aturan awal yang membatasi frontend ke HTML sederhana untuk testing sudah digant
 
 Hal berikut belum diputuskan dan bukan aturan implementasi:
 
-- Fondasi menggunakan satu role dan maksimal satu unit per user sesuai instruksi Tahap 1. Pada Tahap 2B, PIC mendapat akses halaman pegawai termasuk placeholder My Booking. Hak Super Admin untuk melakukan booking pribadi belum diputuskan.
+- Fondasi menggunakan satu role dan maksimal satu unit per user sesuai instruksi Tahap 1. Pada Tahap 2B, PIC mendapat akses halaman pegawai termasuk placeholder My Booking. Hak Admin untuk melakukan booking pribadi belum diputuskan.
 - Apakah akses unit `restricted` diwariskan ke unit turunan?
 - Apa batas waktu dan kewenangan pembatalan, serta apakah booking dapat diubah atau dijadwalkan ulang?
-- Apakah booking yang bersebelahan diperbolehkan, apakah ada buffer, jam operasional, durasi maksimum, atau booking lintas hari? Zona waktu bisnis juga perlu ditetapkan.
+- Booking bersebelahan diperbolehkan tanpa buffer pada implementasi awal; waktu menggunakan WIB dan form satu tanggal (DEC-029). Jam operasional, durasi maksimum, dan dukungan lintas hari belum ditetapkan.
 - Kapan Pending kedaluwarsa, kapan booking menjadi Completed, dan bagaimana Completed diperlakukan dalam pemeriksaan konflik?
-- Jika terdapat beberapa PIC, apakah satu keputusan PIC cukup? Apakah alasan rejection wajib dan apakah Super Admin dapat melakukan override?
+- Implementasi awal memakai satu keputusan PIC, alasan rejection wajib, tanpa override admin (DEC-029). Perubahan kebijakan ini membutuhkan keputusan baru.
 - Bagaimana booking yang sudah ada ditangani ketika ruangan menjadi maintenance/nonaktif atau aturan aksesnya berubah?
-- Apakah unit pemohon pada riwayat booking disimpan sebagai snapshot saat pengajuan atau mengikuti unit pegawai terkini?
+- Nama unit pemohon disimpan sebagai snapshot saat pengajuan (DEC-029).

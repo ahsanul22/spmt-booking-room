@@ -69,7 +69,7 @@ class RoomAssignmentTest extends PostgresTestCase
             }
         }
         $this->get($this->url('show', $room))->assertSee([$first->name, $second->name, 'PIC ruangan berhasil diperbarui.']);
-        $this->get($this->url('pics', $room))->assertSee('value="'.$second->id.'" selected', false);
+        $this->get($this->url('pics', $room))->assertSee('value="'.$second->id.'" checked', false);
         $this->assertSame($users, User::orderBy('id')->get()->toArray());
     }
 

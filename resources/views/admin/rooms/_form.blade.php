@@ -9,7 +9,6 @@
         <option disabled>Belum ada pilihan tersedia.</option>
     @endforelse
 </x-select>
-<x-field name="capacity" label="Kapasitas" type="number" required max="2147483647" step="1" :value="old('capacity', data_get($room ?? null, 'capacity'))" min="0" />
 <x-textarea name="description" label="Deskripsi" maxlength="5000" :value="old('description', data_get($room ?? null, 'description'))" />
 <fieldset>
     <legend>Fasilitas</legend>

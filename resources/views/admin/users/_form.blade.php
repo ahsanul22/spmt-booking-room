@@ -15,7 +15,7 @@
     <option value="">Pilih Role</option>
     <option value="user" @selected(old('role', data_get($userRecord ?? null, 'role')) === 'user')>user</option>
     <option value="room_pic" @selected(old('role', data_get($userRecord ?? null, 'role')) === 'room_pic')>room_pic</option>
-    <option value="super_admin" @selected(old('role', data_get($userRecord ?? null, 'role')) === 'super_admin')>super_admin</option>
+    <option value="super_admin" @selected(old('role', data_get($userRecord ?? null, 'role')) === 'super_admin')>Admin</option>
 </x-workspace-field>
 <x-workspace-field type="select" name="is_active" label="Status Aktif" required>
     <option value="">Pilih Status Aktif</option>

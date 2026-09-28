@@ -11,31 +11,34 @@ use App\Http\Controllers\Admin\RoomPicController;
 use App\Http\Controllers\Admin\ScheduleController;
 use App\Http\Controllers\Admin\UserController;
 use App\Http\Controllers\DashboardController;
+use App\Http\Controllers\BookingPreparationController;
 use App\Http\Controllers\FrontendSkeletonController;
+use App\Http\Controllers\UserBookingController;
+use App\Http\Controllers\Pic\ApprovalController;
 use Illuminate\Support\Facades\Route;
 
-Route::view('/', 'welcome');
+Route::get('/', \App\Http\Controllers\HomeController::class)->name('home');
 
 Route::middleware(['auth', 'can:access-employee'])->group(function () {
-    Route::get('/rooms/search', FrontendSkeletonController::class)->defaults('view', 'user.rooms.search')->name('rooms.search');
-    Route::get('/my-bookings', FrontendSkeletonController::class)->defaults('view', 'user.bookings.index')->name('my-bookings.index');
-    Route::get('/my-bookings/create', FrontendSkeletonController::class)->defaults('view', 'user.bookings.create')->name('my-bookings.create');
-    Route::get('/my-bookings/{booking}', FrontendSkeletonController::class)->defaults('view', 'user.bookings.show')->name('my-bookings.show');
+    Route::get('/my-bookings', [UserBookingController::class, 'index'])->name('my-bookings.index');
+    Route::get('/my-bookings/create', BookingPreparationController::class)->name('my-bookings.create');
+    Route::get('/my-bookings/{booking}', [UserBookingController::class, 'show'])->whereNumber('booking')->name('my-bookings.show');
 });
 
 Route::middleware(['auth', 'can:access-general'])->group(function () {
     Route::get('/dashboard', DashboardController::class)->defaults('title', 'Dashboard Pegawai')->name('dashboard');
-    Route::get('/rooms', FrontendSkeletonController::class)->defaults('view', 'user.rooms.index')->name('rooms.index');
-    Route::get('/rooms/{room}', FrontendSkeletonController::class)->defaults('view', 'user.rooms.show')->name('rooms.show');
-    Route::get('/schedule', FrontendSkeletonController::class)->defaults('view', 'shared.schedule')->name('schedule.index');
+    Route::view('/rooms', 'user.rooms.index')->name('rooms.index');
+    Route::get('/rooms/{room}', FrontendSkeletonController::class)->defaults('view', 'user.rooms.show')->where('room', '(?!search$)[^/]+')->name('rooms.show');
+    Route::view('/schedule', 'shared.schedule')->name('schedule.index');
 });
 
 Route::prefix('pic')->name('pic.')->middleware(['auth', 'can:access-pic'])->group(function () {
     Route::get('/dashboard', DashboardController::class)->defaults('title', 'Dashboard PIC')->name('dashboard');
-    Route::get('/rooms', FrontendSkeletonController::class)->defaults('view', 'pic.rooms.index')->name('rooms.index');
-    Route::get('/approvals', FrontendSkeletonController::class)->defaults('view', 'pic.approvals.index')->name('approvals.index');
-    Route::get('/approvals/history', FrontendSkeletonController::class)->defaults('view', 'pic.approvals.history')->name('approvals.history');
-    Route::get('/approvals/{approval}', FrontendSkeletonController::class)->defaults('view', 'pic.approvals.show')->name('approvals.show');
+    Route::get('/rooms', [\App\Http\Controllers\Pic\RoomController::class, 'index'])->name('rooms.index');
+    Route::get('/approvals', [ApprovalController::class, 'index'])->name('approvals.index');
+    Route::get('/approvals/history', [ApprovalController::class, 'history'])->name('approvals.history');
+    Route::get('/approvals/{approval}', [ApprovalController::class, 'show'])->whereNumber('approval')->name('approvals.show');
+    Route::post('/approvals/{approval}', [ApprovalController::class, 'decide'])->whereNumber('approval')->name('approvals.decide');
 });
 
 Route::prefix('admin')->name('admin.')->middleware(['auth', 'can:access-admin'])->group(function () {
@@ -58,7 +61,7 @@ Route::prefix('admin')->name('admin.')->middleware(['auth', 'can:access-admin'])
     Route::get('/rooms/{room}/access', [RoomAccessController::class, 'edit'])->whereNumber('room')->name('rooms.access');
     Route::put('/rooms/{room}/access', [RoomAccessController::class, 'update'])->whereNumber('room')->name('rooms.access.update');
     Route::get('/bookings', [BookingController::class, 'index'])->name('bookings.index');
-    Route::get('/bookings/{booking}', [BookingController::class, 'show'])->name('bookings.show');
+    Route::get('/bookings/{booking}', [BookingController::class, 'show'])->whereNumber('booking')->name('bookings.show');
     Route::get('/schedule', [ScheduleController::class, 'index'])->name('schedule.index');
 });
 

@@ -1,0 +1,145 @@
+<?php
+
+namespace Tests\Feature;
+
+use App\Livewire\BookingPreparationForm;
+use App\Livewire\RoomCatalog;
+use App\Models\Room;
+use App\Models\User;
+use Carbon\CarbonImmutable;
+use Livewire\Features\SupportLockedProperties\CannotUpdateLockedPropertyException;
+use Livewire\Livewire;
+use Tests\PostgresTestCase;
+
+class BookingPreparationTest extends PostgresTestCase
+{
+    protected function setUp(): void
+    {
+        parent::setUp();
+        $this->travelTo(CarbonImmutable::parse('2026-09-27 10:00:00', 'Asia/Jakarta'));
+        $this->actingAs(User::where('role', 'user')->firstOrFail());
+    }
+
+    protected function tearDown(): void
+    {
+        $this->travelBack();
+        parent::tearDown();
+    }
+
+    private function room(): Room
+    {
+        return Room::where('is_active', true)->where('status', 'available')->where('access_type', 'all')->firstOrFail();
+    }
+
+    private function form()
+    {
+        return Livewire::test(BookingPreparationForm::class, ['roomId' => $this->room()->id])
+            ->set('date', '2026-09-27')->set('start_time', '12:00')->set('end_time', '13:00')
+            ->set('agenda', 'Koordinasi tim');
+    }
+
+    public function test_catalog_selection_opens_the_selected_room_without_dropdown(): void
+    {
+        $room = $this->room();
+        $url = route('my-bookings.create', ['room_id' => $room->id]);
+        $this->get('/rooms')->assertOk()->assertSee($url, false);
+        $this->get($url)->assertOk()->assertSee($room->name)->assertSee('Ruangan sudah dipilih')
+            ->assertDontSee('<select', false)->assertDontSee('participant_count')->assertSee('WIB');
+        $this->get('/my-bookings/create')->assertRedirect(route('rooms.index'));
+        foreach (['bad', '99999999999999999999999999999', '-1', '9999999'] as $id) {
+            $this->get('/my-bookings/create?room_id='.$id)->assertNotFound();
+        }
+        $this->get('/my-bookings/create?room_id[]=1')->assertNotFound();
+    }
+
+    public function test_dashboard_is_a_small_catalog_preview_and_my_bookings_is_not_a_catalog(): void
+    {
+        Livewire::test(RoomCatalog::class, ['summary' => true])
+            ->assertViewHas('rooms', fn ($rooms) => $rooms->count() <= 3)
+            ->assertSee('Lihat semua ruangan')->assertDontSee('aria-label="Filter ruangan"', false);
+        $this->get('/my-bookings')->assertOk()->assertSee('Belum ada booking.')
+            ->assertDontSeeLivewire(RoomCatalog::class)->assertSee(route('rooms.index'), false);
+        $response = $this->get('/rooms')->assertOk();
+        $this->assertSame(1, substr_count($response->getContent(), 'aria-current="page"'));
+        $this->assertStringNotContainsString('Daftar Ruangan', $response->getContent());
+    }
+
+    public function test_exact_two_hours_is_valid_but_does_not_claim_a_reservation(): void
+    {
+        $this->form()->call('checkPlan')->assertHasNoErrors()->assertSet('checked', true)
+            ->assertSee('Ruangan belum dipesan.')->assertSee('ketersediaan akan diperiksa ulang');
+    }
+
+    public function test_less_than_two_hours_and_past_dates_are_rejected(): void
+    {
+        $this->form()->set('start_time', '11:59')->call('checkPlan')->assertHasErrors('start_time');
+        $this->form()->set('date', '2026-09-26')->call('checkPlan')->assertHasErrors('start_time');
+        $this->travelTo(CarbonImmutable::parse('2026-09-27 10:00:30', 'Asia/Jakarta'));
+        $this->form()->call('checkPlan')->assertHasErrors('start_time');
+        $this->form()->set('start_time', '12:01')->call('checkPlan')->assertHasNoErrors();
+    }
+
+    public function test_time_is_rechecked_after_the_form_has_been_left_open(): void
+    {
+        $form = $this->form()->call('checkPlan')->assertSet('checked', true);
+        $this->travel(1)->minutes();
+        $form->call('checkPlan')->assertHasErrors('start_time')->assertSet('checked', false);
+    }
+
+    public function test_end_must_follow_start_on_same_day_and_invalid_dates_are_rejected(): void
+    {
+        foreach (['12:00', '11:00', '00:30'] as $end) {
+            $this->form()->set('end_time', $end)->call('checkPlan')->assertHasErrors('end_time');
+        }
+        $this->form()->set('date', '2026-02-30')->call('checkPlan')->assertHasErrors('date');
+        $this->form()->set('start_time', '25:00')->call('checkPlan')->assertHasErrors('start_time');
+        $this->form()->set('agenda', '   ')->call('checkPlan')->assertHasErrors('agenda');
+        $this->form()->set('notes', str_repeat('x', 2001))->call('checkPlan')->assertHasErrors('notes');
+    }
+
+    public function test_two_hour_window_can_cross_midnight_in_wib(): void
+    {
+        $this->travelTo(CarbonImmutable::parse('2026-09-27 23:30:00', 'Asia/Jakarta'));
+        $this->form()->set('date', '2026-09-28')->set('start_time', '01:30')->set('end_time', '02:30')
+            ->call('checkPlan')->assertHasNoErrors();
+        $this->form()->set('date', '2026-09-28')->set('start_time', '01:29')->set('end_time', '02:30')
+            ->call('checkPlan')->assertHasErrors('start_time');
+    }
+
+    public function test_changed_room_state_is_checked_again_on_the_server(): void
+    {
+        foreach ([['status' => 'maintenance'], ['is_active' => false], ['access_type' => 'restricted']] as $change) {
+            $room = $this->room();
+            $form = $this->form();
+            $room->update($change);
+            $form->call('checkPlan')->assertHasErrors('room')->assertSet('checked', false);
+            $room->update(['status' => 'available', 'is_active' => true, 'access_type' => 'all']);
+        }
+    }
+
+    public function test_explicit_unit_access_is_required_and_revocation_is_rechecked(): void
+    {
+        $room = $this->room();
+        $form = $this->form();
+        $room->update(['access_type' => 'restricted']);
+        $room->allowedOrganizationalUnits()->sync([auth()->user()->organizational_unit_id]);
+        $form->call('checkPlan')->assertHasNoErrors();
+        $room->allowedOrganizationalUnits()->detach();
+        $form->call('checkPlan')->assertHasErrors('room')->assertSet('checked', false);
+    }
+
+    public function test_room_identity_cannot_be_changed_in_livewire_state(): void
+    {
+        $this->expectException(CannotUpdateLockedPropertyException::class);
+        $this->form()->set('roomId', $this->room()->id + 1);
+    }
+
+    public function test_form_enforces_role_authorization_and_has_no_write_route(): void
+    {
+        $room = $this->room();
+        $this->post('/my-bookings/create', ['room_id' => $room->id])->assertStatus(405);
+        $this->actingAs(User::where('role', 'super_admin')->firstOrFail());
+        $this->get(route('my-bookings.create', ['room_id' => $room->id]))->assertForbidden();
+        Livewire::test(BookingPreparationForm::class, ['roomId' => $room->id])->assertForbidden();
+    }
+}

@@ -1,5 +1,66 @@
 # Decisions
 
+## DEC-033 - Kapasitas Tidak Ditampilkan dan Label Admin
+
+- Sesuai permintaan pengguna, kapasitas dihapus dari seluruh UI ruangan (kartu/detail/form admin, katalog pegawai/PIC, form booking, dan panduan dashboard). Kolom database tetap disimpan untuk kompatibilitas: room baru tanpa kapasitas menggunakan 0, edit tanpa kapasitas mempertahankan nilai lama. Validasi tetap berlaku jika field dikirim oleh klien lama.
+- Seluruh label role administratif menjadi Admin, termasuk dashboard, header, ringkasan akun, tabel/detail user dan pilihan role. Nilai internal super_admin beserta Gate/constraint database tetap dipertahankan untuk akun existing; roleLabel memisahkan label dari identifier. Nama pribadi akun existing tidak diubah otomatis.
+
+## DEC-032 - Ruangan Saya PIC berdasarkan Penugasan
+
+- Halaman `/pic/rooms` memakai controller baca khusus dan relasi managedRooms akun login, menggantikan skeleton sesuai penugasan pengguna. Scope mengikuti pivot room_pics, bukan unit kerja; tidak otomatis memperlihatkan seluruh room kepada admin yang membuka URL ini.
+- Menampilkan seluruh room penugasan termasuk nonaktif/perawatan dengan label kondisi, pagination, serta tautan kalender berfilter room. Menggunakan kartu Blade bersama dalam mode managed tanpa tombol booking pribadi. Tidak mengubah Gate, aturan booking, approval, atau data penugasan.
+
+## DEC-031 - Jadwal Ruangan pada Beranda Sebelum Login
+
+- Sesuai permintaan pengguna, bagian Kenali pilihan ruangan dan kartu di `/` diganti kalender yang memakai tampilan/interaksi jadwal pegawai. Tautan navigasi dan hero menuju Jadwal Ruangan.
+- Menggantikan batas jadwal tamu DEC-030: tamu boleh membaca nama ruangan, tanggal, jam, dan status okupansi hanya untuk room aktif dengan access_type=all. Agenda, pemohon, unit, catatan, dan token tetap privat. Booking tetap memerlukan login.
+- PublicRoomSchedule memakai ulang RoomSchedule dengan scope publik pada pilihan/filter dan query booking, termasuk saat refresh atau perubahan akses room. Gate kalender internal dan route pegawai/admin tetap berlaku. Tidak menambah dependency/schema.
+
+
+## DEC-030 - Beranda Tamu dan Jadwal Booking Terhubung
+
+- Pengguna meminta beranda sebelum login yang mengikuti gaya dashboard pegawai serta jadwal penggunaan nyata, termasuk di atas form booking. Root `/` memakai HomeController/layout public, pengantar dan kartu yang sama gayanya. Akun yang sudah login diarahkan ke dashboard role masing-masing.
+- Tamu hanya melihat room aktif dengan akses all, nama/lantai/kapasitas/fasilitas/status operasional. Tidak memuat deskripsi internal, PIC/unit, pemohon, agenda, catatan, atau jadwal. Partial room-catalog-card dipakai ulang tanpa membuka Gate RoomCatalog Livewire kepada tamu.
+- Tombol tamu secara eksplisit Login untuk Booking. Param room hanya menerima ID numerik room publik aktif/operasional dan disimpan ke session sebagai pilihan. Login sukses user/PIC melanjutkan ke form room itu; admin tetap ke dashboard admin. URL redirect dibuat dari route server, tidak menerima return URL bebas. Pilihan bertahan saat login gagal; dikonsumsi setelah login; room yang kemudian nonaktif membawa user ke katalog. Halaman login menjelaskan pilihan tersebut.
+- `/schedule` dan `/admin/schedule` kini menampilkan RoomSchedule Livewire, bukan kalender JavaScript dummy. BookingSchedule mengambil field okupansi saja dari Pending/Approved/Completed: ID room/booking, nama room, tanggal, waktu, status. Tidak mengirim field rapat privat atau token dalam HTML/snapshot jadwal.
+- Kalender 42 hari dengan navigasi bulan/Hari Ini, lompat tanggal, filter room, jumlah booking dan penanda warna per tanggal. Rincian jam/room ditampilkan dalam panel harian yang cukup besar dan turun ke bawah pada mobile; kalender dapat digeser lokal. Room nonaktif yang memiliki jadwal tersimpan tetap terlihat beserta peringatan.
+- Sesuai permintaan warna pengguna, menambah token warning dan warningDark pada Tailwind. Kuning = Pending; biru = Terjadwal; merah = Sedang berlangsung (Approved dan start <= sekarang < end); abu-abu = waktu lewat/Completed. Semua memakai label teks. Pending yang belum selesai tidak dianggap sedang digunakan. Status waktu dihitung dalam WIB tanpa mengubah status booking tersimpan. Cancelled/Rejected tidak tampil sebagai okupansi.
+- Sumber data yang sama dipakai panel jadwal room di atas form. Satu field tanggal mengatur jadwal sekaligus tanggal booking, tanpa mengganti room. Kalender lengkap dapat dibuka di tab baru dengan filter room/tanggal, sehingga isian form tetap. Detail booking menautkan tanggal dan room langsung ke kalender.
+- Pembaruan otomatis 30 detik dan tombol refresh kalender, dengan label waktu WIB/offline. Jadwal adalah informasi pada waktu pembacaan, bukan penguncian slot. Lock/transaksi dan validasi konflik saat submit tetap utuh. Tidak menambah library/schema atau memodifikasi booking existing.
+
+## DEC-029 - Booking Aktif dan Data Ruangan per Lantai
+
+- Pengguna meminta data ruangan dan memastikan booking/pengajuan sudah bisa dilakukan. Ini penugasan eksplisit backend booking dan alur keputusan PIC, menggantikan batas pratinjau pada DEC-028 untuk modul tersebut.
+- Rincian pengguna berjumlah 10 (lantai 2:1, 3:2, 4:2, 6:2, 7:3), walaupun total awal disebut 9. Pertanyaan klarifikasi diajukan; belum ada jawaban saat implementasi. Mengikuti rincian per lantai sebagai asumsi yang disampaikan. Tiga ruangan lantai 7 sementara dinamai Selat Malaka I/II/III; lainnya memakai nama lantai/nomor sampai nama resmi diberikan.
+- Semua ruangan baru access_type=all. Tujuh ruangan non-Selat Malaka langsung Approved sesudah validasi, tanpa izin/PIC. Asumsi Selat Malaka: semua pegawai boleh mengajukan, tetapi memerlukan approval PIC. PIC disalin dari penugasan Selat Malaka existing (lokal: Room PIC Demo), bukan memilih akun atau memberi role baru. Nama/PIC/batas akses masih dapat dikoreksi melalui administrasi.
+- BookingRoomsSeeder terpisah dari FoundationSeeder agar data fixture/master existing tidak direset. Idempotent berdasarkan kode SPMT-L{lantai}-{nomor}; isian admin pada record existing tidak ditimpa saat dijalankan ulang. Empat record demo lama hanya dinonaktifkan bila kode dan deskripsi demo cocok; record/relasinya dipertahankan. Kapasitas 0 sebagai belum diisi (ditampilkan demikian), fasilitas kosong, tanpa mengarang data fasilitas/kapasitas resmi.
+- Tabel bookings menyimpan pemohon, room, snapshot nama unit dan ID unit, tanggal/waktu WIB, agenda/catatan, status, kebutuhan approval saat pengajuan, token idempotensi, hash isian, serta jejak keputusan PIC. Tidak ada jumlah peserta. Foreign key melindungi riwayat; nama unit dipertahankan meskipun unit pemohon berubah.
+- BookingService menjalankan transaksi dengan lock room sebelum memeriksa konflik dan insert. Pending/Approved memblokir interval setengah terbuka `[mulai, selesai)`; booking bersebelahan diperbolehkan tanpa buffer untuk implementasi awal. Seluruh penulisan booking/keputusan menggunakan lock room yang sama; request bersamaan diuji dengan dua proses PostgreSQL. Tidak memakai constraint overlap lintas baris; penulisan booking baru wajib melalui service ini.
+- Waktu minimal dua jam WIB, urutan waktu, akun, akses unit dan kondisi room divalidasi ulang saat submit. Room dengan approval wajib mempunyai PIC aktif. Token dikunci di Livewire dan unik per pemohon; retry isian yang sama mengembalikan record yang sudah tersimpan, bukan membuat duplikat. Token sama dengan isian berbeda ditolak.
+- PIC aktif yang ditugaskan boleh menyetujui/menolak Pending. Satu keputusan PIC cukup; alasan penolakan wajib. Keputusan kedua ditolak. Approval mengecek ulang kondisi/access pemohon dan ruangan, konflik, serta memastikan waktu mulai belum lewat. Batas dua jam berlaku pada pengajuan, bukan waktu PIC memberikan keputusan. Admin dapat memantau seluruh pengajuan namun tidak mempunyai override keputusan.
+- My Booking/list/detail hanya pemohon. Admin list/detail seluruh booking; PIC list/detail hanya ruangan penugasannya. Semua route/mutasi tetap auth/Gate/CSRF. Tidak mengaktifkan pembatalan, penjadwalan ulang, expiry Pending, auto Completed, notifikasi, atau kalender data nyata; kebutuhan tersebut dicatat untuk tahap selanjutnya.
+
+## DEC-028 - Satu Katalog untuk Memulai Booking dan Batas Dua Jam
+
+- Koreksi pengguna menggantikan alur DEC-027: daftar ruangan dan awal booking disatukan di `/rooms` dengan satu menu Booking Ruangan. Dashboard hanya ringkasan tiga kartu dari komponen/data katalog yang sama, bukan cuplikan My Booking. My Booking khusus pengajuan/riwayat pribadi, tidak mengulang katalog.
+- Kartu operasional dengan akses unit yang sesuai membuka `/my-bookings/create?room_id=...`; form tidak lagi memiliki dropdown. Tanpa ID diarahkan ke katalog; ID invalid/hilang menghasilkan 404. ID komponen Livewire dikunci. Ganti ruangan membuka form baru dengan penjelasan isian belum disimpan.
+- Sesuai instruksi minimal dua jam, pemeriksaan rencana memakai waktu server. Asumsi implementasi zona bisnis adalah WIB (`Asia/Jakarta`) yang ditampilkan pada field dan dikonfigurasi di `config/booking.php`, tanpa mengubah timezone global aplikasi. Awal tepat dua jam diterima; karena input presisi menit, batas dengan detik dibulatkan ke menit berikutnya. Waktu dihitung ulang setiap pemeriksaan, termasuk melewati tengah malam.
+- Bentuk form satu tanggal berarti akhir wajib setelah awal pada hari yang sama. Lintas hari belum didukung, bukan keputusan larangan bisnis permanen. Akses restricted pada pratinjau hanya unit yang secara eksplisit terdaftar; tidak menambah pewarisan ke turunan yang belum diputuskan. Status aktif/operasional dan akses terkini diperiksa ulang pada server, bukan hanya tombol kartu.
+- `BookingPreparation` memisahkan aturan pemeriksaan dari controller/komponen. Livewire Periksa Rencana memvalidasi waktu/isian/akses, tanpa menyimpan atau mengunci jadwal. Pesan pemeriksaan disembunyikan saat isian berubah. Pengajuan tetap nonaktif, dan bentrok belum diperiksa. Backend tahap 5/approval/kalender tidak otomatis diaktifkan.
+- Katalog umum mengikuti Gate access-general sesuai `/rooms` existing; admin dapat membaca tanpa aksi booking. Form/pemeriksaan tetap access-employee, tanpa menambah hak booking pribadi admin.
+
+### Wajib saat backend pengajuan diaktifkan
+
+- Validasi ulang batas dua jam, akses unit, akun, dan kondisi ruangan saat submit nyata, termasuk ketika form lama masih terbuka. Pemeriksaan rencana bukan bukti slot tersedia.
+- Pemeriksaan overlap Pending/Approved dan penyimpanan harus aman terhadap dua request bersamaan (transaksi dan penguncian/constraint database yang sesuai), bukan sekadar cek lalu insert. Tangani pengiriman ulang agar tidak menggandakan pengajuan.
+- Perubahan status ruangan/akses sesudah booking, pembatalan, expiry Pending, aturan buffer, dan kewenangan approval masih membutuhkan keputusan tersendiri sesuai PROJECT_CONTEXT. Jangan menganggap aturan tersebut telah diterapkan.
+
+## DEC-027 - Booking Tanpa Jumlah Peserta dan Halaman Cari Ruangan
+
+- Sesuai permintaan pengguna, jumlah peserta dihapus dari form, detail booking, daftar approval, dan panduan UI. Kapasitas master ruangan tetap menjadi informasi ruangan.
+- Halaman dan route Cari Ruangan dihapus; URL lama menghasilkan 404. Booking Ruangan (`/my-bookings/create`) tersedia langsung di navbar user dan dashboard.
+- Form memakai komponen workspace, tetap pratinjau dengan submit nonaktif sesuai roadmap. Tidak mengaktifkan backend Tahap 5 atau mengubah izin role/schema/dependency.
+
 ## DEC-026 - Navigasi Administrasi Tanpa Menu Lantai
 
 - Pengguna meminta frontend Kelola User, Unit Organisasi, dan Fasilitas serta penghapusan bagian Lantai. Ketiga modul memakai layout schedule pada daftar, tambah, edit, dan detail, dengan seluruh proses backend existing dipertahankan.
@@ -69,7 +130,7 @@ Sistem menggunakan tiga role utama:
 
 - User.
 - Room PIC.
-- Super Admin.
+- Admin.
 
 Alasan: menjaga authorization tetap sederhana dan tidak menjadikan jabatan organisasi sebagai role aplikasi.
 

@@ -22,7 +22,7 @@
                     @can('access-pic')
                         @cannot('access-admin')
                             <a @class(['schedule-nav', 'bg-white/10 text-white ring-1 ring-white/10' => request()->routeIs('pic.approvals.index', 'pic.approvals.show')]) @if(request()->routeIs('pic.approvals.index', 'pic.approvals.show')) aria-current="page" @endif href="{{ route('pic.approvals.index') }}"><x-schedule-icon name="clock" />Permintaan Approval</a>
-                            <a class="schedule-nav" href="{{ route('pic.rooms.index') }}"><x-schedule-icon name="room" />Ruangan Saya</a>
+                            <a @class(['schedule-nav', 'bg-white/10 text-white ring-1 ring-white/10' => request()->routeIs('pic.rooms.*')]) @if(request()->routeIs('pic.rooms.*')) aria-current="page" @endif href="{{ route('pic.rooms.index') }}"><x-schedule-icon name="room" />Ruangan Saya</a>
                             <a class="schedule-nav" href="{{ route('pic.approvals.history') }}"><x-schedule-icon name="calendar" />Riwayat Approval</a>
                         @endcannot
                     @endcan
@@ -32,10 +32,12 @@
                             <span class="ml-auto h-1.5 w-1.5 rounded-full bg-secondary"></span>
                         @endif
                     </a>
-                    <a @class(['schedule-nav', 'bg-white/10 text-white ring-1 ring-white/10' => request()->routeIs('admin.rooms.*', 'rooms.index')]) @if(request()->routeIs('admin.rooms.*', 'rooms.index')) aria-current="page" @endif href="{{ route(auth()->user()->can('access-admin') ? 'admin.rooms.index' : 'rooms.index') }}"><x-schedule-icon name="room" />Daftar Ruangan</a>
+                    @if(auth()->user()->role !== \App\Models\User::ROLE_ROOM_PIC)
+                    <a @class(['schedule-nav', 'bg-white/10 text-white ring-1 ring-white/10' => request()->routeIs('admin.rooms.*', 'rooms.index', 'my-bookings.create')]) @if(request()->routeIs('admin.rooms.*', 'rooms.index', 'my-bookings.create')) aria-current="page" @endif href="{{ route(auth()->user()->can('access-admin') ? 'admin.rooms.index' : 'rooms.index') }}"><x-schedule-icon name="room" />{{ auth()->user()->can('access-admin') ? 'Daftar Ruangan' : 'Booking Ruangan' }}</a>
                     @can('access-employee')
-                        <a class="schedule-nav" href="{{ route('my-bookings.index') }}"><x-schedule-icon name="clock" />My Booking</a>
+                        <a @class(['schedule-nav', 'bg-white/10 text-white ring-1 ring-white/10' => request()->routeIs('my-bookings.index', 'my-bookings.show')]) @if(request()->routeIs('my-bookings.index', 'my-bookings.show')) aria-current="page" @endif href="{{ route('my-bookings.index') }}"><x-schedule-icon name="clock" />My Booking</a>
                     @endcan
+                    @endif
                     @can('access-admin')
                         <a @class(['schedule-nav', 'bg-white/10 text-white ring-1 ring-white/10' => request()->routeIs('admin.bookings.*')]) @if(request()->routeIs('admin.bookings.*')) aria-current="page" @endif href="{{ route('admin.bookings.index') }}"><x-schedule-icon name="clock" />Semua Booking</a>
                     @endcan
@@ -60,7 +62,7 @@
         <div class="min-w-0">
             <header class="flex min-h-[80px] items-center justify-between gap-4 border-b border-slate-200/70 bg-surface px-5 lg:px-9">
                 <div class="flex flex-wrap items-center gap-3 text-sm"><span class="text-slate-500">Workspace</span><span class="text-muted">/</span><span class="font-medium">@yield('breadcrumb', 'Jadwal Ruangan')</span></div>
-                <div class="flex items-center gap-3"><div class="hidden text-right sm:block"><p class="text-sm font-semibold">{{ auth()->user()->name }}</p><p class="mt-0.5 text-xs capitalize text-slate-500">{{ str_replace('_', ' ', auth()->user()->role) }}</p></div><span class="flex h-10 w-10 items-center justify-center rounded-full bg-secondaryLight/40 text-sm font-bold text-primaryDark">{{ mb_strtoupper(mb_substr(auth()->user()->name, 0, 1)) }}</span></div>
+                <div class="flex items-center gap-3"><div class="hidden text-right sm:block"><p class="text-sm font-semibold">{{ auth()->user()->name }}</p><p class="mt-0.5 text-xs capitalize text-slate-500">{{ auth()->user()->roleLabel() }}</p></div><span class="flex h-10 w-10 items-center justify-center rounded-full bg-secondaryLight/40 text-sm font-bold text-primaryDark">{{ mb_strtoupper(mb_substr(auth()->user()->name, 0, 1)) }}</span></div>
             </header>
             <main id="content" @class(['mx-auto p-5 lg:p-9', 'max-w-[1800px]' => request()->routeIs('dashboard', '*.dashboard'), 'max-w-[1600px]' => ! request()->routeIs('dashboard', '*.dashboard')])>@yield('content')</main>
             <footer class="flex flex-wrap justify-between gap-2 px-5 pb-6 text-xs text-slate-500 lg:px-9"><span>PT Pelindo Multi Terminal</span><span>Meeting Room · Internal Workspace</span></footer>

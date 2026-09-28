@@ -1,9 +1,8 @@
-@extends(auth()->user()->role === \App\Models\User::ROLE_USER ? 'layouts.user' : 'layouts.base')
+@extends(auth()->user()->role === \App\Models\User::ROLE_USER ? 'layouts.user' : 'layouts.schedule')
 @section('title', 'Detail Booking')
+@section('breadcrumb', 'My Booking / Detail')
 @section('content')
-    <h1>Detail Booking</h1>
-    <x-skeleton-notice />
+    <div class="mb-7 flex flex-wrap items-center justify-between gap-4"><h1 class="text-3xl font-bold text-primaryDark">Detail Booking</h1><a href="{{ route('my-bookings.index') }}" class="workspace-button-secondary">Kembali ke My Booking</a></div>
+    <div class="workspace-feedback"><x-form-feedback /></div>
     @include('shared.booking-details')
-    <x-pending-action>Batalkan Booking</x-pending-action>
-    <a href="{{ route('my-bookings.index') }}">Kembali</a>
 @endsection

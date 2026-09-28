@@ -55,7 +55,7 @@ Unit baru dibuat aktif. Seed ulang memakai `firstOrCreate`, sehingga tidak mengg
 
 | Email | Role | Password awal |
 | --- | --- | --- |
-| `admin@example.test` | Super Admin | `password` |
+| `admin@example.test` | Admin | `password` |
 | `pic@example.test` | Room PIC | `password` |
 | `pegawai@example.test` | Pegawai | `password` |
 

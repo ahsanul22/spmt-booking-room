@@ -23,7 +23,7 @@ class AuthenticationTest extends PostgresTestCase
             $this->post('/login', ['email' => $email, 'password' => 'password'])
                 ->assertSessionHasNoErrors()->assertRedirect($dashboard);
             $this->assertAuthenticatedAs($user);
-            $this->get($dashboard)->assertOk()->assertSee($user->name)->assertSee($user->role)
+            $this->get($dashboard)->assertOk()->assertSee($user->name)->assertSee($user->roleLabel())
                 ->assertSee($user->organizationalUnit->name)->assertDontSee($user->password);
             $this->post('/logout')->assertRedirect('/login');
             $this->assertGuest();

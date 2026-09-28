@@ -10,7 +10,6 @@
         <option disabled>Belum ada pilihan tersedia.</option>
     @endforelse
 </x-workspace-field>
-<x-workspace-field name="capacity" label="Kapasitas" type="number" required max="2147483647" step="1" :value="old('capacity', data_get($room ?? null, 'capacity'))" min="0" />
 <div class="sm:col-span-2"><x-workspace-field type="textarea" name="description" label="Deskripsi" maxlength="5000" :value="old('description', data_get($room ?? null, 'description'))" /></div>
 </div>
 </x-workspace-panel>

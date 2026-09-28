@@ -12,13 +12,14 @@
 <li><a href="{{ route('admin.schedule.index') }}">Jadwal</a></li>
 @else
 @can('access-general')
-<li><a href="{{ route('rooms.index') }}">Daftar Ruangan</a></li>
+@if(auth()->user()->role === \App\Models\User::ROLE_USER)
+<li><a href="{{ route('rooms.index') }}">Booking Ruangan</a></li>
+@endif
 <li><a href="{{ route('schedule.index') }}">Jadwal Ruangan</a></li>
 @endcan
-@can('access-employee')
-<li><a href="{{ route('rooms.search') }}">Cari Ruangan</a></li>
+@if(auth()->user()->role === \App\Models\User::ROLE_USER)
 <li><a href="{{ route('my-bookings.index') }}">My Booking</a></li>
-@endcan
+@endif
 @can('access-pic')
 <li><a href="{{ route('pic.rooms.index') }}">Ruangan Saya</a></li>
 <li><a href="{{ route('pic.approvals.index') }}">Permintaan Approval</a></li>

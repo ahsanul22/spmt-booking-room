@@ -8,13 +8,13 @@
             <div class="flex flex-wrap items-center justify-between gap-3 border-b border-slate-100 p-5 sm:p-6"><div><h2 id="approval-title" class="text-lg font-bold text-primaryDark">Permintaan Approval</h2><p class="mt-1 text-xs leading-5 text-slate-600">Pengajuan dan keputusan belum terhubung.</p></div><span class="rounded-md bg-background px-3 py-1 text-xs font-medium text-slate-600">Pratinjau</span></div>
 @if(count($approvals ?? []) > 0)
             <div class="workspace-table" role="region" aria-label="Permintaan approval, geser untuk melihat seluruh kolom" tabindex="0">
-                <x-table :headers="['Pemohon / Unit', 'Ruangan / Agenda', 'Jadwal', 'Peserta', 'Status', 'Aksi']">
+                <x-table :headers="['Pemohon / Unit', 'Ruangan / Agenda', 'Jadwal', 'Status', 'Aksi']">
                     @foreach($approvals ?? [] as $item)
                         <tr>
                             <td><p class="font-semibold">{{ $item->applicant?->name ?? '—' }}</p><p class="mt-1 text-xs text-slate-600">{{ $item->organizationalUnit?->name ?? '—' }}</p></td>
                             <td><p class="font-semibold">{{ $item->room?->name ?? '—' }}</p><p class="mt-1 text-xs text-slate-600">{{ $item->agenda }}</p></td>
                             <td>{{ $item->date }}<p class="mt-1 text-xs text-slate-600">{{ ($item->start_time ?? '—').' – '.($item->end_time ?? '—') }}</p></td>
-                            <td>{{ $item->participant_count }}</td><td>{{ $item->status }}</td>
+                            <td>{{ $item->status }}</td>
                             <td><a class="font-semibold text-primary hover:underline" href="{{ route('pic.approvals.show', $item->id) }}">Detail</a></td>
                         </tr>
                     @endforeach

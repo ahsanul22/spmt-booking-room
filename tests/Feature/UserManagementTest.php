@@ -75,7 +75,7 @@ class UserManagementTest extends PostgresTestCase
             $this->assertDatabaseHas('users', ['id' => $record->id, 'role' => $role, 'organizational_unit_id' => $unit->id, 'is_active' => true]);
             $this->assertTrue(Hash::check($data['password'], $record->password));
             $this->assertNotSame($data['password'], $record->password);
-            $this->get($this->url('show', $record))->assertOk()->assertSee($data['email'])->assertSee($role)->assertSee($unit->name)
+            $this->get($this->url('show', $record))->assertOk()->assertSee($data['email'])->assertSee($record->fresh()->roleLabel())->assertSee($unit->name)
                 ->assertDontSee($record->password, false)->assertDontSee($data['password']);
             $this->get($this->url('index'))->assertOk()->assertSee($data['email'])->assertSee($unit->name);
         }
@@ -122,7 +122,7 @@ class UserManagementTest extends PostgresTestCase
             $this->put($this->url('update', $record), $data)->assertRedirect($this->url('show', $record))->assertSessionHasNoErrors();
             $this->assertDatabaseHas('users', ['id' => $record->id, 'name' => $data['name'], 'email' => $data['email'], 'role' => $role, 'organizational_unit_id' => $unit->id]);
             $this->assertSame($oldHash, $record->fresh()->password);
-            $this->get($this->url('show', $record))->assertSee($data['name'])->assertSee($data['email'])->assertSee($role)->assertSee($unit->name)->assertSee('User berhasil diperbarui.');
+            $this->get($this->url('show', $record))->assertSee($data['name'])->assertSee($data['email'])->assertSee($record->fresh()->roleLabel())->assertSee($unit->name)->assertSee('User berhasil diperbarui.');
             $this->get($this->url('index'))->assertSee($data['email'])->assertSee($unit->name);
         }
         $data = $this->data(['organizational_unit_id' => null]);

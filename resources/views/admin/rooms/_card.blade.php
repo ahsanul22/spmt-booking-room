@@ -12,9 +12,8 @@
         <h3 id="room-title-{{ $item->id }}" class="relative mt-1.5 break-words text-xl font-bold leading-7 tracking-tight text-primaryDark">
             <a href="{{ route('admin.rooms.show', $item->id) }}" class="hover:underline">{{ $item->name }}</a>
         </h3>
-        <dl class="relative mt-5 grid grid-cols-[minmax(0,1fr)_minmax(0,1fr)] gap-4 border-t border-secondaryLight/40 pt-4">
+        <dl class="relative mt-5 grid grid-cols-1 gap-4 border-t border-secondaryLight/40 pt-4">
             <div><dt class="text-xs text-slate-500">Lantai</dt><dd class="mt-2 break-words text-sm font-semibold text-primaryDark">{{ $item->floor?->name ?? 'Belum ditentukan' }}</dd></div>
-            <div class="border-l border-secondaryLight/50 pl-4"><dt class="text-xs text-slate-500">Kapasitas</dt><dd class="mt-1 text-primaryDark"><span class="text-2xl font-bold tabular-nums">{{ $item->capacity }}</span> <span class="text-xs font-medium text-slate-600">orang</span></dd></div>
         </dl>
     </div>
 

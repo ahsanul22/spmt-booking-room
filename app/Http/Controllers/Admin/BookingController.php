@@ -3,18 +3,20 @@
 namespace App\Http\Controllers\Admin;
 
 use App\Http\Controllers\Controller;
+use App\Models\Booking;
 use Illuminate\View\View;
 
 class BookingController extends Controller
 {
     public function index(): View
     {
-        return view('admin.bookings.index');
+        $bookings = Booking::with(['room', 'applicant', 'organizationalUnit'])->latest('id')->paginate(20);
+        return view('admin.bookings.index', compact('bookings'));
     }
 
-    public function show(string $booking): View
+    public function show(Booking $booking): View
     {
-        // Identifier hanya untuk navigasi pratinjau, belum mengambil record booking.
-        return view('admin.bookings.show');
+        $booking->load(['room', 'applicant', 'organizationalUnit']);
+        return view('admin.bookings.show', compact('booking'));
     }
 }

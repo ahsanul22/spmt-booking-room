@@ -11,7 +11,7 @@ use Tests\PostgresTestCase;
 
 class RoomCatalogTest extends PostgresTestCase
 {
-    public function test_dashboard_renders_database_rooms_on_initial_load(): void
+    public function test_catalog_renders_database_rooms_on_initial_load(): void
     {
         $this->actingAs(User::where('role', 'user')->firstOrFail());
         $room = Room::where('name', 'Selat Malaka')->firstOrFail();
@@ -19,11 +19,11 @@ class RoomCatalogTest extends PostgresTestCase
         $inactive = Room::where('code', 'DEMO-03')->firstOrFail();
         $inactive->update(['is_active' => false]);
 
-        $this->get('/dashboard')->assertOk()->assertSeeLivewire(RoomCatalog::class)
+        $this->get('/rooms')->assertOk()->assertSeeLivewire(RoomCatalog::class)
             ->assertSee($room->name)->assertSee($room->description)
             ->assertDontSee($room->description, false)->assertDontSee($inactive->name)
-            ->assertSee('Projector')->assertSee('Kapasitas 20 peserta')
-            ->assertSee('Dalam perawatan')->assertSee('Booking belum tersedia');
+            ->assertSee('Projector')->assertDontSee('Kapasitas')
+            ->assertSee('Dalam perawatan')->assertSee('Pilih Ruangan');
     }
 
     public function test_filters_partition_active_rooms_and_can_return_to_all(): void
@@ -74,7 +74,7 @@ class RoomCatalogTest extends PostgresTestCase
     public function test_authorization_applies_on_initial_and_subsequent_requests(): void
     {
         Livewire::test(RoomCatalog::class)->assertForbidden();
-        Livewire::actingAs(User::where('role', 'super_admin')->firstOrFail())->test(RoomCatalog::class)->assertForbidden();
+        Livewire::actingAs(User::where('role', 'super_admin')->firstOrFail())->test(RoomCatalog::class)->assertDontSee('Pilih Ruangan');
 
         $user = User::where('role', 'user')->firstOrFail();
         $component = Livewire::actingAs($user)->test(RoomCatalog::class);

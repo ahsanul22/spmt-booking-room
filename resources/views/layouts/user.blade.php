@@ -18,11 +18,11 @@
                 </div>
             </div>
             <nav aria-label="Navigasi utama" class="mx-auto flex max-w-[1800px] flex-wrap gap-1 px-5 pb-4 sm:px-8">
-                @foreach (['dashboard' => 'Dashboard', 'rooms.search' => 'Cari Ruangan', 'my-bookings.index' => 'My Booking', 'schedule.index' => 'Jadwal Ruangan', 'rooms.index' => 'Daftar Ruangan'] as $routeName => $label)
+                @foreach (['dashboard' => 'Dashboard', 'rooms.index' => 'Booking Ruangan', 'my-bookings.index' => 'My Booking', 'schedule.index' => 'Jadwal Ruangan'] as $routeName => $label)
                     @php
                         $active = match ($routeName) {
-                            'my-bookings.index' => request()->routeIs('my-bookings.*'),
-                            'rooms.index' => request()->routeIs('rooms.index', 'rooms.show'),
+                            'my-bookings.index' => request()->routeIs('my-bookings.index', 'my-bookings.show'),
+                            'rooms.index' => request()->routeIs('rooms.index', 'rooms.show', 'my-bookings.create'),
                             default => request()->routeIs($routeName),
                         };
                     @endphp
@@ -31,7 +31,7 @@
             </nav>
         </header>
         <main id="content" class="mx-auto w-full max-w-[1800px] flex-1 p-5 sm:p-8">
-            @if(request()->routeIs('dashboard', 'schedule.index'))
+            @if(request()->routeIs('dashboard', 'schedule.index', 'my-bookings.create', 'rooms.index', 'my-bookings.index', 'my-bookings.show'))
                 @yield('content')
             @else
                 <div class="user-module min-w-0 rounded-2xl border border-slate-200/80 bg-surface p-5 shadow-sm sm:p-6">@yield('content')</div>

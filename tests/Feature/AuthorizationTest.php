@@ -41,10 +41,13 @@ class AuthorizationTest extends PostgresTestCase
         $this->login('pic@example.test', '/pic/dashboard');
         $this->assertPagesAllowed(array_merge(self::GENERAL, self::EMPLOYEE, self::PIC));
         $this->assertPagesDenied(self::ADMIN);
-        $this->get('/pic/dashboard')->assertSee('Dashboard PIC')->assertSee('My Booking')
+        $this->get('/pic/dashboard')->assertSee('Dashboard PIC')->assertDontSee('My Booking')->assertDontSee('Booking Ruangan')
             ->assertSee('Ruangan Saya')->assertSee('Permintaan Approval')->assertDontSee('Kelola User')
-            ->assertSee('schedule-navigation')->assertSee('Antrean approval belum tersedia')
+            ->assertSee('schedule-navigation')->assertSee('Tinjau permintaan approval')
             ->assertDontSee('Pilihan ruang untuk setiap ide.');
+        foreach (['/pic/rooms', '/pic/approvals', '/pic/approvals/history', '/schedule'] as $url) {
+            $this->get($url)->assertOk()->assertDontSee('My Booking')->assertDontSee('Booking Ruangan');
+        }
     }
 
     public function test_admin_can_open_administration_and_pic_placeholders_without_changing_assignments(): void
@@ -53,7 +56,7 @@ class AuthorizationTest extends PostgresTestCase
         $this->login('admin@example.test', '/admin/dashboard');
         $this->assertPagesAllowed(array_merge(self::GENERAL, self::PIC, self::ADMIN));
         $this->assertPagesDenied(self::EMPLOYEE);
-        $this->get('/admin/dashboard')->assertSee('Dashboard Super Admin')->assertSee('Kelola User')
+        $this->get('/admin/dashboard')->assertSee('Dashboard Admin')->assertSee('Kelola User')
             ->assertSee('Semua Booking')->assertDontSee('My Booking')
             ->assertViewIs('admin.dashboard')->assertSee('Pratinjau dashboard')
             ->assertSee('Aktivitas booking belum tersedia');

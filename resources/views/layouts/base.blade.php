@@ -9,7 +9,7 @@
     <header>
         <p>Booking Ruang Rapat PT Pelindo Multi Terminal</p>
         @auth
-            <p>{{ auth()->user()->name }} — Role: {{ auth()->user()->role }}</p>
+            <p>{{ auth()->user()->name }} — Role: {{ auth()->user()->roleLabel() }}</p>
             @include('layouts.navigation')
             <form method="POST" action="{{ route('logout') }}">
                 @csrf

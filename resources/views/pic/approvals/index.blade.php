@@ -1,33 +1,13 @@
-@extends(auth()->user()->can('access-admin') ? 'layouts.schedule' : 'layouts.base')
-@section('breadcrumb', 'Approval Ruangan')
-@section('title', auth()->user()->can('access-admin') ? 'Approval Ruangan' : 'Permintaan Approval')
+@extends('layouts.schedule')
+@section('title', $history ? 'Riwayat Approval' : 'Permintaan Approval')
+@section('breadcrumb', $history ? 'Riwayat Approval' : 'Permintaan Approval')
 @section('content')
-    @can('access-admin')
-        @include('admin.approvals.index')
-    @else
-    <h1>Permintaan Approval</h1>
-    <x-skeleton-notice />
-    <a href="{{ route('pic.approvals.show', 'preview') }}">Pratinjau Detail Approval</a>
-    <x-table :headers="['Pemohon', 'Unit Kerja', 'Ruangan', 'Agenda', 'Tanggal', 'Jam', 'Jumlah Peserta', 'Status', 'Aksi']">
-        @forelse($approvals ?? [] as $item)
-            <tr>
-                <td>{{ $item->applicant?->name ?? '—' }}</td>
-                <td>{{ $item->organizationalUnit?->name ?? '—' }}</td>
-                <td>{{ $item->room?->name ?? '—' }}</td>
-                <td>{{ $item->agenda }}</td>
-                <td>{{ $item->date }}</td>
-                <td>{{ ($item->start_time ?? '—').' – '.($item->end_time ?? '—') }}</td>
-                <td>{{ $item->participant_count }}</td>
-                <td>{{ $item->status }}</td>
-                <td>
-                    <a href="{{ route('pic.approvals.show', $item->id) }}">Detail</a>
-                </td>
-            </tr>
-        @empty
-            <tr>
-                <td colspan="9">Belum ada permintaan approval.</td>
-            </tr>
-        @endforelse
-    </x-table>
-    @endcan
+    <div class="mb-7 flex flex-wrap items-center justify-between gap-4">
+        <div><h1 class="text-3xl font-bold text-primaryDark">{{ $history ? 'Riwayat Approval' : 'Permintaan Approval' }}</h1><p class="mt-3 text-sm text-slate-600">{{ auth()->user()->can('access-admin') ? 'Pantau pengajuan. Keputusan diberikan oleh PIC yang ditugaskan.' : 'Pengajuan untuk ruangan yang menjadi tanggung jawab Anda.' }}</p></div>
+        <a href="{{ route($history ? 'pic.approvals.index' : 'pic.approvals.history') }}" class="workspace-button-secondary">{{ $history ? 'Permintaan Approval' : 'Riwayat Approval' }}</a>
+    </div>
+    <div class="workspace-feedback"><x-form-feedback /></div>
+    <x-workspace-panel :title="$history ? 'Keputusan Pengajuan' : 'Menunggu Keputusan'">
+        @include('shared.bookings-table', ['bookings' => $approvals, 'detailRoute' => 'pic.approvals.show', 'emptyTitle' => $history ? 'Belum ada riwayat approval.' : 'Belum ada permintaan approval.'])
+    </x-workspace-panel>
 @endsection
