@@ -2,6 +2,42 @@
 
 ## Last Update
 
+2026-09-29 - Warna footer dashboard pegawai mengikuti primaryDark.
+
+- Footer memakai bg-primaryDark dengan teks putih/secondaryLight, hover putih, dan garis pemisah putih transparan sesuai permintaan pengguna. Struktur dan tautan tetap.
+- Build Vite berhasil. Test fitur tidak diulang karena hanya perubahan warna; hasil regresi sebelumnya tercatat di bawah. Visual browser belum diperiksa langsung.
+
+## Riwayat sebelum perubahan warna footer
+
+2026-09-29 - Penyesuaian dashboard pegawai dan footer.
+
+- `/dashboard` mengikuti proporsi beranda terbaru: tanpa minimum 100vh, padding vertikal 40/48/56px, gambar maksimal 420px dengan tinggi 240/320/360px dan caption terang di bawah. Deskripsi 16–18px, tombol 16px, panduan 14px. Katalog dan ringkasan akun tetap memakai data existing.
+- Partial `shared/employee-dashboard-footer.blade.php` menampilkan identitas perusahaan, tautan Booking Ruangan/My Booking/Jadwal, copyright tahun dinamis, dan kembali ke atas. Layout user memakainya khusus route dashboard; footer dan tampilan Jadwal Ruangan tetap seperti sebelumnya.
+- Verifikasi: FrontendSkeletonTest, AuthorizationTest, RoomCatalogTest, HomeAndScheduleTest **37 passed, 605 assertions**. Build Vite, view:cache/view:clear, dan diff check berhasil. Responsivitas, label navigasi footer, fokus keyboard dan alt ditinjau dari kode; browser visual belum diuji karena tool browser tidak tersedia.
+
+## Riwayat sebelum penyesuaian dashboard pegawai dan footer
+
+2026-09-29 - Tambahan whitespace kecil pada pembuka beranda.
+
+- Padding vertikal ditambah lagi 8px per sisi; gap kolom dan jarak setelah panel menjadi 48px. Tinggi tetap mengikuti konten, font/gambar/jadwal tidak berubah.
+- Build Vite berhasil. Test fitur tidak diulang karena perubahan hanya tiga class spacing; hasil test sebelumnya tercatat di bawah. Visual browser belum diuji karena tool browser tidak tersedia.
+
+## Riwayat sebelum tambahan spacing
+
+2026-09-29 - Penyeimbangan whitespace beranda publik.
+
+- Padding vertikal pembuka ditambah 8px per sisi, gap kolom dan jarak ke jadwal menjadi 40px, serta pemisah panduan lebih lega. Font dan ukuran gambar dipertahankan; tinggi tetap mengikuti konten tanpa minimum viewport. Section jadwal tidak diubah.
+- Verifikasi: HomeAndScheduleTest dan ExampleTest **18 passed, 164 assertions**; build Vite berhasil. Visual browser belum diuji karena tool browser tidak tersedia.
+
+## Riwayat sebelum penyeimbangan whitespace
+
+2026-09-29 - Beranda publik lebih ringkas setelah review whitespace dan font.
+
+- Minimum 100vh/100svh pada pembuka `/` dihapus sesuai arahan pengguna; tinggi kini mengikuti konten. Padding, jarak antarelemen, dan jarak ke jadwal dikurangi. Deskripsi naik menjadi 16–18px, tombol 16px, panduan/catatan 14px. Ukuran gambar, dashboard pegawai, dan section Jadwal Ruangan tetap dipertahankan.
+- Verifikasi: HomeAndScheduleTest dan ExampleTest **18 passed, 164 assertions**; build Vite berhasil. Responsivitas dan keterbacaan ditinjau dari kode; browser visual belum diverifikasi karena tool browser tidak tersedia.
+
+## Riwayat sebelum peringkasan beranda
+
 2026-09-29 - Verifikasi publikasi ke GitHub atas permintaan pengguna.
 
 - Cakupan publikasi: pengaturan waktu booking fleksibel existing, dashboard pegawai, beranda publik, ilustrasi lokal, test, dan dokumentasi terkait.
