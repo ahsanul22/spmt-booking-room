@@ -23,7 +23,7 @@
     </div>
 
     <!-- Centered Fullscreen Container Wrapper -->
-    <main class="relative z-10 flex min-h-screen w-full items-center justify-center p-3 sm:p-5 lg:p-6">
+    <main id="content" class="relative z-10 flex min-h-screen w-full items-center justify-center p-3 sm:p-5 lg:p-6">
         
         <!-- Main Hero Card Container (Continuous Port Photo Background) -->
         <div class="relative w-full max-w-[1040px] rounded-3xl sm:rounded-[32px] overflow-hidden bg-slate-900 shadow-[0_25px_60px_-15px_rgba(14,51,106,0.30)] border border-white/80 grid grid-cols-1 lg:grid-cols-12 min-h-[540px] lg:min-h-[580px]">
@@ -208,6 +208,7 @@
             </div>
         </div>
     </main>
+    @include('shared.footer')
 
     <!-- Script for show/hide password -->
     <script>

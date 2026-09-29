@@ -10,6 +10,34 @@ use Tests\PostgresTestCase;
 
 class FrontendSkeletonTest extends PostgresTestCase
 {
+    public function test_shared_footer_is_present_and_links_follow_the_visitor_role(): void
+    {
+        foreach (['/', '/login'] as $url) {
+            $html = $this->get($url)->assertOk()->getContent();
+            $this->assertSame(1, substr_count($html, '<footer '));
+            preg_match('/<footer\b.*?<\/footer>/s', $html, $footer);
+            $this->assertStringContainsString(route('home').'#room-schedule', $footer[0]);
+            $this->assertStringNotContainsString(route('my-bookings.index'), $footer[0]);
+        }
+        foreach ([
+            'user' => ['/dashboard', '/schedule', '/my-bookings', 'Booking Ruangan'],
+            'room_pic' => ['/pic/dashboard', '/pic/approvals/history', '/schedule', 'Permintaan Approval'],
+            'super_admin' => ['/admin/dashboard', '/admin/rooms/create', '/admin/schedule', 'Semua Booking'],
+        ] as $role => $pages) {
+            $label = array_pop($pages);
+            $this->actingAs(User::where('role', $role)->firstOrFail());
+            foreach ($pages as $url) {
+                $html = $this->get($url)->assertOk()->getContent();
+                $this->assertSame(1, substr_count($html, '<footer '));
+                preg_match('/<footer\b.*?<\/footer>/s', $html, $footer);
+                $this->assertStringContainsString($label, $footer[0]);
+                if ($role !== 'user') {
+                    $this->assertStringNotContainsString('My Booking', $footer[0]);
+                }
+            }
+        }
+    }
+
     public function test_guests_are_redirected_from_every_skeleton_page(): void
     {
         foreach ($this->pages() as $page) {

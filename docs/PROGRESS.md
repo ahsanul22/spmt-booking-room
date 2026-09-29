@@ -2,6 +2,30 @@
 
 ## Last Update
 
+2026-09-29 - Persiapan publikasi perbaikan booking dan footer bersama ke origin/main.
+
+- Publikasi atas permintaan pengguna mencakup perbaikan form waktu/PIC, footer sesuai role di seluruh layout, dan test terkait. Verifikasi terakhir: 52 test booking/katalog/jadwal serta 78 test regresi layout/otorisasi dan 1 test footer tambahan lulus; kelompok tersebut memiliki sebagian test yang sama. Build Vite dan kompilasi Blade berhasil. Tidak mengulang test karena tidak ada perubahan kode sejak verifikasi.
+
+## Riwayat sebelum publikasi perbaikan booking dan footer
+
+2026-09-29 - Footer biru tua digunakan di semua halaman aplikasi.
+
+- Partial dashboard dipindahkan menjadi `shared/footer.blade.php`, dipakai layout user/public/schedule/base dan halaman login. Tautan mengikuti tamu, pegawai, PIC, atau admin; PIC/admin tidak mendapat tautan booking pribadi. Login mendapat target content untuk tautan kembali ke atas. Kalender dan proses form tidak diubah.
+- Layout base kini memuat aset Vite agar footer tampil konsisten; header/konten lama memakai styling user-module existing untuk mempertahankan keterbacaan form dan tabel setelah Tailwind reset.
+- Verifikasi regresi AuthenticationTest, AuthorizationTest, FrontendSkeletonTest, HomeAndScheduleTest, FloorFacilityManagementTest, RoomManagementTest, RoomAssignmentTest: **78 passed, 1567 assertions**. Test footer tambahan **1 passed, 44 assertions**, memeriksa satu footer pada berbagai layout dan tautan sesuai role. Build Vite, view:cache/view:clear, diff check berhasil. Struktur responsif dan fokus ditinjau dari kode; visual browser belum diperiksa langsung karena tool browser tidak tersedia.
+
+## Riwayat sebelum footer bersama
+
+2026-09-29 - Pemeriksaan dan perbaikan alur booking pegawai.
+
+- Jam selesai otomatis kini berupa ringkasan, bukan input readonly yang tampak bisa diklik. Input jam selesai hanya muncul untuk durasi custom, dengan step 60 detik sesuai validasi backend per menit. Mode otomatis/custom memiliki wire:key berbeda; error jam selesai tetap terlihat pada kedua mode.
+- Komponen memvalidasi pilihan durasi dan menghitung ulang waktu otomatis sebelum check/submit. Perubahan jam selesai manual mengaktifkan mode custom. Penanda perubahan Alpine mencakup tanggal di luar form, sehingga hasil pemeriksaan lama langsung disembunyikan saat tanggal diubah.
+- Pemeriksaan PIC aktif diekstrak ke BookingService::assertPicAvailable dan digunakan oleh checkPlan serta submit; precheck tidak lagi menyatakan lolos untuk ruangan approval tanpa PIC aktif. Validasi konflik, akses, minimal dua jam, transaksi, dan idempotensi tetap dipertahankan.
+- Verifikasi: BookingPreparationTest, BookingWorkflowTest, HomeAndScheduleTest, RoomCatalogTest **52 passed, 522 assertions**. Test baru mencakup ringkasan otomatis/input manual, waktu manual 14:07 tersimpan, durasi invalid, ketiadaan PIC, dan perubahan tanggal. Run pertama 1 failed/51 passed karena helper test masih mengisi jam selesai manual pada skenario otomatis; helper disesuaikan agar memakai hasil durasi seperti UI. Build Vite, view:cache/view:clear, dan diff check berhasil.
+- Audit dilakukan melalui kode dan test HTTP/Livewire, termasuk konflik concurrent, retry, otorisasi, dan privasi. Browser/interaksi native time picker serta respons jaringan langsung belum diuji karena tool browser tidak tersedia; tidak menyatakan seluruh kemungkinan bug sudah terhapus.
+
+## Riwayat sebelum pemeriksaan booking pegawai
+
 2026-09-29 - Warna footer dashboard pegawai mengikuti primaryDark.
 
 - Footer memakai bg-primaryDark dengan teks putih/secondaryLight, hover putih, dan garis pemisah putih transparan sesuai permintaan pengguna. Struktur dan tautan tetap.

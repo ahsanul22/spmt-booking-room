@@ -40,9 +40,7 @@ class BookingService
             }
             $data = $this->preparation->validate($input);
             $this->assertRoomAllowed($room, $user);
-            if ($room->requires_approval && ! $room->pics()->where('role', User::ROLE_ROOM_PIC)->where('is_active', true)->exists()) {
-                throw ValidationException::withMessages(['room' => 'PIC aktif belum ditetapkan. Hubungi administrator sebelum mengajukan ruangan ini.']);
-            }
+            $this->assertPicAvailable($room);
             $this->assertNoConflict($roomId, $data);
 
             return Booking::create([
@@ -57,6 +55,13 @@ class BookingService
                 'submission_token' => $token, 'request_hash' => $hash,
             ]);
         }, 3);
+    }
+
+    public function assertPicAvailable(Room $room): void
+    {
+        if ($room->requires_approval && ! $room->pics()->where('role', User::ROLE_ROOM_PIC)->where('is_active', true)->exists()) {
+            throw ValidationException::withMessages(['room' => 'PIC aktif belum ditetapkan. Hubungi administrator sebelum mengajukan ruangan ini.']);
+        }
     }
 
     public function assertRoomAllowed(Room $room, User $user): void

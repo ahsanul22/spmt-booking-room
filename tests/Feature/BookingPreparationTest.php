@@ -34,7 +34,7 @@ class BookingPreparationTest extends PostgresTestCase
     private function form()
     {
         return Livewire::test(BookingPreparationForm::class, ['roomId' => $this->room()->id])
-            ->set('date', '2026-09-27')->set('start_time', '12:00')->set('end_time', '13:00')
+            ->set('date', '2026-09-27')->set('start_time', '12:00')
             ->set('agenda', 'Koordinasi tim');
     }
 
@@ -79,6 +79,46 @@ class BookingPreparationTest extends PostgresTestCase
             $this->get('/my-bookings/create?room_id='.$id)->assertNotFound();
         }
         $this->get('/my-bookings/create?room_id[]=1')->assertNotFound();
+    }
+
+    public function test_automatic_end_is_a_summary_and_manual_end_accepts_any_minute(): void
+    {
+        $form = Livewire::test(BookingPreparationForm::class, ['roomId' => $this->room()->id])
+            ->assertSee('Jam selesai otomatis (WIB)')->assertDontSee('name="end_time"', false)
+            ->set('start_time', '13:00')->assertSet('end_time', '14:00')
+            ->set('duration', 'custom')->assertSee('name="end_time"', false)
+            ->assertSee('step="60"', false)->assertDontSee('readonly', false)
+            ->set('end_time', '14:07')->set('agenda', 'Rapat menit khusus');
+        $form->call('checkPlan')->assertHasNoErrors()->call('submitBooking')->assertHasNoErrors();
+        $this->assertDatabaseHas('bookings', ['room_id' => $this->room()->id, 'end_time' => '14:07:00']);
+    }
+
+    public function test_invalid_duration_is_rejected_by_both_actions(): void
+    {
+        $form = $this->form()->set('duration', '999');
+        $form->call('checkPlan')->assertHasErrors('duration')->assertSet('checked', false);
+        $form->call('submitBooking')->assertHasErrors('duration');
+        $this->assertDatabaseCount('bookings', 0);
+    }
+
+    public function test_precheck_and_submit_reject_a_room_without_an_active_pic(): void
+    {
+        $room = $this->room();
+        $room->update(['requires_approval' => true]);
+        $room->pics()->detach();
+        $form = $this->form();
+        $form->call('checkPlan')->assertHasErrors('room')->assertSet('checked', false)
+            ->assertSee('PIC aktif belum ditetapkan');
+        $form->call('submitBooking')->assertHasErrors('room');
+        $this->assertDatabaseCount('bookings', 0);
+    }
+
+    public function test_date_change_clears_success_and_rechecks_the_selected_day(): void
+    {
+        $this->form()->call('checkPlan')->assertSet('checked', true)
+            ->set('date', '2026-09-26')->assertSet('checked', false)
+            ->assertDontSee('Waktu dan isian lolos pemeriksaan saat ini.')
+            ->call('checkPlan')->assertHasErrors('start_time');
     }
 
     public function test_dashboard_is_a_small_catalog_preview_and_my_bookings_is_not_a_catalog(): void

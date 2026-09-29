@@ -1,4 +1,4 @@
-<div wire:poll.30s>
+<div wire:poll.30s x-data="{ changed: false }" x-on:input="changed = true" x-on:change="changed = true" x-on:plan-checked.window="changed = false">
     <div class="mb-7 flex flex-wrap items-center justify-between gap-4">
         <div><p class="mb-2 text-xs font-semibold text-primary">Langkah 2 dari 2 &middot; Detail pertemuan</p><h1 class="text-3xl font-bold text-primaryDark">Booking Ruangan</h1><p class="mt-3 text-sm text-slate-600">Ruangan sudah dipilih. Lengkapi jadwal dan agenda Anda.</p></div>
         <a href="{{ route('rooms.index') }}" class="workspace-button-secondary">Kembali ke pilihan ruangan</a>
@@ -35,7 +35,7 @@
                 </x-workspace-panel>
             </div>
             <x-workspace-panel title="Detail Pertemuan" description="Isi tanggal, waktu, dan agenda. Kolom bertanda * wajib diisi.">
-                <form x-data="{ changed: false }" x-on:input="changed = true" x-on:plan-checked.window="changed = false" wire:submit="submitBooking" method="POST" action="{{ route('my-bookings.create') }}" class="workspace-form">
+                <form wire:submit="submitBooking" method="POST" action="{{ route('my-bookings.create') }}" class="workspace-form">
                     @csrf
                     <input type="hidden" name="room_id" value="{{ $room->id }}">
                     <div class="rounded-xl bg-background p-4 text-sm leading-6 text-primaryDark sm:col-span-2">
@@ -43,7 +43,7 @@
                         <p class="mt-1 text-xs text-slate-600">Waktu paling awal saat halaman diperbarui: {{ $earliestStart->format('d/m/Y H:i') }} WIB. Batas dihitung ulang saat pemeriksaan dan saat booking dikirim.</p>
                     </div>
                     <div class="space-y-3 sm:col-span-2">
-                        <p class="text-sm text-slate-600">Pilih jam mulai dan durasi. Jam selesai dihitung otomatis. Pilihan awal mengikuti jam kerja {{ config('booking.workday_start') }}–{{ config('booking.workday_end') }} WIB.</p>
+                        <p class="text-sm text-slate-600">Pilih jam mulai dan durasi. Untuk mengisi jam selesai langsung, pilih “Atur jam selesai sendiri” pada Durasi. Pilihan awal mengikuti jam kerja {{ config('booking.workday_start') }}–{{ config('booking.workday_end') }} WIB.</p>
                         <label class="flex items-center gap-3 text-sm font-semibold text-primaryDark">
                             <input type="checkbox" wire:model.live="outsideWorkHours" class="h-4 w-4 rounded border-slate-300 accent-primary focus:ring-2 focus:ring-primary">
                             Tampilkan jam di luar jam kerja
@@ -59,7 +59,18 @@
                             @foreach(config('booking.duration_options') as $minutes => $label)<option value="{{ $minutes }}">{{ $label }}</option>@endforeach
                             <option value="custom">Atur jam selesai sendiri</option>
                         </x-workspace-field>
-                        <x-workspace-field wire:model.live="end_time" name="end_time" label="Jam Selesai (WIB)" type="time" :readonly="$duration !== 'custom'" :step="config('booking.time_step_minutes') * 60" hint="Pilih durasi custom untuk mengubah jam selesai." required />
+                        @if($duration === 'custom')
+                            <div wire:key="manual-end-time">
+                                <x-workspace-field wire:model.live="end_time" name="end_time" label="Jam Selesai (WIB)" type="time" step="60" hint="Isi jam selesai setelah jam mulai, pada tanggal yang sama." required />
+                            </div>
+                        @else
+                            <div wire:key="automatic-end-time" class="rounded-xl border border-secondaryLight/60 p-4">
+                                <p class="text-sm font-semibold text-primaryDark">Jam selesai otomatis (WIB)</p>
+                                <p class="mt-2 text-xl font-bold text-primaryDark">{{ $end_time ?: '—' }}</p>
+                                <p class="mt-2 text-xs leading-5 text-slate-600">Dihitung dari jam mulai dan durasi. Pilih “Atur jam selesai sendiri” untuk mengisi secara manual.</p>
+                                @error('end_time')<p role="alert" class="mt-2 text-sm text-danger">{{ $message }}</p>@enderror
+                            </div>
+                        @endif
                         <div role="status" aria-live="polite" class="rounded-xl bg-background p-4 text-sm leading-6 text-primaryDark">
                             @if($start_time && $end_time)
                                 <p class="font-semibold">{{ $start_time }}–{{ $end_time }} WIB</p>

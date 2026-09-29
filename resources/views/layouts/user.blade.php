@@ -39,11 +39,7 @@
                 <div class="user-module min-w-0 rounded-2xl border border-slate-200/80 bg-surface p-5 shadow-sm sm:p-6">@yield('content')</div>
             @endif
         </main>
-        @if(request()->routeIs('dashboard'))
-            @include('shared.employee-dashboard-footer')
-        @else
-            <footer class="mx-auto flex w-full max-w-[1800px] flex-wrap justify-between gap-2 px-5 pb-6 text-xs text-slate-500 sm:px-8"><span>PT Pelindo Multi Terminal</span><span>Booking Room · Ruang untuk berkolaborasi</span></footer>
-        @endif
+        @include('shared.footer')
     </div>
 </body>
 </html>

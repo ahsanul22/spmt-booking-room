@@ -14,6 +14,6 @@
         </nav>
     </header>
     <main id="content" class="mx-auto max-w-[1800px] p-5 sm:p-8">@yield('content')</main>
-    <footer class="mx-auto flex max-w-[1800px] flex-wrap justify-between gap-2 px-5 py-6 text-xs text-slate-600 sm:px-8"><span>PT Pelindo Multi Terminal</span><span>Booking Room &middot; Untuk pegawai internal</span></footer>
+    @include('shared.footer')
 </body>
 </html>

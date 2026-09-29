@@ -76,7 +76,7 @@
                 <div class="flex items-center gap-3"><div class="hidden text-right sm:block"><p class="text-sm font-semibold">{{ auth()->user()->name }}</p><p class="mt-0.5 text-xs capitalize text-slate-500">{{ auth()->user()->roleLabel() }}</p></div><span class="flex h-10 w-10 items-center justify-center rounded-full bg-secondaryLight/40 text-sm font-bold text-primaryDark">{{ mb_strtoupper(mb_substr(auth()->user()->name, 0, 1)) }}</span></div>
             </header>
             <main id="content" @class(['mx-auto p-5 lg:p-9', 'max-w-[1800px]' => request()->routeIs('dashboard', '*.dashboard'), 'max-w-[1600px]' => ! request()->routeIs('dashboard', '*.dashboard')])>@yield('content')</main>
-            <footer class="flex flex-wrap justify-between gap-2 px-5 pb-6 text-xs text-slate-500 lg:px-9"><span>PT Pelindo Multi Terminal</span><span>Meeting Room · Internal Workspace</span></footer>
+            @include('shared.footer')
         </div>
     </div>
 </body>

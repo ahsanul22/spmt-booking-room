@@ -47,6 +47,9 @@ class BookingPreparationForm extends Component
     {
         $this->checked = false;
         $this->resetValidation();
+        if ($property === 'end_time') {
+            $this->duration = 'custom';
+        }
         if (in_array($property, ['start_time', 'duration'], true)) {
             $this->calculateEndTime();
         }
@@ -71,6 +74,7 @@ class BookingPreparationForm extends Component
     {
         $this->checked = false;
         $this->resetValidation();
+        $this->prepareTime();
         $room = Room::with(['floor', 'facilities', 'allowedOrganizationalUnits'])->findOrFail($this->roomId);
         $reason = $preparation->unavailableReason($room, auth()->user()->fresh());
         if ($reason) {
@@ -78,6 +82,7 @@ class BookingPreparationForm extends Component
             return;
         }
         $preparation->validate($this->only(['date', 'start_time', 'end_time', 'agenda', 'notes']));
+        app(BookingService::class)->assertPicAvailable($room);
         app(BookingService::class)->assertNoConflict($room->id, $this->only(['date', 'start_time', 'end_time']));
         $this->checked = true;
         $this->dispatch('plan-checked');
@@ -87,11 +92,20 @@ class BookingPreparationForm extends Component
     {
         $this->checked = false;
         $this->resetValidation();
+        $this->prepareTime();
         $booking = $service->submit(auth()->user(), $this->roomId,
             $this->only(['date', 'start_time', 'end_time', 'agenda', 'notes']), $this->submissionToken);
         session()->flash('status', $booking->status === 'approved'
             ? 'Booking berhasil. Ruangan telah dipesan.' : 'Pengajuan berhasil dikirim. Menunggu persetujuan PIC.');
         $this->redirectRoute('my-bookings.show', ['booking' => $booking->id]);
+    }
+
+    private function prepareTime(): void
+    {
+        $this->validate(['duration' => ['required', \Illuminate\Validation\Rule::in([
+            ...array_map('strval', array_keys(config('booking.duration_options'))), 'custom',
+        ])]], ['duration.in' => 'Pilih durasi yang tersedia atau atur jam selesai sendiri.']);
+        $this->calculateEndTime();
     }
 
     public function render(): View
