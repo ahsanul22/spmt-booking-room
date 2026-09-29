@@ -1,6 +1,8 @@
 @extends('layouts.schedule')
+
 @section('title', 'Detail Approval')
 @section('breadcrumb', 'Approval / Detail')
+
 @section('content')
     <div class="mb-7 flex flex-wrap items-center justify-between gap-4"><h1 class="text-3xl font-bold text-primaryDark">Detail Approval</h1><a href="{{ route('pic.approvals.index') }}" class="workspace-button-secondary">Kembali ke Permintaan Approval</a></div>
     <div class="workspace-feedback"><x-form-feedback /></div>

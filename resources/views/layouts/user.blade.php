@@ -11,7 +11,9 @@
     <div class="flex min-h-screen flex-col">
         <header class="border-b border-slate-200/80 bg-surface">
             <div class="mx-auto flex max-w-[1800px] flex-wrap items-center justify-between gap-4 px-5 py-5 sm:px-8">
-                <a href="{{ route('dashboard') }}" aria-label="Pelindo Multi Terminal, Dashboard" class="shrink-0 text-primaryDark"><span class="block text-2xl font-bold italic tracking-tight">pelindo<span class="text-primary" aria-hidden="true">∿</span></span><span class="block text-[9px] font-semibold uppercase tracking-[0.22em]">Multi Terminal</span></a>
+                <a href="{{ route('dashboard') }}" aria-label="Pelindo Multi Terminal, Dashboard" class="shrink-0 focus:outline-none">
+                    <x-application-logo variant="light" class="h-8 sm:h-9 w-auto max-w-[165px] sm:max-w-[185px] object-contain" />
+                </a>
                 <div class="flex min-w-0 items-center gap-3">
                     <span class="hidden max-w-xs truncate text-sm font-semibold text-primaryDark sm:block">{{ auth()->user()->name }}</span>
                     <form method="POST" action="{{ route('logout') }}">@csrf<button type="submit" class="rounded-lg border border-slate-200 px-3 py-2.5 text-sm font-semibold text-primaryDark hover:bg-background">Keluar</button></form>
