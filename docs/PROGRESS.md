@@ -2,6 +2,40 @@
 
 ## Last Update
 
+2026-09-29 - Tampilan metrik dashboard PIC diperbarui menjadi angka dinamis.
+
+- Mengganti garis/strip (`—`) pada 3 kartu statistik ringkasan PIC (`Menunggu approval`, `Ruangan tanggung jawab`, dan `Jadwal hari ini`) menjadi angka metrik dinamis:
+  - `app/Http/Controllers/DashboardController.php`: Menghitung metrik khusus PIC secara efisien:
+    - `Menunggu approval`: Menghitung booking dengan `requires_approval = true` dan `status = 'pending'` sesuai cakupan penugasan ruangan PIC akun login (atau seluruhnya jika diakses admin).
+    - `Ruangan tanggung jawab`: Menghitung jumlah ruangan penugasan PIC melalui relasi `$user->managedRooms()->count()`.
+    - `Jadwal hari ini`: Menghitung penggunaan ruangan pada tanggal berjalan (WIB) dengan status `pending`, `approved`, atau `completed` untuk ruangan penugasan PIC.
+  - `resources/views/pic/dashboard.blade.php`: Merender nilai angka tebal (`text-3xl font-bold text-primaryDark`) dan deskripsi pembantu ringkas ("Pengajuan perlu ditinjau", "Ruangan ditugaskan", "Penggunaan hari ini"). Diberikan fallback default yang aman.
+- Verifikasi aktual:
+  - `php artisan test --filter=PicDashboardBannerTest` **1 passed (33 assertions)**.
+  - `php artisan test --filter=AuthorizationTest` **9 passed (293 assertions)**.
+  - `php artisan view:clear` & `php artisan view:cache` sukses.
+  - `npm run build` sukses (3.51s).
+
+## Riwayat sebelum pembaruan angka metrik PIC
+
+2026-09-29 - Tampilan dashboard PIC diselaraskan menyerupai dashboard admin.
+
+- Menyelaraskan struktur dan komponen visual dashboard PIC (`resources/views/dashboard.blade.php` dan `resources/views/pic/dashboard.blade.php`) agar konsisten dengan layout dan pola dashboard admin (`resources/views/admin/dashboard.blade.php`):
+  - Header halaman berdesain flex dengan tagline "Workspace PIC Ruangan", judul `Dashboard PIC`, deskripsi tugas, dan tombol aksi utama "Permintaan Approval" di kanan atas.
+  - Banner catatan pratinjau berlatar `bg-secondaryLight/20` dengan dot aksen primary.
+  - Tiga kartu metrik ringkasan (`Menunggu approval`, `Ruangan tanggung jawab`, `Jadwal hari ini`).
+  - Tata letak 2 kolom (`xl:grid-cols-[minmax(0,1fr)_300px]`):
+    - Kolom kiri: Panel shortcut "Kelola Pengajuan dan Ruangan" (`Permintaan Approval`, `Ruangan Saya`, `Riwayat Approval`, `Jadwal Ruangan`) serta kartu status aktivitas "Menunggu Tinjauan Anda" lengkap dengan badge Pratinjau, ikon jam, dan tombol tautan "Buka permintaan".
+    - Kolom kanan: Kartu sorotan biru tua `bg-primaryDark` ("Tinjau cepat. Persetujuan tepat."), panel panduan peninjauan ("Saat meninjau pengajuan"), dan kartu identitas "Akun Anda".
+  - Mempertahankan proteksi role, ketiadaan tombol booking pribadi untuk PIC (sesuai DEC-030), integritas route, CSRF, escaping, dan relasi akun.
+- Verifikasi aktual:
+  - Seluruh test suite aplikasi: **151 passed, 2712 assertions** (`php artisan test --compact`).
+  - Test spesifik `PicDashboardBannerTest`, `AuthorizationTest`, `FrontendSkeletonTest`, `PicRoomsTest`, dan `UserManagementTest` seluruhnya lulus.
+  - `php artisan view:clear` & `php artisan view:cache` sukses.
+  - `npm run build` sukses (2.20s).
+
+## Riwayat sebelum penyelarasan dashboard PIC
+
 2026-09-29 - Navbar pegawai sticky dengan blur ringan saat scroll.
 
 - `resources/views/layouts/user.blade.php` memakai sticky top-0; setelah scroll lebih dari 8px, latar putih menjadi 90% dengan blur 4px melalui state di `resources/js/app.js`. Saat di atas halaman kembali solid. Tinggi header dibatasi viewport dengan scroll internal agar menu mobile tetap terjangkau. Label role di samping avatar dihapus, nama pengguna dipertahankan.
@@ -142,6 +176,13 @@
 
 ## Riwayat sebelum pendaftaran seeder ruangan
 
+2026-09-29 - Penerapan desain login, logo resmi Pelindo SPMT, dan latar sidebar.
+
+- Menggantikan tampilan teks merek dengan aset logo resmi PT Pelindo Multi Terminal (SPMT) melalui komponen `<x-application-logo>` (`variant="light"` dan `variant="dark"`).
+- Hero card login mengambang dengan latar foto pelabuhan SPMT (`login-port.jpg`), ornamen gelombang, dan kartu putih modern.
+- Sidebar jadwal mengadopsi latar derek pelabuhan kontinu (`sidebar-port.jpg`) dan item menu glassmorphism.
+- Verifikasi: test suite aplikasi passed; build Vite dan view:clear berhasil.
+
 2026-09-28 - Verifikasi untuk publikasi perubahan booking, jadwal, dan tampilan PIC/admin.
 
 - Seluruh suite terakhir: **143 passed, 2550 assertions** (`php artisan test --compact`). Build Vite dan kompilasi Blade terakhir berhasil pada verifikasi perubahan UI. Staged diff check bersih.
@@ -250,7 +291,7 @@
 
 ## Pembaruan sebelumnya
 
-2026-09-24 - Verifikasi publikasi frontend admin dalam commit terpisah ke origin/main.
+
 
 ## Verifikasi Publikasi Frontend Admin
 

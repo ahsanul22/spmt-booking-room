@@ -1,5 +1,13 @@
 # Decisions
 
+## DEC-035 - Penerapan Logo Resmi Pelindo Multi Terminal (SPMT)
+
+- Menggantikan tampilan teks merek sementara `pelindo ∿ Multi Terminal` dengan aset logo resmi PT Pelindo Multi Terminal (SPMT) sesuai arahan pengguna.
+- Menyediakan komponen Blade reusable `<x-application-logo>` dengan dukungan varian tema:
+  - `variant="light"` menggunakan `public/images/pelindo-logo.png` (warna cyan `#2FA4D7` dan corporate blue `#0E73A7` resmi) untuk permukaan latar terang seperti header pengguna (`layouts/user.blade.php`).
+  - `variant="dark"` menggunakan `public/images/pelindo-logo-white.png` (teks dan kontur putih kontras tinggi dengan aksen cyan `#2FA4D7`) untuk permukaan latar gelap (`primaryDark` `#0E336A`) seperti sidebar jadwal (`layouts/schedule.blade.php`) dan panel samping login (`auth/login.blade.php`).
+- Tidak mengubah route, otorisasi, controller, maupun menambah dependensi baru.
+
 ## DEC-034 - Pemilihan Waktu Booking dengan Jam Kerja Fleksibel
 
 - Pengguna menyetujui jam kerja 08.00–17.00 sebagai default pilihan waktu, bukan batas keras. Opsi tampilkan jam di luar jam kerja menyediakan pilihan sepanjang hari; tidak menambah approval khusus atau pembatasan akhir pekan.
@@ -65,7 +73,7 @@
 
 - Sesuai permintaan pengguna, jumlah peserta dihapus dari form, detail booking, daftar approval, dan panduan UI. Kapasitas master ruangan tetap menjadi informasi ruangan.
 - Halaman dan route Cari Ruangan dihapus; URL lama menghasilkan 404. Booking Ruangan (`/my-bookings/create`) tersedia langsung di navbar user dan dashboard.
-- Form memakai komponen workspace, tetap pratinjau dengan submit nonaktif sesuai roadmap. Tidak mengaktifkan backend Tahap 5 atau mengubah izin role/schema/dependency.
+
 
 ## DEC-026 - Navigasi Administrasi Tanpa Menu Lantai
 
