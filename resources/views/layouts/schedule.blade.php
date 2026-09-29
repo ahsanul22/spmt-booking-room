@@ -20,7 +20,7 @@
                 <a href="{{ route(auth()->user()->dashboardRouteName()) }}" aria-label="Pelindo Multi Terminal, Dashboard" class="inline-block focus:outline-none">
                     <x-application-logo variant="dark" class="h-8 sm:h-9 w-auto max-w-[160px] sm:max-w-[175px] object-contain drop-shadow-sm" />
                 </a>
-                <button type="button" data-menu-toggle aria-expanded="false" aria-controls="schedule-navigation" class="rounded-lg p-2 hover:bg-white/10 lg:hidden" aria-label="Buka navigasi"><x-schedule-icon name="menu" /></button>
+                <button type="button" data-menu-toggle aria-expanded="false" aria-controls="schedule-navigation" class="rounded-lg p-3 hover:bg-white/10 focus-visible:outline-white lg:hidden" aria-label="Buka navigasi"><x-schedule-icon name="menu" /></button>
             </div>
             <div id="schedule-navigation" class="relative z-10 hidden flex-1 flex-col px-4 pb-5 lg:flex">
                 <div class="mx-3 mb-8 border-t border-white/15 pt-5"><p class="text-sm font-semibold tracking-wide text-white">Meeting Room</p><p class="mt-1 text-xs text-secondaryLight">Ruang untuk berkolaborasi.</p></div>

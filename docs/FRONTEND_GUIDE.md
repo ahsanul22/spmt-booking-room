@@ -40,7 +40,7 @@ Gunakan `bg-primary`, `text-primaryDark`, `bg-surface`, `border-secondaryLight`,
 - Gunakan header surface dan latar background. Sidebar primaryDark berlaku untuk PIC/admin; role user memakai navbar `layouts.user` sesuai DEC-024. Referensi admin/jadwal adalah gaya visual, sedangkan susunan konten mengikuti tugas role: approval untuk PIC, pencarian dan booking pribadi untuk user. Halaman mempunyai satu h1, deskripsi singkat, serta aksi utama yang relevan dengan role.
 - Ikuti skala referensi: konten `p-5 lg:p-9`, jarak `gap-4`/`gap-6`, card `rounded-2xl`, tombol `rounded-lg`/`rounded-xl`, border halus dan `shadow-sm` secukupnya.
 - Gunakan komponen/partial untuk form, tabel, badge, dan detail yang berulang. Periksa pemakai komponen sebelum mengubahnya agar halaman lain tetap berfungsi.
-- Sidebar PIC/admin pada mobile dapat dibuka/tutup. Navbar user membungkus dan tetap terlihat pada mobile tanpa JavaScript. Form menyesuaikan lebar layar; tabel/kalender lebar boleh scroll di dalam container, bukan membuat seluruh halaman melebar.
+- Pada desktop, navigasi pegawai sejajar di kanan logo dan PIC/admin memakai sidebar. Di bawah breakpoint lg, navigasi ketiga role dibuka/tutup melalui hamburger dengan JavaScript existing; Escape menutup menu dan mengembalikan fokus ke tombol. Form menyesuaikan lebar layar; tabel/kalender lebar boleh scroll di dalam container, bukan membuat seluruh halaman melebar.
 - Sediakan label input, fokus keyboard terlihat, aria-label tombol ikon, dan teks error yang berhubungan dengan input. Beri state hover/focus/disabled yang jelas.
 - Semua tombol harus menjalankan aksi, navigasi, atau memiliki status belum tersedia yang jelas. Jangan menampilkan keberhasilan palsu lewat JavaScript.
 

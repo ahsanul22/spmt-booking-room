@@ -2,6 +2,35 @@
 
 ## Last Update
 
+2026-09-29 - Navbar pegawai sticky dengan blur ringan saat scroll.
+
+- `resources/views/layouts/user.blade.php` memakai sticky top-0; setelah scroll lebih dari 8px, latar putih menjadi 90% dengan blur 4px melalui state di `resources/js/app.js`. Saat di atas halaman kembali solid. Tinggi header dibatasi viewport dengan scroll internal agar menu mobile tetap terjangkau. Label role di samping avatar dihapus, nama pengguna dipertahankan.
+- Verifikasi: FrontendSkeletonTest dan AuthorizationTest **16 passed, 459 assertions**; build Vite dan view:cache/view:clear berhasil. Visual scroll/blur serta keyboard langsung di browser belum diverifikasi karena tool browser tidak tersedia. Review pada halaman pegawai, termasuk `/dashboard`.
+
+## Riwayat sebelum navbar sticky
+
+2026-09-29 - Perapian visual navbar pegawai.
+
+- `resources/views/layouts/user.blade.php`: menu dikelompokkan dengan latar background dan penanda aktif putih/aksen primary, spacing logo/menu diselaraskan, area akun memakai avatar inisial serta pemisah, dan tombol keluar memakai ikon existing. Menu desktop tidak membungkus; nama akun disembunyikan pada rentang lg dan tampil kembali pada xl untuk memberi ruang navigasi. Mobile tetap hamburger dengan menu vertikal dan identitas akun.
+- Verifikasi: FrontendSkeletonTest dan AuthorizationTest **16 passed, 459 assertions**; build Vite, view:cache/view:clear berhasil. Struktur responsive, fokus, dan nama panjang ditinjau dari kode; visual browser belum diperiksa karena tool browser tidak tersedia. Review `/dashboard` dan halaman pegawai lainnya.
+
+## Riwayat sebelum perapian visual navbar
+
+2026-09-29 - Navigasi desktop dan hamburger mobile semua role.
+
+- Layout user menempatkan navigasi Dashboard sampai Jadwal Ruangan sejajar di kanan logo pada desktop. Di mobile/tablet (di bawah 1024px), hamburger membuka menu beserta akun/logout. Sidebar PIC/admin mempertahankan hamburger dengan area tekan lebih besar dan fokus terlihat.
+- `resources/js/schedule.js` menggunakan target aria-controls untuk kedua layout, memperbarui label/aria-expanded, mendukung Escape dengan pengembalian fokus, dan mereset menu ketika melewati breakpoint desktop. Route, active state, izin dan CSRF logout dipertahankan. Panduan frontend diperbarui sesuai permintaan.
+- Verifikasi: FrontendSkeletonTest dan AuthorizationTest **16 passed, 459 assertions**; build Vite serta view:cache/view:clear berhasil. Struktur responsive dan keyboard ditinjau melalui kode; interaksi dan visual browser belum diuji karena tool browser tidak tersedia. Review `/dashboard`, `/pic/dashboard`, dan `/admin/dashboard` pada desktop/mobile.
+
+## Riwayat sebelum navigasi hamburger
+
+2026-09-29 - Penambahan jarak konten dashboard pegawai.
+
+- `resources/views/user/dashboard.blade.php`: padding vertikal pembuka dan jarak antarbagian ditambah sedikit (umumnya 4–8px), termasuk tombol, panduan, dan panel bawah. Review di `/dashboard`. Perubahan konten lokal existing dipertahankan.
+- Verifikasi: RoomCatalogTest **6 passed, 42 assertions**; build Vite, view:cache/view:clear, dan diff check berhasil. Responsivitas dan urutan keyboard ditinjau dari kode; visual desktop/mobile belum diuji langsung karena tool browser tidak tersedia.
+
+## Riwayat sebelum penambahan jarak dashboard pegawai
+
 2026-09-29 - Persiapan publikasi perbaikan booking dan footer bersama ke origin/main.
 
 - Publikasi atas permintaan pengguna mencakup perbaikan form waktu/PIC, footer sesuai role di seluruh layout, dan test terkait. Verifikasi terakhir: 52 test booking/katalog/jadwal serta 78 test regresi layout/otorisasi dan 1 test footer tambahan lulus; kelompok tersebut memiliki sebagian test yang sama. Build Vite dan kompilasi Blade berhasil. Tidak mengulang test karena tidak ada perubahan kode sejak verifikasi.
