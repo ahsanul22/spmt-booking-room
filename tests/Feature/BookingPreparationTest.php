@@ -38,13 +38,42 @@ class BookingPreparationTest extends PostgresTestCase
             ->set('agenda', 'Koordinasi tim');
     }
 
+    public function test_duration_picker_updates_end_time_and_preserves_custom_time(): void
+    {
+        Livewire::test(BookingPreparationForm::class, ['roomId' => $this->room()->id])
+            ->assertViewHas('startOptions', fn ($times) => in_array('08:00', $times) && in_array('16:45', $times) && ! in_array('18:00', $times))
+            ->set('start_time', '13:15')->assertSet('end_time', '14:15')
+            ->set('duration', '30')->assertSet('end_time', '13:45')
+            ->set('duration', '120')->assertSet('end_time', '15:15')
+            ->set('duration', 'custom')->set('end_time', '16:45')
+            ->set('start_time', '14:00')->assertSet('end_time', '16:45')
+            ->set('agenda', 'Rapat custom')->call('checkPlan')->assertHasNoErrors()
+            ->set('duration', '60')->assertSet('end_time', '15:00')->assertSet('checked', false);
+    }
+
+    public function test_outside_work_hours_remain_bookable_and_cross_midnight_is_rejected(): void
+    {
+        $form = $this->form()->set('outsideWorkHours', true)
+            ->assertViewHas('startOptions', fn ($times) => in_array('07:00', $times) && in_array('18:00', $times))
+            ->set('start_time', '23:30')->assertSet('end_time', '')
+            ->call('checkPlan')->assertHasErrors('end_time')
+            ->set('start_time', '16:30')->assertSet('end_time', '17:30')
+            ->assertSee('Waktu pilihan berada di luar jam kerja')
+            ->call('checkPlan')->assertHasNoErrors()
+            ->set('start_time', '18:00')->assertSet('end_time', '19:00')
+            ->set('outsideWorkHours', false)->assertSet('start_time', '18:00')
+            ->assertViewHas('startOptions', fn ($times) => in_array('18:00', $times));
+        $form->call('submitBooking')->assertHasNoErrors();
+        $this->assertDatabaseHas('bookings', ['room_id' => $this->room()->id, 'start_time' => '18:00:00', 'end_time' => '19:00:00']);
+    }
+
     public function test_catalog_selection_opens_the_selected_room_without_dropdown(): void
     {
         $room = $this->room();
         $url = route('my-bookings.create', ['room_id' => $room->id]);
         $this->get('/rooms')->assertOk()->assertSee($url, false);
         $this->get($url)->assertOk()->assertSee($room->name)->assertSee('Ruangan sudah dipilih')
-            ->assertDontSee('<select', false)->assertDontSee('participant_count')->assertSee('WIB');
+            ->assertDontSee('<select id="room_id"', false)->assertDontSee('participant_count')->assertSee('WIB');
         $this->get('/my-bookings/create')->assertRedirect(route('rooms.index'));
         foreach (['bad', '99999999999999999999999999999', '-1', '9999999'] as $id) {
             $this->get('/my-bookings/create?room_id='.$id)->assertNotFound();

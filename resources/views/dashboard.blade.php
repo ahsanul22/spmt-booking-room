@@ -4,7 +4,7 @@
 @section('breadcrumb', 'Dashboard')
 
 @section('content')
-    <div class="mb-6">
+    <div @class(['mb-6' => $user->can('access-pic'), 'sr-only' => ! $user->can('access-pic')])>
         <p class="mb-2 text-[11px] font-bold uppercase tracking-[0.2em] text-primary">Workspace ruang rapat</p>
         <h1 class="text-3xl font-bold tracking-tight text-primaryDark sm:text-4xl">{{ $title }}</h1>
         <p class="mt-3 break-words text-sm leading-6 text-slate-600">Selamat datang, {{ $user->name }}.</p>

@@ -1,5 +1,11 @@
 # Decisions
 
+## DEC-034 - Pemilihan Waktu Booking dengan Jam Kerja Fleksibel
+
+- Pengguna menyetujui jam kerja 08.00–17.00 sebagai default pilihan waktu, bukan batas keras. Opsi tampilkan jam di luar jam kerja menyediakan pilihan sepanjang hari; tidak menambah approval khusus atau pembatasan akhir pekan.
+- Form memakai pilihan jam mulai interval 15 menit dan durasi 30 menit, 1 jam, 2 jam, atau jam selesai custom. Jam selesai otomatis mengikuti jam mulai/durasi; durasi yang melewati tengah malam mengosongkan jam selesai dan meminta koreksi, tidak memutar waktu ke hari berikutnya. Pilihan jam kerja dan durasi berasal dari config/booking.php.
+- Ringkasan memberi pengingat bila waktu berada di luar jam kerja. Validasi server minimal dua jam, tanggal yang sama, konflik, akses, dan approval ruangan tetap berlaku. Interval picker merupakan bantuan UI, bukan constraint baru untuk data booking.
+
 ## DEC-033 - Kapasitas Tidak Ditampilkan dan Label Admin
 
 - Sesuai permintaan pengguna, kapasitas dihapus dari seluruh UI ruangan (kartu/detail/form admin, katalog pegawai/PIC, form booking, dan panduan dashboard). Kolom database tetap disimpan untuk kompatibilitas: room baru tanpa kapasitas menggunakan 0, edit tanpa kapasitas mempertahankan nilai lama. Validasi tetap berlaku jika field dikirim oleh klien lama.

@@ -2,6 +2,49 @@
 
 ## Last Update
 
+2026-09-29 - Verifikasi publikasi ke GitHub atas permintaan pengguna.
+
+- Cakupan publikasi: pengaturan waktu booking fleksibel existing, dashboard pegawai, beranda publik, ilustrasi lokal, test, dan dokumentasi terkait.
+- Origin/main sudah diperbarui melalui fetch dan tidak memiliki perbedaan commit sebelum publikasi. BookingPreparationTest dan BookingWorkflowTest diverifikasi ulang: **26 passed, 277 assertions**. Hasil build dan test frontend terbaru tercatat di bawah.
+
+## Riwayat sebelum verifikasi publikasi
+
+2026-09-29 - Penyesuaian visual beranda publik setelah review pengguna.
+
+- Panel biru tua diganti surface putih dengan teks primaryDark dan aksen primary. Porsi gambar diperkecil menjadi kolom sekitar 35%, maksimum lebar 420px, tinggi foto 240/320/360px sesuai breakpoint; caption berada di bawah foto. Tinggi minimum pembuka tetap mengikuti viewport, dengan konten yang dapat memanjang pada layar kecil.
+- Hanya pembuka `resources/views/welcome.blade.php` berubah; dashboard pegawai tetap dipertahankan dan section Jadwal Ruangan diverifikasi identik dengan versi sebelumnya.
+- Verifikasi: HomeAndScheduleTest dan ExampleTest **18 passed, 164 assertions**; build Vite, view:cache/view:clear berhasil. Responsivitas dan kontras ditinjau dari kode; verifikasi visual browser belum dilakukan karena tool browser tidak tersedia.
+
+## Riwayat sebelum penyesuaian ukuran gambar dan latar
+
+2026-09-29 - Penyegaran beranda sebelum login di `/`.
+
+- Sesuai klarifikasi pengguna, dashboard pegawai hasil perubahan sebelumnya tetap dipertahankan. Beranda publik memakai gaya serupa dengan gambar besar di kiri dan panel primaryDark di kanan, judul pengantar, Login Pegawai, tautan ke jadwal, serta panduan ringkas. Tinggi minimum 100vh/100svh; pada desktop dikurangi ruang header/padding. Mobile mengikuti tinggi konten agar tidak terpotong.
+- Hanya `resources/views/welcome.blade.php` diubah, memakai ulang `public/images/dashboard-meeting-room.jpg` dengan caption ilustrasi. Section Jadwal Ruangan beserta Livewire-nya tetap utuh; layout publik dan backend tidak berubah. Batas minimal pengajuan tetap membaca konfigurasi.
+- Verifikasi: HomeAndScheduleTest, FrontendSkeletonTest, AuthorizationTest, ExampleTest **33 passed, 565 assertions**. Build Vite berhasil setelah eskalasi spawn EPERM; view:cache/view:clear berhasil; diff check bersih. Responsivitas, urutan baca mobile, fokus, kontras, dan alt gambar ditinjau dari kode; visual dan keyboard langsung di browser belum diuji karena tool browser tidak tersedia.
+
+## Riwayat sebelum penyegaran beranda publik
+
+2026-09-29 - Penyegaran dashboard pegawai di `/dashboard`.
+
+- Hero dua kolom dengan ilustrasi ruangan besar, CTA Booking Ruangan/My Booking, dan panduan tiga langkah. Tinggi minimum mengikuti viewport (100vh dengan dukungan 100svh); desktop mengurangi tinggi navbar dan padding. Mobile tetap bertambah tinggi mengikuti konten tanpa pemotongan. Katalog tiga ruangan dan ringkasan akun existing dipertahankan.
+- File: `resources/views/user/dashboard.blade.php`, heading dashboard bersama (sr-only khusus pegawai), dan `public/images/dashboard-meeting-room.jpg` (372 KB). Layout, komponen, dan halaman Jadwal Ruangan tidak diubah. Koreksi existing pada dashboard tetap dipertahankan.
+- Gambar konseptual dibuat dengan built-in imagegen; bukan foto ruangan aktual dan diberi caption ilustrasi. Prompt: contemporary meeting room, light oak conference table, navy blue chairs, floor-to-ceiling windows with distant maritime port, morning light, white walls, blue accents, indoor plant; realistic architectural 3D editorial illustration, portrait 4:5, no people/text/logos/watermark.
+- Verifikasi: AuthorizationTest, FrontendSkeletonTest, RoomCatalogTest, HomeAndScheduleTest **37 passed, 602 assertions**. Build Vite berhasil setelah sandbox menolak spawn esbuild (EPERM); view:cache/view:clear berhasil; diff check bersih.
+- Struktur desktop/mobile, fokus keyboard, alt gambar, escaping nama, dan empty state katalog ditinjau dari kode. Visual/interaksi browser belum diverifikasi karena tool browser tidak tersedia. Tidak ada perubahan backend atau kebijakan bisnis.
+
+## Riwayat sebelum penyegaran dashboard
+
+2026-09-28 - Pengaturan waktu form Booking Ruangan dipermudah (DEC-034).
+
+- URL review: `/my-bookings/create?room_id={id}` setelah memilih ruangan. BookingPreparationForm dan Blade memakai pilihan jam mulai per 15 menit, durasi cepat/custom, jam selesai otomatis, serta ringkasan WIB. Default picker 08.00–17.00 dengan opsi waktu di luar jam kerja; pilihan existing tetap terlihat ketika rentang picker diganti. Konfigurasi berada di config/booking.php.
+- Pengajuan di luar jam kerja tetap diperbolehkan dengan pengingat. Minimal dua jam, tanggal yang sama, konflik, akses, dan approval tetap diperiksa oleh backend existing. Durasi lintas tengah malam meminta koreksi.
+- Verifikasi: BookingPreparationTest dan BookingWorkflowTest **26 passed, 277 assertions**; mencakup perhitungan durasi, custom, reset hasil pemeriksaan, tengah malam, dan penyimpanan di luar jam kerja. Build Vite berhasil setelah percobaan awal diblokir sandbox (spawn EPERM); view:cache dan view:clear berhasil.
+- HomeAndScheduleTest **16 passed, 159 assertions**; run awal satu assertion gagal karena teks 17:00 kini juga menjadi panduan jam kerja. Assertion diperjelas untuk memeriksa slot booking ruangan lain, bukan melarang teks jam pada seluruh form. Diff check bersih.
+- Struktur responsif, label, native select/checkbox, fokus, empty state, dan error ditinjau dari kode. Verifikasi browser desktop/mobile dan keyboard langsung belum dilakukan karena tool browser tidak tersedia. Perubahan existing dashboard pengguna tidak disentuh.
+
+## Riwayat sebelum pengaturan waktu fleksibel
+
 2026-09-28 - BookingRoomsSeeder didaftarkan ke DatabaseSeeder.
 
 - Seeder utama menjalankan FoundationSeeder lalu BookingRoomsSeeder agar PIC awal tersedia sebelum katalog ruangan diisi. Perintah db:seed kini mencakup keduanya.

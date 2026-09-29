@@ -25,6 +25,8 @@ class BookingPreparationForm extends Component
     public string $end_time = '';
     public string $agenda = '';
     public string $notes = '';
+    public string $duration = '60';
+    public bool $outsideWorkHours = false;
 
     #[Locked]
     public bool $checked = false;
@@ -41,10 +43,28 @@ class BookingPreparationForm extends Component
         $this->date = app(BookingPreparation::class)->earliestStart()->toDateString();
     }
 
-    public function updated(): void
+    public function updated(string $property): void
     {
         $this->checked = false;
         $this->resetValidation();
+        if (in_array($property, ['start_time', 'duration'], true)) {
+            $this->calculateEndTime();
+        }
+    }
+
+    private function calculateEndTime(): void
+    {
+        if ($this->duration === 'custom') {
+            return;
+        }
+        $durations = config('booking.duration_options');
+        if (! isset($durations[$this->duration]) || ! preg_match('/^(?:[01]\d|2[0-3]):[0-5]\d$/', $this->start_time)) {
+            $this->end_time = '';
+            return;
+        }
+        [$hour, $minute] = array_map('intval', explode(':', $this->start_time));
+        $end = $hour * 60 + $minute + (int) $this->duration;
+        $this->end_time = $end < 1440 ? sprintf('%02d:%02d', intdiv($end, 60), $end % 60) : '';
     }
 
     public function checkPlan(BookingPreparation $preparation): void
@@ -78,8 +98,22 @@ class BookingPreparationForm extends Component
     {
         $room = Room::with(['floor', 'facilities', 'allowedOrganizationalUnits'])->findOrFail($this->roomId);
         $preparation = app(BookingPreparation::class);
+        $startOptions = [];
+        for ($minute = 0; $minute < 1440; $minute += config('booking.time_step_minutes')) {
+            $time = sprintf('%02d:%02d', intdiv($minute, 60), $minute % 60);
+            if ($this->outsideWorkHours || ($time >= config('booking.workday_start') && $time < config('booking.workday_end'))) {
+                $startOptions[] = $time;
+            }
+        }
+        // Keep the selected value visible when the user switches the picker range.
+        if ($this->start_time !== '' && ! in_array($this->start_time, $startOptions, true)) {
+            $startOptions[] = $this->start_time;
+            sort($startOptions);
+        }
 
         return view('livewire.booking-preparation-form', [
+            'startOptions' => $startOptions,
+            'outsideWorkday' => $this->start_time !== '' && ($this->start_time < config('booking.workday_start') || $this->start_time >= config('booking.workday_end') || $this->end_time > config('booking.workday_end')),
             'room' => $room,
             'scheduleDateValid' => app(BookingSchedule::class)->validDate($this->date),
             'daySlots' => app(BookingSchedule::class)->validDate($this->date) ? app(BookingSchedule::class)->slots($this->date, $this->date, $room->id) : collect(),

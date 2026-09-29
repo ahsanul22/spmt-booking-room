@@ -227,7 +227,8 @@ class HomeAndScheduleTest extends PostgresTestCase
         $this->booking(['room_id' => Room::where('id', '!=', $room->id)->firstOrFail()->id, 'start_time' => '17:00', 'end_time' => '18:00']);
         $component = Livewire::actingAs($this->employee())->test(BookingPreparationForm::class, ['roomId' => $room->id])
             ->assertSeeInOrder(['Jadwal Ruangan Ini', '12:00', 'Detail Pertemuan'])
-            ->assertDontSee('17:00')->assertDontSee('RAHASIA-AGENDA')->assertDontSee('RAHASIA-CATATAN')
+            ->assertViewHas('daySlots', fn ($slots) => $slots->count() === 1 && $slots->first()['start'] === '12:00')
+            ->assertDontSee('17:00 &ndash; 18:00', false)->assertDontSee('RAHASIA-AGENDA')->assertDontSee('RAHASIA-CATATAN')
             ->set('date', '2026-09-28')->assertSee('15:00')
             ->assertViewHas('daySlots', fn ($slots) => $slots->count() === 1 && $slots->first()['start'] === '15:00')
             ->set('date', '2026-02-30')->assertSee('Pilih tanggal yang valid');

@@ -1,31 +1,35 @@
-<section aria-labelledby="booking-intro" class="relative mb-12 grid min-h-[58vh] items-center gap-10 overflow-hidden rounded-3xl border border-slate-200/80 bg-surface p-6 sm:p-10 lg:grid-cols-[minmax(0,1.3fr)_minmax(320px,0.7fr)] lg:p-12 xl:p-16">
-    <div class="relative max-w-3xl">
-        <p class="text-[11px] font-bold uppercase tracking-[0.24em] text-primary">Ruang untuk berkolaborasi</p>
-        <h2 id="booking-intro" class="mt-5 text-3xl font-bold leading-tight tracking-tight text-primaryDark sm:text-4xl xl:text-5xl">Pertemuan yang baik<br>dimulai dari ruang<br class="hidden xl:block"> yang tepat.</h2>
-        <p class="mt-6 max-w-2xl text-sm leading-8 text-slate-600">Selamat datang di Booking Room PT Pelindo Multi Terminal. Kenali ruang rapat yang sesuai kebutuhan tim, rencanakan waktu pertemuan, dan pantau pengajuan Anda dalam satu tempat.</p>
-        <p class="mt-3 max-w-2xl text-xs leading-7 text-slate-600">Mulai dengan melihat fasilitas ruangan di bawah. Saat mengajukan booking, siapkan tanggal, waktu, dan agenda rapat. Ruangan tertentu memerlukan persetujuan PIC.</p>
-        <div class="mt-8 flex flex-wrap items-center gap-5">
-            <a href="{{ route('rooms.index') }}" class="inline-flex items-center gap-2 rounded-xl bg-primary px-5 py-3 text-sm font-semibold text-white transition hover:bg-primaryDark">Booking Ruangan<x-schedule-icon name="plus" class="h-4 w-4" /></a>
-            <a href="{{ route('my-bookings.index') }}" class="inline-flex items-center gap-2 py-3 text-sm font-semibold text-primaryDark hover:underline">My Booking<x-schedule-icon name="arrow" class="h-4 w-4" /></a>
-        </div>ja
+<section aria-labelledby="booking-intro" class="mb-10 grid min-h-screen overflow-hidden rounded-3xl border border-secondaryLight/50 bg-surface supports-[height:100svh]:min-h-[100svh] lg:min-h-[calc(100vh-216px)] lg:grid-cols-2 lg:supports-[height:100svh]:min-h-[calc(100svh-216px)]">
+    <div class="flex min-w-0 flex-col justify-center p-6 sm:p-10 xl:p-16">
+        <p class="flex items-center gap-3 text-[11px] font-bold uppercase tracking-[0.2em] text-primary"><span aria-hidden="true" class="h-px w-8 bg-primary"></span>Ruang untuk berkolaborasi</p>
+        <p class="mt-7 break-words text-sm font-medium text-slate-600">Selamat datang, {{ $user->name }}.</p>
+        <h2 id="booking-intro" class="mt-4 text-4xl font-bold leading-[1.12] tracking-tight text-primaryDark sm:text-5xl xl:text-6xl">Ruang yang tepat.<br><span class="text-primary">Ide yang hebat.</span></h2>
+        <p class="mt-6 max-w-lg text-sm leading-7 text-slate-600 sm:text-base sm:leading-8">Pertemuan yang baik dimulai dari ruang yang tepat. Temukan ruang rapat untuk tim Anda, rencanakan pertemuan, dan mulai kolaborasi berikutnya.</p>
+        <div class="mt-8 flex flex-wrap gap-3">
+            <a href="{{ route('rooms.index') }}" class="workspace-button px-6 py-3.5">Booking Ruangan<x-schedule-icon name="arrow" class="h-4 w-4" /></a>
+            <a href="{{ route('my-bookings.index') }}" class="workspace-button-secondary px-6 py-3.5">My Booking<x-schedule-icon name="clock" class="h-4 w-4" /></a>
+        </div>
+        <div class="mt-10 border-t border-secondaryLight/60 pt-6 xl:mt-14">
+            <p class="text-xs font-semibold text-primaryDark">Dari rencana menjadi pertemuan.</p>
+            <ol class="mt-4 grid gap-4 text-xs leading-5 sm:grid-cols-3">
+                <li><span class="font-bold text-primary">01 /</span><span class="mt-1 block font-semibold text-primaryDark">Temukan ruangan</span><span class="text-slate-600">Pilih fasilitas yang sesuai.</span></li>
+                <li><span class="font-bold text-primary">02 /</span><span class="mt-1 block font-semibold text-primaryDark">Rencanakan pertemuan</span><span class="text-slate-600">Tentukan waktu dan agenda.</span></li>
+                <li><span class="font-bold text-primary">03 /</span><span class="mt-1 block font-semibold text-primaryDark">Pantau pengajuan</span><span class="text-slate-600">Lihat status di My Booking.</span></li>
+            </ol>
+        </div>
     </div>
-    <div class="relative overflow-hidden rounded-2xl bg-primaryDark p-7 text-white sm:p-9">
-        <div aria-hidden="true" class="pointer-events-none absolute -right-12 -top-12 h-48 w-48 rounded-full border-[30px] border-secondary/10"></div>
-        <span class="relative inline-flex rounded-xl bg-white/10 p-3 text-secondaryLight"><x-schedule-icon name="room" class="h-8 w-8" /></span>
-        <h3 class="relative mt-5 text-xl font-semibold">Satu ruang, banyak ide.</h3>
-        <p class="relative mt-2 text-sm leading-6 text-secondaryLight">Kenali alur perencanaan rapat Anda.</p>
-        <ol class="relative mt-7 space-y-6">
-            <li class="flex gap-4"><span class="text-sm font-semibold text-secondaryLight" aria-hidden="true">01</span><div><h4 class="text-sm font-semibold">Temukan ruangan</h4><p class="mt-1 text-xs leading-6 text-secondaryLight">Sesuaikan fasilitas, dan kebutuhan pertemuan.</p></div></li>
-            <li class="flex gap-4"><span class="text-sm font-semibold text-secondaryLight" aria-hidden="true">02</span><div><h4 class="text-sm font-semibold">Rencanakan pertemuan</h4><p class="mt-1 text-xs leading-6 text-secondaryLight">Tentukan jadwal dan lengkapi agenda sebelum mengajukan.</p></div></li>
-            <li class="flex gap-4"><span class="text-sm font-semibold text-secondaryLight" aria-hidden="true">03</span><div><h4 class="text-sm font-semibold">Pantau pengajuan</h4><p class="mt-1 text-xs leading-6 text-secondaryLight">Pastikan status Approved sebelum menggunakan ruangan.</p></div></li>
-        </ol>
-        <p class="relative mt-7 border-t border-white/15 pt-5 text-xs leading-6 text-secondaryLight">Pilih kartu ruangan, isi jadwal minimal dua jam ke depan, lalu kirim booking. Pantau hasilnya di My Booking.</p>
-    </div>
+    <figure class="relative m-3 mt-0 min-h-[360px] overflow-hidden rounded-2xl bg-secondaryLight sm:min-h-[440px] lg:m-3 lg:ml-0 lg:min-h-[560px]">
+        <img src="{{ asset('images/dashboard-meeting-room.jpg') }}" alt="Ilustrasi ruang rapat modern dengan kursi biru dan pemandangan pelabuhan." width="1122" height="1402" fetchpriority="high" class="absolute inset-0 h-full w-full object-cover">
+        <figcaption class="absolute inset-x-4 bottom-4 rounded-xl bg-primaryDark/95 p-5 text-white sm:inset-x-6 sm:bottom-6 sm:p-6">
+            <p class="text-[10px] font-semibold uppercase tracking-[0.2em] text-secondaryLight">Satu ruang, banyak ide.</p>
+            <p class="mt-2 text-xl font-semibold sm:text-2xl">Tempat untuk langkah besar berikutnya.</p>
+            <p class="mt-3 text-xs text-secondaryLight">Ilustrasi suasana ruang rapat</p>
+        </figcaption>
+    </figure>
 </section>
 
 <livewire:room-catalog :summary="true" />
 
-<div class="mt-12 grid items-start gap-6 lg:grid-cols-[minmax(0,1fr)_340px]">
+<div class="mt-10 grid items-start gap-6 lg:grid-cols-[minmax(0,1fr)_340px]">
     <section aria-labelledby="next-step-title" class="rounded-2xl border border-slate-200/80 bg-surface p-6 sm:p-8">
         <h2 id="next-step-title" class="text-xl font-bold text-primaryDark">Sudah menemukan ruang yang sesuai?</h2>
         <p class="mt-3 max-w-3xl text-sm leading-7 text-slate-600">Siapkan tanggal, jam mulai dan selesai, serta agenda rapat. Pengajuan akan mengikuti aturan akses dan persetujuan masing-masing ruangan.</p>

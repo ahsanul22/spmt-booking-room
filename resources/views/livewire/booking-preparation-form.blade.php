@@ -42,11 +42,36 @@
                         <p>Rapat dimulai minimal <strong>{{ config('booking.minimum_notice_hours') }} jam</strong> setelah waktu pengajuan.</p>
                         <p class="mt-1 text-xs text-slate-600">Waktu paling awal saat halaman diperbarui: {{ $earliestStart->format('d/m/Y H:i') }} WIB. Batas dihitung ulang saat pemeriksaan dan saat booking dikirim.</p>
                     </div>
-                    <div class="grid gap-5 sm:col-span-2 sm:grid-cols-2">
-                        <x-workspace-field wire:model="start_time" name="start_time" label="Jam Mulai (WIB)" type="time" required />
-                        <x-workspace-field wire:model="end_time" name="end_time" label="Jam Selesai (WIB)" type="time" required />
+                    <div class="space-y-3 sm:col-span-2">
+                        <p class="text-sm text-slate-600">Pilih jam mulai dan durasi. Jam selesai dihitung otomatis. Pilihan awal mengikuti jam kerja {{ config('booking.workday_start') }}–{{ config('booking.workday_end') }} WIB.</p>
+                        <label class="flex items-center gap-3 text-sm font-semibold text-primaryDark">
+                            <input type="checkbox" wire:model.live="outsideWorkHours" class="h-4 w-4 rounded border-slate-300 accent-primary focus:ring-2 focus:ring-primary">
+                            Tampilkan jam di luar jam kerja
+                        </label>
+                        <p class="text-xs leading-5 text-slate-600">Rapat di luar jam kerja tetap dapat diajukan. Aturan persetujuan ruangan tetap berlaku.</p>
                     </div>
-                    <p>Jam selesai harus setelah jam mulai pada tanggal yang sama. Rapat lintas hari belum didukung.</p>
+                    <div class="grid gap-5 sm:col-span-2 sm:grid-cols-2">
+                        <x-workspace-field wire:model.live="start_time" name="start_time" label="Jam Mulai (WIB)" type="select" required>
+                            <option value="">Pilih jam mulai</option>
+                            @foreach($startOptions as $time)<option value="{{ $time }}">{{ $time }}</option>@endforeach
+                        </x-workspace-field>
+                        <x-workspace-field wire:model.live="duration" name="duration" label="Durasi" type="select" required>
+                            @foreach(config('booking.duration_options') as $minutes => $label)<option value="{{ $minutes }}">{{ $label }}</option>@endforeach
+                            <option value="custom">Atur jam selesai sendiri</option>
+                        </x-workspace-field>
+                        <x-workspace-field wire:model.live="end_time" name="end_time" label="Jam Selesai (WIB)" type="time" :readonly="$duration !== 'custom'" :step="config('booking.time_step_minutes') * 60" hint="Pilih durasi custom untuk mengubah jam selesai." required />
+                        <div role="status" aria-live="polite" class="rounded-xl bg-background p-4 text-sm leading-6 text-primaryDark">
+                            @if($start_time && $end_time)
+                                <p class="font-semibold">{{ $start_time }}–{{ $end_time }} WIB</p>
+                                @if($outsideWorkday)<p>Waktu pilihan berada di luar jam kerja. Pastikan sesuai kebutuhan rapat Anda.</p>@endif
+                            @elseif($start_time)
+                                <p>Pilih jam selesai pada tanggal yang sama. Jika durasi melewati tengah malam, pilih durasi lebih singkat atau custom.</p>
+                            @else
+                                <p>Pilih jam mulai untuk melihat ringkasan waktu.</p>
+                            @endif
+                        </div>
+                    </div>
+                    <p class="sm:col-span-2">Jam selesai harus setelah jam mulai pada tanggal yang sama. Rapat lintas hari belum didukung.</p>
                     <div class="sm:col-span-2"><x-workspace-field wire:model="agenda" name="agenda" label="Judul / Agenda Rapat" maxlength="255" required /></div>
                     <div class="sm:col-span-2"><x-workspace-field wire:model="notes" name="notes" label="Catatan (opsional)" type="textarea" maxlength="2000" /></div>
                     @if($errors->any())<div role="alert" class="text-sm text-danger sm:col-span-2">Rencana belum lolos pemeriksaan. Periksa pesan pada kolom yang perlu diperbaiki.@error('room')<p>{{ $message }}</p>@enderror</div>@endif
