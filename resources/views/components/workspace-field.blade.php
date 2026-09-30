@@ -1,4 +1,4 @@
-@props(['name', 'label', 'type' => 'text', 'value' => null, 'hint' => null])
+@props(['name', 'label', 'type' => 'text', 'value' => null, 'hint' => null, 'rows' => 5])
 <div class="min-w-0">
     <label for="{{ $name }}" class="mb-2 block text-sm font-semibold text-primaryDark">{{ $label }}@if($attributes->get('required')) <span aria-hidden="true" class="text-danger">*</span>@endif</label>
     @php
@@ -9,7 +9,7 @@
     @if($type === 'select')
         <select id="{{ $name }}" name="{{ $name }}" @if($descriptionIds) aria-describedby="{{ $descriptionIds }}" @endif {{ $controlAttributes }}>{{ $slot }}</select>
     @elseif($type === 'textarea')
-        <textarea id="{{ $name }}" name="{{ $name }}" rows="5" @if($descriptionIds) aria-describedby="{{ $descriptionIds }}" @endif {{ $controlAttributes }}>{{ $value }}</textarea>
+        <textarea id="{{ $name }}" name="{{ $name }}" rows="{{ $rows }}" @if($descriptionIds) aria-describedby="{{ $descriptionIds }}" @endif {{ $controlAttributes }}>{{ $value }}</textarea>
     @else
         <input id="{{ $name }}" name="{{ $name }}" type="{{ $type }}" @if($type !== 'password') value="{{ $value }}" @endif @if($descriptionIds) aria-describedby="{{ $descriptionIds }}" @endif {{ $controlAttributes }}>
     @endif

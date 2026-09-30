@@ -2,6 +2,24 @@
 
 ## Last Update
 
+2026-09-30 - Koreksi tombol kalender dan whitespace dashboard.
+
+- Menghapus tombol Lihat Kalender pada komponen room-catalog yang digunakan `/dashboard` dan `/rooms`, sesuai permintaan pengguna.
+- Pembuka dashboard pegawai lebih padat: padding dan jarak antar elemen dikurangi, tinggi gambar desktop dari 360px menjadi 260px (mobile 200px, sm 240px), padding caption diperkecil. Ukuran judul dan teks tetap terbaca; identitas visual dipertahankan.
+- Verifikasi: RoomCatalogTest **6 passed, 42 assertions**; build Vite, view:cache/view:clear dan diff check berhasil. Responsivitas ditinjau melalui class breakpoint; visual browser belum diperiksa karena tool browser tidak tersedia.
+
+## Riwayat sebelum koreksi tombol kalender dan whitespace
+
+2026-09-30 - Perapian UI/UX beranda, katalog, dan form booking.
+
+- Beranda `/`: label Login Pegawai menjadi Login (termasuk footer tamu), jarak hero dipadatkan. Dashboard `/dashboard`: panduan tiga langkah menjadi satu baris fleksibel dengan teks lebih besar; jarak pembuka dan antarbagian dikurangi.
+- `/rooms`: judul katalog dan deskripsi lebih langsung, ukuran teks filter/penjelasan ditingkatkan, tautan Lihat Kalender ditempatkan dekat judul Pilih ruangan. Data, filter, pagination dan izin tetap existing.
+- `/my-bookings/create?room_id=...`: lebar form dibatasi, panel ruangan diperkecil, fasilitas dapat dibuka melalui details native. Jadwal dan Detail Pertemuan disatukan dalam satu panel; kalender tepat di samping tanggal, daftar jadwal panjang dapat digulir dengan keyboard. Penjelasan berulang dipangkas, ringkasan jam selesai dipadatkan, teks input 16px, catatan dua baris. Komponen workspace-field menerima parameter rows dengan default lima untuk pemakai lain.
+- Tidak ada perubahan kebijakan bisnis, backend, dependency, atau data. Referensi alur: Robin web room booking dan Envoy Rooms; palet serta komponen existing dipertahankan.
+- Verifikasi final: BookingPreparationTest, BookingWorkflowTest, RoomCatalogTest, HomeAndScheduleTest, FrontendSkeletonTest, AuthorizationTest **68 passed, 983 assertions**. Run awal 2 failed/66 passed karena assertion copy lama dan label footer tamu; diperbaiki dan suite diulang. Build Vite berhasil (pengulangan di luar sandbox setelah esbuild EPERM), view:cache/view:clear berhasil, diff check bersih. Label, breakpoint mobile, fokus, error, empty state dan kontrak form ditinjau dari kode/test; visual desktop/mobile dan interaksi keyboard langsung belum diuji karena browser tool tidak tersedia.
+
+## Riwayat sebelum perapian UI/UX booking
+
 2026-09-29 - Navbar pegawai sticky dengan blur ringan saat scroll.
 
 - `resources/views/layouts/user.blade.php` memakai sticky top-0; setelah scroll lebih dari 8px, latar putih menjadi 90% dengan blur 4px melalui state di `resources/js/app.js`. Saat di atas halaman kembali solid. Tinggi header dibatasi viewport dengan scroll internal agar menu mobile tetap terjangkau. Label role di samping avatar dihapus, nama pengguna dipertahankan.

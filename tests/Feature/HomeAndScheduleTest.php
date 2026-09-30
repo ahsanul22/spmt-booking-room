@@ -70,7 +70,7 @@ class HomeAndScheduleTest extends PostgresTestCase
         $this->room()->update(['name' => '<script>room-name</script>']);
         $this->get('/')->assertSee('<script>room-name</script>')->assertDontSee('<script>room-name</script>', false);
         Room::query()->update(['is_active' => false]);
-        $this->get('/')->assertOk()->assertSee('Belum ada jadwal ruangan.')->assertSee('Login Pegawai');
+        $this->get('/')->assertOk()->assertSee('Belum ada jadwal ruangan.')->assertSee('Login')->assertDontSee('Login Pegawai');
     }
 
     public function test_public_schedule_scopes_filters_and_refresh_to_public_active_rooms(): void

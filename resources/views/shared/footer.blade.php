@@ -11,7 +11,7 @@
                 <div class="mt-3 flex flex-wrap gap-x-6 gap-y-1 md:max-w-sm">
                     @php
                         if (! auth()->check()) {
-                            $footerLinks = [route('home') => 'Beranda', route('home').'#room-schedule' => 'Jadwal Ruangan', route('login') => 'Login Pegawai'];
+                            $footerLinks = [route('home') => 'Beranda', route('home').'#room-schedule' => 'Jadwal Ruangan', route('login') => 'Login'];
                         } elseif (auth()->user()->can('access-admin')) {
                             $footerLinks = [route('admin.dashboard') => 'Dashboard', route('admin.rooms.index') => 'Daftar Ruangan', route('admin.bookings.index') => 'Semua Booking', route('admin.schedule.index') => 'Jadwal Ruangan'];
                         } elseif (auth()->user()->can('access-pic')) {

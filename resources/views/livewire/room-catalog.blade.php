@@ -1,18 +1,21 @@
 <section id="room-catalog" class="scroll-mt-6" aria-labelledby="catalog-title">
-    <div class="flex flex-wrap items-end justify-between gap-4">
-        <div><p class="text-[11px] font-bold uppercase tracking-[0.2em] text-primary">Temukan ruang Anda</p><h2 id="catalog-title" class="mt-2 text-3xl font-bold tracking-tight text-primaryDark sm:text-4xl">Pilihan ruang untuk setiap ide.</h2><p class="mt-3 text-sm leading-6 text-slate-600">{{ $summary ? 'Beberapa pilihan dari katalog ruangan. Pilih ruangan untuk mulai merencanakan rapat.' : 'Pilih ruangan berdasarkan fasilitas dan kebutuhan pertemuan Anda.' }}</p></div>
-        <p class="text-sm text-slate-500" aria-live="polite">{{ $rooms->total() }} ruangan</p>
+    <div class="flex flex-wrap items-center gap-4">
+        <div class="min-w-0">
+            <h2 id="catalog-title" class="text-2xl font-bold tracking-tight text-primaryDark">{{ $summary ? 'Temukan ruang untuk pertemuan Anda' : 'Pilih ruangan' }}</h2>
+            <p class="mt-2 text-base leading-6 text-slate-600">{{ $summary ? 'Pilih ruangan untuk mulai merencanakan rapat.' : 'Bandingkan fasilitas dan aturan akses sebelum memilih.' }}</p>
+        </div>
+        <p class="text-sm text-slate-600 sm:ml-auto" aria-live="polite">{{ $rooms->total() }} ruangan</p>
     </div>
 
     @if(! $summary)
     <div class="mt-7 flex flex-wrap gap-x-6 border-b border-slate-300 sm:gap-x-9" role="group" aria-label="Filter ruangan">
         @foreach($filters as $key => $label)
             <button type="button" wire:key="filter-{{ $key }}" wire:click="selectFilter('{{ $key }}')" wire:loading.attr="disabled" aria-pressed="{{ $filter === $key ? 'true' : 'false' }}" aria-controls="room-results"
-                @class(['-mb-px border-b-2 px-1 py-4 text-sm transition disabled:cursor-wait focus-visible:outline-primary', 'border-primaryDark font-bold text-primaryDark' => $filter === $key, 'border-transparent font-medium text-slate-600 hover:border-slate-400 hover:text-text' => $filter !== $key])>{{ $label }}</button>
+                @class(['-mb-px border-b-2 px-1 py-3 text-base transition disabled:cursor-wait focus-visible:outline-primary', 'border-primaryDark font-bold text-primaryDark' => $filter === $key, 'border-transparent font-medium text-slate-600 hover:border-slate-400 hover:text-text' => $filter !== $key])>{{ $label }}</button>
         @endforeach
     </div>
     @endif
-    <div class="flex min-h-[44px] flex-wrap items-center justify-between gap-2 py-3 text-xs leading-5 text-slate-600">
+    <div class="flex min-h-[44px] flex-wrap items-center justify-between gap-2 py-3 text-sm leading-5 text-slate-600">
         <p>Status operasional bukan ketersediaan jadwal. Pilih ruangan untuk menentukan waktu booking.</p>
         <span wire:loading role="status" class="font-medium text-primary">Memuat ruangan…</span>
     </div>

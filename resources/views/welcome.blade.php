@@ -1,13 +1,13 @@
 @extends('layouts.public')
 @section('title', 'Selamat Datang di Booking Room')
 @section('content')
-<section aria-labelledby="welcome-title" class="mb-12 grid items-center gap-12 overflow-hidden rounded-3xl border border-secondaryLight/50 bg-surface px-6 py-10 sm:px-8 sm:py-12 lg:px-10 lg:py-14 lg:grid-cols-[minmax(0,0.7fr)_minmax(0,1.3fr)]">
+<section aria-labelledby="welcome-title" class="mb-8 grid items-center gap-8 overflow-hidden rounded-3xl border border-secondaryLight/50 bg-surface px-6 py-8 sm:px-8 sm:py-10 lg:px-10 lg:py-10 lg:grid-cols-[minmax(0,0.7fr)_minmax(0,1.3fr)]">
     <div class="flex min-w-0 flex-col justify-center text-primaryDark lg:order-2 lg:pl-5">
         <p class="flex items-center gap-3 text-xs sm:text-sm font-bold uppercase tracking-[0.2em] text-primary"><span aria-hidden="true" class="h-px w-8 bg-secondary"></span>Pelindo Multi Terminal</p>
         <h1 id="welcome-title" class="mt-5 text-4xl font-bold leading-[1.12] tracking-tight sm:text-5xl xl:text-6xl">Pertemuan yang baik.<br><span class="text-primary">Dimulai di sini.</span></h1>
         <p class="mt-4 max-w-2xl text-base leading-7 text-slate-600 sm:text-lg sm:leading-8">Selamat datang di Booking Room PT Pelindo Multi Terminal. Ruang untuk bertukar ide, menyatukan rencana, dan membawa kolaborasi lebih jauh.</p>
         <div class="mt-6 flex flex-wrap gap-3">
-            <a href="{{ route('login') }}" class="inline-flex min-h-[48px] items-center justify-center gap-3 rounded-xl bg-primary px-6 py-3 text-base font-semibold text-white transition hover:bg-primaryDark">Login Pegawai<x-schedule-icon name="arrow" class="h-4 w-4" /></a>
+            <a href="{{ route('login') }}" class="inline-flex min-h-[48px] items-center justify-center gap-3 rounded-xl bg-primary px-6 py-3 text-base font-semibold text-white transition hover:bg-primaryDark">Login<x-schedule-icon name="arrow" class="h-4 w-4" /></a>
             <a href="#room-schedule" class="inline-flex min-h-[48px] items-center justify-center gap-3 rounded-xl border border-secondaryLight/60 px-5 py-3 text-base font-semibold text-primaryDark transition hover:bg-background"><x-schedule-icon name="calendar" class="h-4 w-4" />Lihat Jadwal Ruangan</a>
         </div>
         <p class="mt-4 text-sm leading-6 text-primary">Jadwal dapat dilihat langsung. Login untuk melakukan booking.</p>
