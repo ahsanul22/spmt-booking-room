@@ -18,6 +18,7 @@ use App\Http\Controllers\Pic\ApprovalController;
 use Illuminate\Support\Facades\Route;
 
 Route::get('/', \App\Http\Controllers\HomeController::class)->name('home');
+Route::view('/jadwal-ruangan', 'public.schedule')->name('public.schedule');
 
 Route::middleware(['auth', 'can:access-employee'])->group(function () {
     Route::get('/my-bookings', [UserBookingController::class, 'index'])->name('my-bookings.index');

@@ -6,25 +6,23 @@
                 <p class="mt-3 text-2xl font-bold tracking-tight text-white">Ruang untuk berkolaborasi.</p>
                 <p class="mt-3 max-w-lg text-sm leading-7 text-secondaryLight">Rencanakan pertemuan, temukan ruangan yang sesuai, dan pantau pengajuan Anda dalam satu tempat.</p>
             </div>
-            <nav aria-label="Navigasi footer" class="min-w-0">
-                <p class="text-sm font-semibold text-white">Akses cepat</p>
-                <div class="mt-3 flex flex-wrap gap-x-6 gap-y-1 md:max-w-sm">
-                    @php
-                        if (! auth()->check()) {
-                            $footerLinks = [route('home') => 'Beranda', route('home').'#room-schedule' => 'Jadwal Ruangan', route('login') => 'Login'];
-                        } elseif (auth()->user()->can('access-admin')) {
-                            $footerLinks = [route('admin.dashboard') => 'Dashboard', route('admin.rooms.index') => 'Daftar Ruangan', route('admin.bookings.index') => 'Semua Booking', route('admin.schedule.index') => 'Jadwal Ruangan'];
-                        } elseif (auth()->user()->can('access-pic')) {
-                            $footerLinks = [route('pic.dashboard') => 'Dashboard', route('pic.approvals.index') => 'Permintaan Approval', route('pic.rooms.index') => 'Ruangan Saya', route('schedule.index') => 'Jadwal Ruangan'];
-                        } else {
-                            $footerLinks = [route('rooms.index') => 'Booking Ruangan', route('my-bookings.index') => 'My Booking', route('schedule.index') => 'Jadwal Ruangan'];
-                        }
-                    @endphp
-                    @foreach($footerLinks as $url => $label)
-                        <a href="{{ $url }}" class="inline-flex min-h-[44px] items-center text-sm font-medium text-secondaryLight hover:text-white hover:underline">{{ $label }}</a>
-                    @endforeach
+            <div class="min-w-0">
+                <p class="text-sm font-semibold text-white">Email & Kontak</p>
+                <div class="mt-3 flex flex-col gap-y-3 md:max-w-sm text-sm text-secondaryLight">
+                    <p class="flex items-center gap-3">
+                        <svg class="h-5 w-5 text-secondaryLight" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor">
+                            <path stroke-linecap="round" stroke-linejoin="round" d="M21.75 6.75v10.5a2.25 2.25 2.25 0 01-2.25 2.25h-15a2.25 2.25 2.25 0 01-2.25-2.25V6.75m19.5 0A2.25 2.25 2.25 0 0019.5 4.5h-15a2.25 2.25 2.25 0 00-2.25 2.25m19.5 0v.243a2.25 2.25 2.25 0 01-1.07 1.916l-7.5 4.615a2.25 2.25 2.25 0 01-2.36 0L3.32 8.91a2.25 2.25 2.25 0 01-1.07-1.916V6.75" />
+                        </svg>
+                        <a href="mailto:info@pelindomultiterminal.co.id" class="hover:text-white hover:underline transition-colors">info@pelindomultiterminal.co.id</a>
+                    </p>
+                    <p class="flex items-center gap-3">
+                        <svg class="h-5 w-5 text-secondaryLight" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor">
+                            <path stroke-linecap="round" stroke-linejoin="round" d="M2.25 6.75c0 8.284 6.716 15 15 15h2.25a2.25 2.25 2.25 0 002.25-2.25v-1.372c0-.516-.351-.966-.852-1.091l-4.423-1.106c-.44-.11-.902.055-1.173.417l-.97 1.293c-2.896-1.596-5.48-4.18-7.076-7.076l1.293-.97c.363-.271.527-.734.417-1.173L6.963 3.102a1.125 1.125 0 00-1.091-.852H4.5A2.25 2.25 2.25 0 002.25 4.5v2.25z" />
+                        </svg>
+                        <a href="tel:+626141000000" class="hover:text-white hover:underline transition-colors">+62 61 4100 0000</a>
+                    </p>
                 </div>
-            </nav>
+            </div>
         </div>
         <div class="flex flex-wrap items-center justify-between gap-x-6 gap-y-3 border-t border-white/15 py-5 text-xs leading-6 text-secondaryLight">
             <p>&copy; {{ now()->year }} PT Pelindo Multi Terminal</p>
