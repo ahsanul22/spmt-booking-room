@@ -67,6 +67,7 @@ Dapat:
 - Mengelola kondisi operasional ruangan.
 - Melihat seluruh booking.
 - Melakukan administrasi sistem.
+- Menyetujui atau menolak pengajuan Pending yang membutuhkan approval di seluruh ruangan (DEC-037).
 
 ## Ruangan
 
@@ -139,7 +140,11 @@ Status utama: Pending, Approved, Rejected, Cancelled, dan Completed.
 
 Booking yang dibatalkan tidak boleh dihapus dari database karena diperlukan sebagai history.
 
-## Notification
+## Laporan Bulanan
+
+Admin dan PIC dapat membuat laporan berdasarkan bulan tanggal rapat dan filter ruangan, melihat rekap status serta durasi terjadwal, mengunduh CSV, dan mencetak/menyimpan PDF melalui browser. Admin mencakup semua ruangan; PIC hanya penugasan saat ini termasuk riwayat ruangan nonaktif. Jam terjadwal menghitung Approved + Completed, bukan bukti penggunaan aktual. Status mengikuti data saat laporan dibuka; tidak mengubah lifecycle booking (DEC-036).
+
+## Notification Internal
 
 Tahap awal menggunakan notification internal website, misalnya:
 
@@ -165,6 +170,6 @@ Hal berikut belum diputuskan dan bukan aturan implementasi:
 - Apa batas waktu dan kewenangan pembatalan, serta apakah booking dapat diubah atau dijadwalkan ulang?
 - Booking bersebelahan diperbolehkan tanpa buffer pada implementasi awal; waktu menggunakan WIB dan form satu tanggal (DEC-029). Jam operasional, durasi maksimum, dan dukungan lintas hari belum ditetapkan.
 - Kapan Pending kedaluwarsa, kapan booking menjadi Completed, dan bagaimana Completed diperlakukan dalam pemeriksaan konflik?
-- Implementasi awal memakai satu keputusan PIC, alasan rejection wajib, tanpa override admin (DEC-029). Perubahan kebijakan ini membutuhkan keputusan baru.
+- Satu keputusan PIC yang ditugaskan atau Admin aktif menyelesaikan pengajuan Pending; alasan rejection wajib. Admin dapat memutuskan seluruh ruangan, tetapi tidak mengubah keputusan final (DEC-037).
 - Bagaimana booking yang sudah ada ditangani ketika ruangan menjadi maintenance/nonaktif atau aturan aksesnya berubah?
 - Nama unit pemohon disimpan sebagai snapshot saat pengajuan (DEC-029).

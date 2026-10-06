@@ -2,6 +2,79 @@
 
 ## Last Update
 
+2026-10-06 - Pengelompokan perubahan untuk publikasi GitHub.
+
+- Perubahan yang tertunda dipisahkan menjadi sembilan commit: pengaman test database, laporan bulanan, pengelolaan/detail ruangan, review approval, integrasi route, dashboard, tampilan aplikasi, beranda/login/footer, dan dokumentasi.
+- Verifikasi aktual: build Vite serta view:cache/view:clear berhasil. Run `php artisan test` dihentikan sebelum selesai karena setiap test database membutuhkan sekitar 20 detik; hasil yang sudah dilaporkan adalah 19 test lulus (2 Unit, 1 AdminDashboard, 16 Authentication), tanpa ringkasan suite penuh. Tidak mengklaim seluruh suite lulus. Audit visual tidak diulang karena task hanya pengelompokan commit dan push.
+- Pemeriksaan diff seluruh perubahan menemukan trailing whitespace pada dua baris kosong partial `_access.blade.php` dan `_pics.blade.php`; isi implementasi dipertahankan sesuai scope publikasi.
+
+2026-10-06 - Tombol login ganda pada jadwal publik dihapus.
+
+- Menghapus tombol Login untuk Booking di header Jadwal Ketersediaan Ruangan (`public.schedule`); Login pada navbar tetap tersedia. Kalender dan navigasi kembali ke beranda tetap dipertahankan.
+- Verifikasi: test terarah halaman jadwal publik/privasi `HomeAndScheduleTest` lulus (1 test, 25 assertions). Build Vite berhasil setelah retry di luar sandbox akibat esbuild EPERM; view:cache/view:clear dan diff check file berhasil. Visual desktop/mobile dan keyboard browser belum diuji ulang; perubahan hanya menghapus tautan tanpa mengubah form atau kalender.
+
+2026-10-06 - Ringkasan laporan bulanan menjadi tiga kartu.
+
+- Menghapus kartu Pending di atas laporan PIC/Admin pada template bersama `reports/monthly.blade.php`, termasuk versi cetak/PDF. Grid menjadi tiga kolom mulai breakpoint sm. Total Booking, Jam Terjadwal, dan Approved / Completed tetap tersedia; hitungan Pending dan kolomnya di rekap per ruangan tetap utuh.
+- Verifikasi: `MonthlyReportTest` lulus (5 tests, 102 assertions); Vite build berhasil setelah retry di luar sandbox akibat esbuild EPERM; view:cache/view:clear dan diff check file berhasil. Responsivitas ditinjau dari Blade; visual desktop/mobile dan keyboard browser belum diuji ulang. Form/filter, empty state, otorisasi, dan CSV tidak diubah.
+
+2026-10-06 - Navigasi dashboard Room PIC diringkas.
+
+- Menghapus tombol Permintaan Approval di header dan seluruh panel Kelola Pengajuan dan Ruangan beserta empat shortcut pada `/pic/dashboard`. Navigasi sidebar tetap tersedia. Ringkasan tugas, panel tinjauan, dan informasi akun dipertahankan; tidak menambah konten pengisi atau data baru.
+- Verifikasi: `PicDashboardBannerTest` lulus (1 test, 36 assertions), build Vite dan view:cache/view:clear berhasil, serta diff check tanpa error whitespace. Susunan responsif existing ditinjau dari Blade; visual desktop/mobile dan keyboard langsung belum diuji pada perubahan ini. Tidak mengubah form, validasi, atau empty state.
+
+2026-10-05 - Penyederhanaan UI dan pengelolaan ruangan terpadu (DEC-038).
+
+- Footer menghapus navigasi Jadwal/Login/Dashboard dan memperjelas ikon kontak. Hero pegawai diberi jarak antar teks/tombol; Mulai Booking dihapus. Navbar pegawai memakai teks dengan garis aktif/hover tanpa pill/dot. Keluar PIC/Admin dipindahkan dari menu sidebar ke sebelah profil header. Logout mengakhiri session dan menuju Beranda.
+- Kartu admin mempertahankan desain dasar, menghapus dekorasi pojok serta aksi PIC/Akses/status, dan memakai satu aksi Detail / Edit. `/admin/rooms/{id}` dan `/edit` memakai satu halaman dengan form data/status, PIC, akses, dan modal hapus. URL GET PIC/akses lama redirect ke bagian terkait. PIC tetap mengikuti kewenangan existing dan dapat membaca PIC/akses pada detail umum.
+- Penghapusan Admin membersihkan pivot tanpa menghapus master terkait. Ruangan dengan booking tidak dapat dihapus agar riwayat terlindungi; pesan meminta penonaktifan. Konfirmasi, CSRF, auth dan lock transaksi tetap berlaku.
+- Approval Pending memakai satu tombol Review, ringkasan lengkap, Setujui/Tolak, serta catatan keputusan tersimpan dan tampil pada detail pemohon. Migration nullable decision_notes sudah diterapkan tanpa reset data. Alasan penolakan tetap wajib dan kompatibel dengan data lama.
+- Header Booking Ruangan diringkas menjadi “Pilih ruangan dan tentukan jadwal pertemuan.” Aturan waktu tetap dekat form dan validasi backend tetap aktif.
+- Verifikasi: **29 skenario terarah memiliki hasil akhir lulus** setelah koreksi/pengulangan. Run regresi utama (Authentication terarah, AuthorizationTest, FrontendSkeletonTest, BookingWorkflow/RoomAssignment/RoomManagement terarah): **21 passed, 2 failed, 665 assertions**; kedua kegagalan adalah assertion lama yang menganggap seluruh checkbox halaman harus kosong. Run pilihan form: **2 passed, 1 failed, 56 assertions** mengungkap fallback fasilitas kosong pada request lama; perbaikan `_section` form/fallback old input diverifikasi ulang bersama catatan booking: **2 passed, 38 assertions**. Test edit/sync fasilitas dan isolasi pilihan antarbagian sudah lulus pada run pilihan form. Tiga test keamanan tambahan: **3 passed, 40 assertions**. Dua test baru awal (hapus/relasi/otorisasi dan catatan/perlindungan riwayat) lulus; catatan diulang pada run final. Semua kasus yang gagal sudah mempunyai hasil ulang lulus; suite penuh tidak diulang. XML hasil terarah ada di artefak audit.
+- Build Vite berhasil, termasuk retry di luar sandbox setelah esbuild EPERM; view cache/clear, syntax PHP/JS, dan diff check berhasil. Migration catatan keputusan sudah diterapkan. Pemeriksaan login/logout mencakup ketiga role dan invalidasi session/rotasi CSRF. Run gabungan luas awal dihentikan tanpa ringkasan sebelum beralih ke cakupan terarah di atas.
+- Audit Chrome pada 14 kombinasi halaman dan viewport 1440/390 lulus tanpa overflow horizontal: dashboard pegawai, kartu/detail-edit admin, daftar/empty/error approval PIC dan daftar approval admin. Review menerima catatan persetujuan, mewajibkan catatan penolakan, membuka ulang error/old input; Batal/Escape mengembalikan fokus, modal hapus menahan fokus keyboard. Snapshot Blade terisolasi tanpa penulisan database; artefak lokal `storage/app/ui-audit/simplify/`. Submit database diperiksa melalui feature tests, bukan snapshot.
+
+2026-10-05 - Approval langsung dari daftar, kewenangan Admin, dan footer setelah viewport.
+
+- `/pic/approvals` menyediakan tombol Setujui/Tolak untuk Pending melalui dialog native: ringkasan pengajuan, konfirmasi persetujuan, alasan penolakan wajib maksimal 2.000 karakter, tombol batal, fokus keyboard, dan pemulihan dialog/isian saat validasi gagal. Setelah berhasil kembali ke daftar/page asal, atau halaman terakhir yang masih tersedia bila antrean berkurang. Detail tetap tersedia untuk catatan lengkap dan form tanpa JavaScript; riwayat tidak memuat aksi keputusan.
+- Admin aktif kini boleh memutuskan Pending seluruh ruangan tanpa assignment. PIC tetap mengikuti assignment. Service mempertahankan pemeriksaan status/role terkini, kondisi/akses pemohon, konflik, waktu mulai, lock transaksi, pencegahan keputusan kedua, serta pencatatan aktor/waktu. Tidak menambah schema/dependency (DEC-037).
+- Dashboard PIC menghapus kartu ?Tinjau cepat. Persetujuan tepat.? dan ?Saat meninjau pengajuan?; kartu akun tetap tersedia. Footer semua role memakai konten beranda dengan Jadwal Ruangan dan Dashboard bagi akun berizin (Login untuk tamu). Header/konten ditempatkan dalam wrapper minimal setinggi layar, footer sesudahnya.
+- Build Vite, view:cache/view:clear, PHP/JavaScript syntax check dan diff check berhasil. Gabungan BookingWorkflowTest, AuthorizationTest, FrontendSkeletonTest, PicDashboardBannerTest: **32 passed, 1 failed, 646 assertions**. Satu kegagalan awal role tidak dikenal diperbaiki dengan Gate pada tautan Dashboard footer; pengulangan terarah **1 passed, 36 assertions**. Setelah penyempurnaan redirect halaman antrean terakhir, test keputusan Admin diulang: **1 passed, 22 assertions**. Semua skenario yang gagal/berubah telah lulus pengujian ulang; suite penuh tidak diulang.
+- Audit Chrome headless pada snapshot Blade terisolasi (tanpa menulis database): 12 kombinasi PIC/Admin/pegawai, daftar/empty state/dashboard, desktop 1440 dan mobile 390 lulus tanpa overflow horizontal. Footer halaman pendek berada pada y=924 desktop/pegawai mobile atau y=1032 PIC/Admin mobile dengan viewport tinggi 900, sehingga harus scroll. Dialog Setujui/Tolak, alasan wajib, Batal, Escape/fokus kembali, error/old input dan tinggi dialog pada mobile pendek diverifikasi. Native Tab tidak mencapai kontrol halaman di belakang dialog. Artefak lokal `storage/app/ui-audit/approval/`.
+
+2026-10-05 - Penyempurnaan beranda publik: logo, timeline, dan ilustrasi baru.
+
+- Tombol Login hero dihapus; tombol navbar dipertahankan. Navbar publik memakai komponen application-logo varian light (aset resmi yang sama dengan identitas admin, disesuaikan latar putih). Beranda mengikuti container layout 1800px seperti halaman role lain.
+- Panduan Masuk/Rencanakan/Pantau menjadi timeline dengan lingkaran nomor dan judul, garis horizontal desktop/vertikal mobile, serta panel pengingat waktu pengajuan dari config existing.
+- Hero memakai ilustrasi baru `public/images/welcome-collaboration.png`, dibuat dengan imagegen bawaan. Prompt lengkap dicatat di `docs/assets/welcome-collaboration.md`. Aset dashboard pegawai tidak diubah.
+- Verifikasi: AuthorizationTest, FrontendSkeletonTest, dan test beranda/privasi jadwal **17 passed, 495 assertions**. Build Vite berhasil setelah retry di luar sandbox (esbuild EPERM); view:cache/view:clear dan diff check berhasil.
+- Screenshot Chrome headless dengan emulasi viewport 1440px dan 390px diperiksa: logo/gambar tampil, tiga lingkaran tersambung, tombol Login hero tidak ada, dan tidak ada overflow horizontal (scrollWidth 1425/390). Artefak lokal `storage/app/ui-audit/welcome-1440.png` dan `welcome-390.png`. Pemeriksaan keyboard langsung belum dilakukan; fokus global dan tautan native dipertahankan. Tidak ada form atau empty state baru.
+
+2026-10-05 - Whitespace beranda sebelum login dirapikan.
+
+- Halaman `/` (`resources/views/welcome.blade.php`) dibatasi maksimum 1280px, dengan padding pembuka dan jarak antarbagian lebih lega. Panduan tiga langkah serta aturan pengajuan dipindahkan ke bagian tersendiri; seluruh teks dan tautan existing dipertahankan.
+- Lebar paragraf dibatasi, kartu fitur memakai tipografi dan token warna existing, serta panel penutup dibagi judul/konten dua kolom pada desktop dan ditumpuk pada mobile. Tidak mengubah layout bersama atau backend.
+- Verifikasi: test terarah `test_public_schedule_page_and_home_link_do_not_expose_private_meeting_fields` **1 passed, 25 assertions**; Vite build, view:cache/view:clear, dan diff check berhasil. Run suite HomeAndScheduleTest penuh dihentikan setelah menunggu tanpa ringkasan hasil; verifikasi dipersempit ke beranda/tautan jadwal yang terdampak.
+- Breakpoint, hierarki heading, kontras token, dan fokus tautan ditinjau dari kode. Visual desktop/mobile serta keyboard langsung belum diverifikasi karena tool browser tidak tersedia; halaman ini tidak memiliki form/error input atau daftar data/empty state.
+
+2026-10-05 - Laporan bulanan, Kelola Akses, dashboard, footer, dan audit lintas role diselesaikan.
+
+- Menambahkan laporan bulanan untuk Admin dan PIC: filter bulan/ruangan, cakupan sesuai role, rekap status per ruangan, durasi terjadwal, rincian booking, ekspor CSV aman, serta versi cetak/simpan PDF melalui browser. Route: `/admin/reports/monthly` dan `/pic/reports/monthly`.
+- Memperbaiki halaman Kelola Akses (`/admin/rooms/{room}/access`) agar memakai layout workspace, panel unit, checkbox responsif, empty state, error/old input, dan tombol proses aktif. Halaman Lantai dan detail ruangan umum yang masih lama/skeleton juga diselaraskan dan dihubungkan ke data nyata.
+- Dashboard Admin kini membaca metrik booking nyata dan lima booking terbaru. Menambahkan halaman error 403/404 yang konsisten. Footer memakai layout flex dengan main `flex-1`, dan ukuran informasi utama/input/tombol diseragamkan ke 16px; keterangan/badge minimal 14px. Tabel tetap scroll lokal di mobile.
+- Audit browser Chrome pada 135 kombinasi halaman/role/ukuran (desktop 1440, tablet 1024, mobile 390) lulus: tidak ada overflow horizontal, footer gap, heading ganda, atau informasi teks di bawah 14px. Interaksi menu mobile + Escape/fokus, kalender pindah bulan, simpan Kelola Akses, filter laporan, ekspor CSV, dan pembuatan PDF diuji. Artefak audit tersimpan lokal di `storage/app/ui-audit/2026-10-05/`.
+- Verifikasi akhir: seluruh suite **160 passed, 2.879 assertions**; Vite build berhasil setelah dijalankan di luar sandbox karena esbuild sempat terkena EPERM; view cache/clear dan diff check berhasil. Test reset database diberi guard agar `RefreshDatabase`, migration, atau truncation tidak boleh menyentuh database bersama; test memakai schema PostgreSQL sementara.
+- Catatan data lokal: satu test lama memakai `RefreshDatabase` dan sempat mengosongkan database PostgreSQL publik sebelum guard ditambahkan. Pencarian backup di workspace/Documents/Downloads/pgAdmin tidak menemukan salinan dan PostgreSQL archive mode tidak aktif. Database aplikasi lokal saat ini kosong; data fixture dapat dibuat ulang melalui `php artisan db:seed` bila diperlukan, tetapi data pengguna sebelumnya tidak diklaim pulih.
+
+2026-10-05 - Tampilan Tambah Ruangan admin diselaraskan dengan Edit Ruangan.
+
+- `/admin/rooms/create` sebelumnya masih memakai layout base dan form HTML lama; kini memakai layout schedule, breadcrumb yang sesuai, heading, panel putih, field responsif, feedback validasi, serta tombol Simpan Ruangan/Batal.
+- `_form.blade.php` memakai desain form edit existing melalui komponen workspace. `_edit-form.blade.php` menjadi wrapper partial bersama agar tambah/edit konsisten. Field, default, old input, fasilitas dari database, CSRF, route, dan authorization dipertahankan; tanpa perubahan backend atau kebijakan bisnis.
+- Verifikasi: RoomManagementTest **10 passed**. Gabungan dengan FrontendSkeletonTest dan AuthorizationTest: **22 passed, 4 failed, 625 assertions**. Keempat kegagalan dikonfirmasi terjadi juga dengan ketiga view versi HEAD sebelum perubahan: assertion teks dashboard pegawai, tautan footer publik, dan dua pemeriksaan tautan yang mendapat 404. Hasil baseline kedua suite umum: **12 passed, 4 failed, 342 assertions**; di luar cakupan halaman tambah ruangan.
+- Build Vite, view:cache/view:clear, dan diff check berhasil. Label, fokus, error, old input, empty state, serta breakpoint desktop/mobile ditinjau dari kode dan test; visual browser dan interaksi keyboard langsung belum diverifikasi karena tool browser tidak tersedia. Review melalui `/admin/rooms/create` setelah login admin.
+
+## Riwayat sebelum tampilan Tambah Ruangan admin
+
 2026-09-30 - Koreksi tombol kalender dan whitespace dashboard.
 
 - Menghapus tombol Lihat Kalender pada komponen room-catalog yang digunakan `/dashboard` dan `/rooms`, sesuai permintaan pengguna.

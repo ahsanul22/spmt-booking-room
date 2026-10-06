@@ -1,3 +1,15 @@
+> Pembaruan DEC-037: daftar approval memiliki aksi Setujui/Tolak melalui dialog (alasan penolakan wajib). Admin aktif dapat memutuskan Pending seluruh ruangan; PIC mengikuti assignment. Footer bersama berada setelah area header/konten setinggi viewport, sehingga tampil setelah scroll.
+
+## Penyederhanaan alur 2026-10-05 (DEC-038)
+
+- Admin mengelola ruangan melalui satu view `admin.rooms.edit` pada URL detail/edit existing. Bagian PIC dan akses memakai partial `_pics`/`_access` dengan endpoint simpan existing; URL GET lama redirect ke anchor bagian tersebut. Kartu hanya menautkan Detail / Edit.
+- DELETE `admin.rooms.destroy` memakai konfirmasi modal. Booking yang sudah terhubung mencegah penghapusan permanen; tampilkan pesan untuk menonaktifkan ruangan. PIC tetap hanya membaca detail dan memutuskan booking ruangan tugasnya.
+- Approval Pending menggunakan dialog Review; detail existing hanya fallback tanpa JavaScript/riwayat. Catatan keputusan untuk approved/rejected tersimpan di `decision_notes`, dengan kompatibilitas `rejection_reason`.
+- Footer tanpa menu Jadwal/Login/Dashboard, navbar pegawai berupa teks, tombol Keluar PIC/Admin bersama profil header. Logout menuju Beranda dengan invalidasi session existing.
+
+
+> Pembaruan DEC-036 (2026-10-05): laporan bulanan Admin/PIC aktif (rekap, CSV, cetak/PDF); Kelola Akses dan halaman Lantai memakai workspace. Detail ruangan umum sudah memakai data nyata dan tidak lagi skeleton. Dashboard Admin menggunakan statistik/aktivitas booking nyata. Footer dan tipografi diperbaiki lintas role; panduan ukuran teks mengikuti FRONTEND_GUIDE. Catatan skeleton di bawah adalah riwayat.
+
 > Pembaruan DEC-033: kapasitas dihapus dari semua tampilan/form ruangan. Role administratif ditampilkan sebagai Admin; identifier database tetap kompatibel dengan akun existing.
 
 > Pembaruan DEC-032: `/pic/rooms` aktif dengan kartu room penugasan, pagination, empty state, dan tautan jadwal. Memakai layout schedule serta partial kartu bersama dalam mode managed. Tersisa satu route skeleton: detail room umum.

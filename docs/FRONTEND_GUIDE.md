@@ -36,6 +36,8 @@ Gunakan `bg-primary`, `text-primaryDark`, `bg-surface`, `border-secondaryLight`,
 
 ## Gaya dan komponen
 
+- Ukuran informasi utama, input, dan tombol 16px (`text-base`); keterangan pendukung, label ringkas, dan badge minimal 14px (`text-sm`). Hindari `text-xs` atau ukuran 9–13px untuk informasi. Beri line-height yang cukup dan periksa ulang pembungkusan teks pada mobile.
+- Header + konten memakai wrapper flex `min-h-screen` dengan main `flex-1`; footer bersama berada setelah wrapper agar tampil setelah scroll, termasuk pada halaman pendek (DEC-037). Jangan memakai posisi fixed. Container tabel `workspace-table` memakai `relative` agar teks sr-only tidak menambah lebar halaman pada mobile.
 - Font mengikuti `font-sans` existing (Segoe UI, Arial, sans-serif); jangan menambah font CDN.
 - Gunakan header surface dan latar background. Sidebar primaryDark berlaku untuk PIC/admin; role user memakai navbar `layouts.user` sesuai DEC-024. Referensi admin/jadwal adalah gaya visual, sedangkan susunan konten mengikuti tugas role: approval untuk PIC, pencarian dan booking pribadi untuk user. Halaman mempunyai satu h1, deskripsi singkat, serta aksi utama yang relevan dengan role.
 - Ikuti skala referensi: konten `p-5 lg:p-9`, jarak `gap-4`/`gap-6`, card `rounded-2xl`, tombol `rounded-lg`/`rounded-xl`, border halus dan `shadow-sm` secukupnya.

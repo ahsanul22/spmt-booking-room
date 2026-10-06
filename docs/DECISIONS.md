@@ -1,5 +1,30 @@
 # Decisions
 
+## DEC-038 - Pengelolaan Ruangan Terpadu dan Review Booking
+
+- Atas permintaan pengguna, detail/edit Admin memakai satu view; informasi, fasilitas, status, PIC, dan akses unit tersedia di halaman yang sama. URL GET PIC/akses lama diarahkan ke bagian terkait; endpoint penulisan existing dipertahankan. Form per bagian tetap terpisah agar perubahan PIC/akses tidak ikut mengubah data ruangan. Old input checkbox dibatasi menurut bagian form yang gagal.
+- Kewenangan master data tetap Admin sesuai DEC-018; tidak memperluas hak PIC untuk mengubah assignment, akses, atau menghapus ruangan. PIC dapat membaca informasi PIC/akses pada detail ruangan dan memutuskan booking sesuai assignment.
+- DELETE ruangan khusus Admin memerlukan konfirmasi, lock ruangan dan transaksi. Ruangan yang memiliki booking dalam status apa pun tidak boleh dihapus permanen; gunakan status nonaktif agar riwayat tetap utuh. Ruangan tanpa booking dihapus bersama pivot fasilitas/PIC/akses melalui FK cascade existing, tanpa menghapus akun/fasilitas/unit. Lock yang sama dengan submit booking mencegah pemeriksaan dan penghapusan bersaing dengan pengajuan.
+- Daftar Pending menggunakan satu tombol Review: ringkasan ruangan, pemohon, snapshot unit, tanggal/jam, agenda, catatan pemohon, serta Setujui/Tolak dan Catatan. Catatan persetujuan opsional; penolakan tetap wajib sesuai DEC-029. Kolom nullable `decision_notes` menyimpan catatan kedua keputusan; `rejection_reason` tetap diisi untuk kompatibilitas penolakan lama. Halaman detail existing tetap berfungsi sebagai fallback tanpa JavaScript dan untuk riwayat, bukan langkah wajib approval.
+- Logout POST seluruh role tetap logout guard, invalidate session dan regenerate CSRF, lalu menuju route home. Menggantikan redirect login DEC-011. Footer tanpa navigasi Jadwal/Login/Dashboard; tombol Keluar PIC/Admin berada bersama profil pada header, mengikuti pola pegawai.
+
+## DEC-037 - Approval Langsung dan Kewenangan Admin
+
+- Atas permintaan pengguna, Admin aktif boleh menyetujui/menolak seluruh pengajuan yang membutuhkan approval dan masih Pending, tanpa penugasan PIC. Ini menggantikan batas keputusan hanya PIC pada DEC-029; tidak memberi kewenangan mengubah keputusan final atau booking otomatis tanpa approval.
+- PIC tetap hanya memutuskan ruangan penugasannya. Service memeriksa ulang role/status aktif dan assignment dalam transaksi, mempertahankan lock ruangan/booking, validasi kondisi/akses pemohon, waktu mulai, konflik, dan penolakan keputusan kedua. Aktor serta waktu keputusan dicatat pada decided_by/decided_at existing.
+- Daftar approval menyediakan tombol Setujui/Tolak dengan dialog konfirmasi; alasan penolakan wajib maksimal 2.000 karakter, tetap terlihat pada detail pemohon. Halaman detail tetap tersedia untuk agenda/catatan lengkap dan jalur proses tanpa JavaScript. Tidak menambah kolom catatan persetujuan atau schema baru.
+- Footer semua role memakai komponen dan konten beranda; tautan Dashboard menggantikan Login untuk akun masuk. Header dan konten minimal setinggi viewport, footer berada setelahnya sehingga perlu scroll bahkan pada halaman pendek. Menggantikan posisi footer di dalam area minimum layar pada DEC-036.
+
+## DEC-036 - Laporan Bulanan dan Audit Antarmuka Seluruh Role
+
+- Atas permintaan pengguna 2026-10-05, laporan bulanan aktif untuk Admin dan PIC melalui `/admin/reports/monthly` dan `/pic/reports/monthly`. Periode mengikuti tanggal rapat (WIB), bukan tanggal pengajuan atau keputusan. Pilihan bulan default bulan berjalan; filter ruangan opsional.
+- Admin mencakup seluruh ruangan. PIC dibatasi penugasan ruangan saat laporan dibuka, termasuk ruangan nonaktif agar riwayatnya tetap dapat dilaporkan. Filter, CSV, dan versi cetak menggunakan scope yang sama; pegawai/tamu tidak dapat mengakses laporan. Ini bukan arsip penugasan historis atau laporan yang dibekukan.
+- Rekap memisahkan seluruh status database. Jam terjadwal adalah jumlah durasi Approved + Completed, bukan okupansi aktual/kehadiran. Pending lewat waktu tetap Pending; tidak mengaktifkan expiry, auto Completed, pembatalan, atau kebijakan baru lifecycle booking.
+- Rincian layar dipaginasi; CSV dan cetak/PDF melalui browser mencakup semua hasil filter. CSV UTF-8 menggunakan snapshot unit pengajuan, mengamankan nilai yang dapat dibaca sebagai formula spreadsheet, serta tidak menyertakan token pengajuan/catatan privat. Tidak menambah dependency PDF/Excel, schema, atau email otomatis.
+- Audit melengkapi detail ruangan umum dengan data nyata (menggantikan route skeleton). Pegawai hanya dapat membuka ruangan aktif; PIC dapat membuka ruangan aktif atau nonaktif yang ditugaskan kepadanya; Admin dapat membuka seluruhnya. Aksi booking tetap mengikuti authorization dan validasi existing.
+- Dashboard Admin menampilkan ringkasan booking nyata dan lima pengajuan terbaru; angka rapat berlangsung mengikuti Approved pada interval waktu saat ini. Halaman dashboard alternatif tetap menampilkan konteks role akun.
+- Tipografi aplikasi: informasi utama/input/tombol 16px, keterangan/badge minimal 14px; heading mengikuti skala existing. Layout menggunakan tinggi minimum layar dengan konten fleksibel agar footer mencapai bawah layar pada halaman pendek. Tabel tetap dapat digulir di dalam container, bukan melebarkan halaman.
+
 ## DEC-035 - Penerapan Logo Resmi Pelindo Multi Terminal (SPMT)
 
 - Menggantikan tampilan teks merek sementara `pelindo ∿ Multi Terminal` dengan aset logo resmi PT Pelindo Multi Terminal (SPMT) sesuai arahan pengguna.
