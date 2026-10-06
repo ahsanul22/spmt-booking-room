@@ -8,19 +8,12 @@ use App\Models\Room;
 use App\Models\User;
 use App\Services\RoomAssignmentService;
 use Illuminate\Http\RedirectResponse;
-use Illuminate\View\View;
 
 class RoomPicController extends Controller
 {
-    public function edit(Room $room): View
+    public function edit(Room $room): RedirectResponse
     {
-        $room->load('pics');
-
-        return view('admin.rooms.pics', [
-            'room' => $room,
-            'eligiblePics' => User::where('role', User::ROLE_ROOM_PIC)->orderBy('name')->get(),
-            'selectedPicIds' => $room->pics->pluck('id')->all(),
-        ]);
+        return redirect()->to(route('admin.rooms.show', $room).'#pics');
     }
 
     public function update(SaveRoomPicsRequest $request, Room $room, RoomAssignmentService $service): RedirectResponse

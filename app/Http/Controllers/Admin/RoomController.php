@@ -7,6 +7,8 @@ use App\Http\Requests\SaveRoomRequest;
 use App\Models\Facility;
 use App\Models\Floor;
 use App\Models\Room;
+use App\Models\User;
+use App\Models\OrganizationalUnit;
 use App\Services\RoomService;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
@@ -35,14 +37,18 @@ class RoomController extends Controller
 
     public function show(Room $room): View
     {
-        return view('admin.rooms.show', ['room' => $room->load(['floor', 'facilities', 'pics', 'allowedOrganizationalUnits'])]);
+        return $this->edit($room);
     }
 
     public function edit(Room $room): View
     {
         return view('admin.rooms.edit', $this->formOptions() + [
-            'room' => $room,
-            'selectedFacilityIds' => $room->facilities()->pluck('facilities.id')->all(),
+            'room' => $room->load(['floor', 'facilities', 'pics', 'allowedOrganizationalUnits']),
+            'eligiblePics' => User::where('role', User::ROLE_ROOM_PIC)->orderBy('name')->get(),
+            'units' => OrganizationalUnit::orderBy('name')->get(),
+            'selectedPicIds' => $room->pics->pluck('id')->all(),
+            'selectedUnitIds' => $room->allowedOrganizationalUnits->pluck('id')->all(),
+            'selectedFacilityIds' => $room->facilities->pluck('id')->all(),
         ]);
     }
 
@@ -60,6 +66,14 @@ class RoomController extends Controller
 
         return redirect()->route('admin.rooms.show', $room)
             ->with('status', $room->is_active ? 'Ruangan berhasil diaktifkan.' : 'Ruangan berhasil dinonaktifkan.');
+    }
+
+    public function destroy(Request $request, Room $room, RoomService $service): RedirectResponse
+    {
+        $request->validate(['confirm_delete' => ['required', 'accepted']]);
+        $service->delete($room);
+
+        return redirect()->route('admin.rooms.index')->with('status', 'Ruangan berhasil dihapus.');
     }
 
     private function formOptions(): array

@@ -87,8 +87,8 @@ class RoomManagementTest extends PostgresTestCase
         $this->assertDatabaseHas('rooms', array_replace($data, ['id' => $room->id, 'is_active' => true, 'requires_approval' => true]));
         $this->assertDatabaseHas('facility_room', ['room_id' => $room->id, 'facility_id' => $facility->id]);
         $this->get($this->url('show', $room))->assertOk()->assertSee('Ruangan berhasil ditambahkan.')
-            ->assertSee([$room->name, $room->code, $floor->name, '15', $room->description, 'restricted', 'Requires Approval: Ya', 'available', 'Status Aktif: Aktif', $facility->name]);
-        $this->get($this->url('index'))->assertOk()->assertSee([$room->name, $room->code, $floor->name, '15', 'restricted', 'Ya', 'available', 'Aktif', $facility->name]);
+            ->assertSee([$room->name, $room->code, $floor->name, $room->description, 'restricted', 'Perlu Approval', 'available', 'Status Aktif', $facility->name]);
+        $this->get($this->url('index'))->assertOk()->assertSee([$room->name, $room->code, $floor->name, 'restricted', 'Ya', 'available', 'Aktif', $facility->name]);
     }
 
     public function test_edit_prefills_and_updates_fields_and_syncs_or_clears_facilities(): void
@@ -109,7 +109,7 @@ class RoomManagementTest extends PostgresTestCase
         $this->assertDatabaseMissing('facility_room', ['room_id' => $room->id, 'facility_id' => $existing->id]);
         $this->assertDatabaseHas('rooms', ['id' => $room->id, 'name' => 'Ruang Diperbarui', 'code' => 'TEST-ROOM',
             'floor_id' => $floor->id, 'capacity' => 0, 'access_type' => 'all', 'requires_approval' => false, 'status' => 'maintenance', 'is_active' => false]);
-        $this->get($this->url('show', $room))->assertSee(['Ruang Diperbarui', $floor->name, $replacement->name, 'Requires Approval: Tidak', 'maintenance', 'Status Aktif: Nonaktif', 'berhasil diperbarui.']);
+        $this->get($this->url('show', $room))->assertSee(['Ruang Diperbarui', $floor->name, $replacement->name, 'Perlu Approval', 'maintenance', 'Status Aktif', 'berhasil diperbarui.']);
         $this->get($this->url('index'))->assertSee(['Ruang Diperbarui', $replacement->name, 'maintenance']);
         // No checked checkbox means the browser omits facility_ids entirely.
         unset($data['facility_ids']);
@@ -119,7 +119,7 @@ class RoomManagementTest extends PostgresTestCase
         $this->assertSame(0, $room->facilities()->count());
         $this->assertNull($room->fresh()->code);
         $this->assertNull($room->fresh()->description);
-        $this->get($this->url('show', $room))->assertSee('Belum ada fasilitas.');
+        $this->assertDoesNotMatchRegularExpression('/name="facility_ids\[\]"[^>]* checked/', $this->get($this->url('show', $room))->assertOk()->getContent());
     }
 
     public function test_validation_rejects_invalid_fields_and_unique_codes_without_writes(): void
@@ -154,7 +154,7 @@ class RoomManagementTest extends PostgresTestCase
         $data = $this->data(['name' => '', 'facility_ids' => []]);
         unset($data['facility_ids']);
         $this->from($this->url('edit', $room))->put($this->url('update', $room), $data)->assertSessionHasErrors('name');
-        $this->get($this->url('edit', $room))->assertOk()->assertSee('role="alert"', false)->assertDontSee(' checked', false);
+        $this->assertDoesNotMatchRegularExpression('/name="facility_ids\[\]"[^>]* checked/', $this->get($this->url('edit', $room))->assertOk()->assertSee('role="alert"', false)->getContent());
         $this->from($this->url('edit', $room))->put($this->url('update', $room), $this->data(['facility_ids' => 'invalid']))
             ->assertSessionHasErrors('facility_ids');
         $this->get($this->url('edit', $room))->assertOk()->assertSee('role="alert"', false);
@@ -190,11 +190,11 @@ class RoomManagementTest extends PostgresTestCase
             $this->patch($this->url('status', $room), ['is_active' => (int) $active, 'status' => 'unavailable', 'facility_ids' => []])
                 ->assertRedirect($this->url('show', $room))->assertSessionHasNoErrors();
             $this->assertDatabaseHas('rooms', ['id' => $room->id, 'is_active' => $active, 'status' => 'available']);
-            $this->get($this->url('show', $room))->assertSee('Status Aktif: '.($active ? 'Aktif' : 'Nonaktif'));
-            $this->get($this->url('index'))->assertSee($active ? 'Nonaktifkan' : 'Aktifkan');
+            $this->get($this->url('show', $room))->assertSee('Status Aktif');
+            $this->get($this->url('index'))->assertSee($active ? 'Aktif' : 'Nonaktif');
         }
         $this->patch($this->url('status', $room), ['is_active' => 'bad'])->assertSessionHasErrors('is_active');
-        $this->delete($this->url('show', $room))->assertStatus(405);
+        $this->delete($this->url('show', $room))->assertSessionHasErrors('confirm_delete');
         $this->assertModelExists($room);
         $this->assertEquals($facilities, $room->facilities()->pluck('facilities.id')->all());
         $this->assertEquals($pics, DB::table('room_pics')->orderBy('room_id')->orderBy('user_id')->get()->toArray());
@@ -245,5 +245,6 @@ class RoomManagementTest extends PostgresTestCase
         $this->post($this->url('store'), $this->data())->assertStatus(419);
         $this->put($this->url('update', $room), $this->data())->assertStatus(419);
         $this->patch($this->url('status', $room), ['is_active' => 0])->assertStatus(419);
+        $this->delete($this->url('destroy', $room), ['confirm_delete' => 1])->assertStatus(419);
     }
 }

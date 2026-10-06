@@ -57,7 +57,7 @@ class RoomAssignmentTest extends PostgresTestCase
         $first = User::where('role', 'room_pic')->firstOrFail();
         $second = User::factory()->create(['name' => 'PIC Tambahan Database', 'role' => 'room_pic', 'is_active' => true]);
         $users = User::orderBy('id')->get()->toArray();
-        $this->get($this->url('pics', $room))->assertOk()->assertSee($room->name)->assertSee($second->name)
+        $this->get($this->url('show', $room))->assertOk()->assertSee($room->name)->assertSee($second->name)
             ->assertViewHas('eligiblePics', fn ($pics) => $pics->every(fn ($pic) => $pic->role === 'room_pic'))
             ->assertDontSee('event.preventDefault()');
         foreach ([1, 2] as $attempt) {
@@ -69,7 +69,7 @@ class RoomAssignmentTest extends PostgresTestCase
             }
         }
         $this->get($this->url('show', $room))->assertSee([$first->name, $second->name, 'PIC ruangan berhasil diperbarui.']);
-        $this->get($this->url('pics', $room))->assertSee('value="'.$second->id.'" checked', false);
+        $this->get($this->url('show', $room))->assertSee('value="'.$second->id.'" checked', false);
         $this->assertSame($users, User::orderBy('id')->get()->toArray());
     }
 
@@ -85,7 +85,7 @@ class RoomAssignmentTest extends PostgresTestCase
         }
         $this->put($this->url('pics.update', $room), ['pic_ids' => [$pic->id, $pic->id]])->assertSessionHasErrors('pic_ids.0');
         $this->from($this->url('pics', $room))->put($this->url('pics.update', $room), ['pic_ids' => 'invalid'])->assertSessionHasErrors('pic_ids');
-        $this->get($this->url('pics', $room))->assertOk()->assertSee('role="alert"', false);
+        $this->get($this->url('show', $room))->assertOk()->assertSee('role="alert"', false);
         $this->assertSame($original, $room->pics()->pluck('users.id')->all());
     }
 
@@ -121,7 +121,7 @@ class RoomAssignmentTest extends PostgresTestCase
         $directorate = OrganizationalUnit::where('type', 'directorate')->has('children')->firstOrFail();
         $department = OrganizationalUnit::where('type', 'department')->firstOrFail();
         $units = OrganizationalUnit::orderBy('id')->get()->toArray();
-        $this->get($this->url('access', $room))->assertOk()->assertSee($directorate->name)->assertSee($department->name);
+        $this->get($this->url('show', $room))->assertOk()->assertSee($directorate->name)->assertSee($department->name);
         foreach ([1, 2] as $attempt) {
             $this->put($this->url('access.update', $room), ['organizational_unit_ids' => [$directorate->id, $department->id]])
                 ->assertRedirect($this->url('show', $room))->assertSessionHasNoErrors()->assertSessionHas('status');
@@ -130,7 +130,7 @@ class RoomAssignmentTest extends PostgresTestCase
         $this->assertDatabaseHas('room_unit_access', ['room_id' => $room->id, 'organizational_unit_id' => $directorate->id]);
         $this->assertDatabaseMissing('room_unit_access', ['room_id' => $room->id, 'organizational_unit_id' => $directorate->children()->firstOrFail()->id]);
         $this->get($this->url('show', $room))->assertSee([$directorate->name, $department->name, 'Unit akses ruangan berhasil diperbarui.']);
-        $this->get($this->url('access', $room))->assertSee('value="'.$directorate->id.'" checked', false);
+        $this->get($this->url('show', $room))->assertSee('value="'.$directorate->id.'" checked', false);
         $this->put($this->url('access.update', $room), ['organizational_unit_ids' => [$department->id]])->assertSessionHasNoErrors();
         $this->assertSame([$department->id], $room->allowedOrganizationalUnits()->pluck('organizational_units.id')->all());
         $this->put($this->url('access.update', $room), [])->assertSessionHasNoErrors();
@@ -150,15 +150,15 @@ class RoomAssignmentTest extends PostgresTestCase
         }
         $this->from($this->url('access', $room))->put($this->url('access.update', $room), ['organizational_unit_ids' => 'bad'])
             ->assertSessionHasErrors('organizational_unit_ids');
-        $this->get($this->url('access', $room))->assertOk()->assertSee('role="alert"', false);
+        $this->get($this->url('show', $room))->assertOk()->assertSee('role="alert"', false);
         $room->update(['access_type' => 'all']);
         $this->put($this->url('access.update', $room), ['organizational_unit_ids' => [$unit->id]])->assertSessionHasErrors('organizational_unit_ids');
-        $this->get($this->url('access', $room))->assertSee('Daftar unit tersimpan di bawah tidak digunakan.')
+        $this->get($this->url('show', $room))->assertSee('Daftar unit tersimpan di bawah tidak digunakan.')
             ->assertDontSee('name="organizational_unit_ids[]"', false)->assertDontSee('Simpan Unit Akses');
         $this->get($this->url('show', $room))->assertSee('Akses terbuka untuk semua unit.');
         $this->assertSame($original, $room->allowedOrganizationalUnits()->pluck('organizational_units.id')->all());
         $room->update(['access_type' => 'restricted']);
-        $this->get($this->url('access', $room))->assertSee('name="organizational_unit_ids[]"', false);
+        $this->get($this->url('show', $room))->assertSee('name="organizational_unit_ids[]"', false);
     }
 
     public function test_assignment_operations_preserve_room_fields_facilities_and_other_records(): void
@@ -213,9 +213,9 @@ class RoomAssignmentTest extends PostgresTestCase
         }
         $this->delete('/admin/rooms/'.$room->id.'/pics/999999999')->assertNotFound();
         $pic = User::factory()->create(['name' => '<script>alert(1)</script>', 'role' => 'room_pic']);
-        $this->get($this->url('pics', $room))->assertSee($pic->name)->assertDontSee($pic->name, false);
+        $this->get($this->url('show', $room))->assertSee($pic->name)->assertDontSee($pic->name, false);
         $unit = OrganizationalUnit::create(['name' => '<script>alert(2)</script>', 'type' => 'directorate', 'is_active' => true]);
-        $this->get($this->url('access', $room))->assertSee($unit->name)->assertDontSee($unit->name, false);
+        $this->get($this->url('show', $room))->assertSee($unit->name)->assertDontSee($unit->name, false);
         $this->app->bind(VerifyCsrfToken::class, fn ($app) => new class($app, $app['encrypter']) extends VerifyCsrfToken
         {
             protected function runningUnitTests(): bool
