@@ -21,7 +21,7 @@
                         @endif
                     </dd></div>
                 </dl>
-                <p class="mt-5 text-sm text-slate-600">Status Aktif: {{ $unit->is_active ? 'Aktif' : 'Nonaktif' }}</p>
+                <p class="mt-5 text-base text-slate-600">Status Aktif: {{ $unit->is_active ? 'Aktif' : 'Nonaktif' }}</p>
                 <div class="mt-6 flex flex-wrap items-center gap-3 border-t border-slate-100 pt-5">
                     <a class="workspace-button" href="{{ route('admin.organizational-units.edit', $unit->id) }}">Edit</a>
                     <div class="workspace-record-actions">@include('admin.organizational-units._status')</div>
@@ -33,7 +33,7 @@
                 <ul class="divide-y divide-slate-100">
                     @foreach($unit->children as $child)
                         <li class="flex flex-wrap items-center justify-between gap-3 p-5 sm:px-6">
-                            <div class="min-w-0"><a class="break-words text-sm font-semibold text-primary hover:underline" href="{{ route('admin.organizational-units.show', $child) }}">{{ $child->name }}</a><p class="mt-1 text-xs text-slate-600">{{ $child->type }}</p></div>
+                            <div class="min-w-0"><a class="break-words text-base font-semibold text-primary hover:underline" href="{{ route('admin.organizational-units.show', $child) }}">{{ $child->name }}</a><p class="mt-1 text-sm text-slate-600">{{ $child->type }}</p></div>
                             <x-workspace-status :active="$child->is_active" />
                         </li>
                     @endforeach

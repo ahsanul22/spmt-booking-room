@@ -31,7 +31,7 @@ class AuthorizationTest extends PostgresTestCase
         $this->assertPagesDenied(array_merge(self::PIC, self::ADMIN));
         $this->get('/dashboard')->assertSee('Dashboard Pegawai')->assertSee('My Booking')
             ->assertDontSee('Ruangan Saya')->assertDontSee('Permintaan Approval')->assertDontSee('Kelola User')
-            ->assertSee('Temukan ruang untuk pertemuan Anda')->assertDontSee('schedule-navigation');
+            ->assertSee('Ruang yang tepat.')->assertDontSee('schedule-navigation');
         $this->get('/schedule')->assertOk()->assertDontSee('schedule-navigation')
             ->assertSee('aria-label="Navigasi utama"', false)->assertSee('data-schedule', false);
     }
@@ -44,7 +44,7 @@ class AuthorizationTest extends PostgresTestCase
         $this->get('/pic/dashboard')->assertSee('Dashboard PIC')->assertDontSee('My Booking')->assertDontSee('Booking Ruangan')
             ->assertSee('Ruangan Saya')->assertSee('Permintaan Approval')->assertDontSee('Kelola User')
             ->assertSee('schedule-navigation')->assertSee('Tinjau permintaan approval')
-            ->assertDontSee('Temukan ruang untuk pertemuan Anda');
+            ->assertDontSee('Ruang yang tepat.');
         foreach (['/pic/rooms', '/pic/approvals', '/pic/approvals/history', '/schedule'] as $url) {
             $this->get($url)->assertOk()->assertDontSee('My Booking')->assertDontSee('Booking Ruangan');
         }
@@ -58,8 +58,8 @@ class AuthorizationTest extends PostgresTestCase
         $this->assertPagesDenied(self::EMPLOYEE);
         $this->get('/admin/dashboard')->assertSee('Dashboard Admin')->assertSee('Kelola User')
             ->assertSee('Semua Booking')->assertDontSee('My Booking')
-            ->assertViewIs('admin.dashboard')->assertSee('Pratinjau dashboard')
-            ->assertSee('Aktivitas booking belum tersedia');
+            ->assertViewIs('admin.dashboard')->assertDontSee('Pratinjau dashboard')
+            ->assertSee('Belum ada booking.')->assertSee('Laporan Bulanan');
         $this->assertEquals($before, DB::table('room_pics')->orderBy('room_id')->orderBy('user_id')->get()->toArray());
     }
 
@@ -71,7 +71,7 @@ class AuthorizationTest extends PostgresTestCase
             $response->assertSee('href="'.url($dashboard).'"', false);
             preg_match_all('/<a\b[^>]*href="([^"]+)"/', $response->getContent(), $matches);
             foreach ($matches[1] as $url) {
-                if (str_starts_with($url, '#')) {
+                if (str_starts_with($url, '#') || preg_match('/^(mailto|tel):/', $url)) {
                     continue;
                 }
                 $this->get(html_entity_decode($url))->assertOk();
@@ -96,7 +96,7 @@ class AuthorizationTest extends PostgresTestCase
         $this->assertPagesDenied(array_merge(self::GENERAL, self::EMPLOYEE, self::PIC, self::ADMIN));
         $this->get('/login')->assertForbidden();
         $this->assertSame('user', $user->fresh()->role);
-        $this->post('/logout')->assertRedirect('/login');
+        $this->post('/logout')->assertRedirect(route('home'));
         $this->assertGuest();
     }
 

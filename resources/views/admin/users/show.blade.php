@@ -16,7 +16,7 @@
                     <div><dt>Unit Kerja</dt><dd>{{ $userRecord->organizationalUnit?->name ?? 'Tanpa Unit Kerja' }}</dd></div>
                     <div><dt>Role</dt><dd>{{ $userRecord->roleLabel() }}</dd></div>
                 </dl>
-                <p class="mt-5 text-sm text-slate-600">Status Aktif: {{ $userRecord->is_active ? 'Aktif' : 'Nonaktif' }}</p>
+                <p class="mt-5 text-base text-slate-600">Status Aktif: {{ $userRecord->is_active ? 'Aktif' : 'Nonaktif' }}</p>
                 <div class="mt-6 flex flex-wrap items-center gap-3 border-t border-slate-100 pt-5">
                     <a class="workspace-button" href="{{ route('admin.users.edit', $userRecord->id) }}">Edit</a>
                     <div class="workspace-record-actions">@include('admin.users._status')</div>

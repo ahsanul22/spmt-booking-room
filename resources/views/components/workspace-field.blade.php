@@ -1,6 +1,6 @@
 @props(['name', 'label', 'type' => 'text', 'value' => null, 'hint' => null, 'rows' => 5])
 <div class="min-w-0">
-    <label for="{{ $name }}" class="mb-2 block text-sm font-semibold text-primaryDark">{{ $label }}@if($attributes->get('required')) <span aria-hidden="true" class="text-danger">*</span>@endif</label>
+    <label for="{{ $name }}" class="mb-2 block text-base font-semibold text-primaryDark">{{ $label }}@if($attributes->get('required')) <span aria-hidden="true" class="text-danger">*</span>@endif</label>
     @php
         $controlAttributes = $attributes->class(['workspace-control', 'border-danger' => $errors->has($name)])
             ->merge(['aria-invalid' => $errors->has($name) ? 'true' : 'false']);
@@ -13,6 +13,6 @@
     @else
         <input id="{{ $name }}" name="{{ $name }}" type="{{ $type }}" @if($type !== 'password') value="{{ $value }}" @endif @if($descriptionIds) aria-describedby="{{ $descriptionIds }}" @endif {{ $controlAttributes }}>
     @endif
-    @if($hint)<p id="{{ $name }}-hint" class="mt-2 text-xs leading-5 text-slate-600">{{ $hint }}</p>@endif
-    @error($name)<p id="{{ $name }}-error" class="mt-2 text-sm text-danger">{{ $message }}</p>@enderror
+    @if($hint)<p id="{{ $name }}-hint" class="mt-2 text-sm leading-5 text-slate-600">{{ $hint }}</p>@endif
+    @error($name)<p id="{{ $name }}-error" class="mt-2 text-base text-danger">{{ $message }}</p>@enderror
 </div>

@@ -6,7 +6,8 @@
     <title>@yield('title', 'Booking Ruang Rapat')</title>
     @vite(['resources/css/app.css', 'resources/js/app.js'])
 </head>
-<body class="bg-background font-sans text-text antialiased">
+<body class="flex min-h-screen flex-col bg-background font-sans text-text antialiased">
+    <div class="flex min-h-screen flex-col">
     <header class="user-module p-5">
         <p>Booking Ruang Rapat PT Pelindo Multi Terminal</p>
         @auth
@@ -18,9 +19,10 @@
             </form>
         @endauth
     </header>
-    <main id="content" class="user-module p-5">
+    <main id="content" class="user-module flex-1 p-5">
         @yield('content')
     </main>
+    </div>
     @include('shared.footer')
 </body>
 </html>

@@ -2,11 +2,24 @@
 @tailwind components;
 @tailwind utilities;
 
+@media print {
+    @page { size: A4 landscape; margin: 12mm; }
+    .report-page { background: white; font-size: 11pt; }
+    .report-page main { max-width: none; padding: 0; }
+    .report-page .workspace-table { overflow: visible; }
+    .report-page .workspace-table table { min-width: 0; table-layout: fixed; font-size: 10pt; }
+    .report-page .workspace-table th, .report-page .workspace-table td { white-space: normal; overflow-wrap: anywhere; padding: 6px; }
+    .report-page section { overflow: visible; box-shadow: none; }
+    .report-page tr { break-inside: avoid; }
+    .report-page thead { display: table-header-group; }
+    .report-page tfoot { display: table-row-group; }
+}
+
 @layer components {
-    .schedule-nav { @apply flex items-center gap-3 rounded-xl px-3.5 py-2.5 text-sm text-white/80 transition-all duration-150 hover:bg-white/10 hover:text-white border border-transparent; }
+    .schedule-nav { @apply flex items-center gap-3 rounded-xl px-3.5 py-2.5 text-base text-white/80 transition-all duration-150 hover:bg-white/10 hover:text-white border border-transparent; }
     .schedule-nav-active { @apply bg-gradient-to-r from-white/20 via-white/15 to-white/10 text-white font-medium border-white/20 shadow-sm backdrop-blur-md; }
     /* Preserve readable skeleton forms when the user navbar loads Tailwind's reset. */
-    .user-module { @apply space-y-5 text-sm leading-6; }
+    .user-module { @apply space-y-5 text-base leading-6; }
     .user-module h1 { @apply text-3xl font-bold text-primaryDark; }
     .user-module h2 { @apply text-lg font-bold text-primaryDark; }
     .user-module form { @apply space-y-4; }
@@ -25,32 +38,32 @@
 }
 
 @layer components {
-    .workspace-feedback [role="status"], .workspace-feedback [role="alert"] { @apply mb-6 rounded-xl border border-secondaryLight bg-surface p-4 text-sm leading-6 text-primaryDark; }
+    .workspace-feedback [role="status"], .workspace-feedback [role="alert"] { @apply mb-6 rounded-xl border border-secondaryLight bg-surface p-4 text-base leading-6 text-primaryDark; }
     .workspace-feedback [role="alert"] { @apply border-danger text-danger; }
-    .room-status-action button { @apply rounded-lg border border-slate-200 px-3 py-2.5 text-sm font-semibold text-primary hover:bg-background; }
-    .room-card-status button { @apply inline-flex min-h-[44px] items-center rounded-lg px-2 py-2 text-xs font-medium text-slate-600 hover:bg-surface hover:text-primaryDark; }
-    .workspace-notice { @apply mb-6 rounded-xl border border-secondaryLight/70 bg-secondaryLight/20 px-4 py-3 text-xs leading-5 text-primaryDark; }
+    .room-status-action button { @apply rounded-lg border border-slate-200 px-3 py-2.5 text-base font-semibold text-primary hover:bg-background; }
+    .room-card-status button { @apply inline-flex min-h-[44px] items-center rounded-lg px-2 py-2 text-sm font-medium text-slate-600 hover:bg-surface hover:text-primaryDark; }
+    .workspace-notice { @apply mb-6 rounded-xl border border-secondaryLight/70 bg-secondaryLight/20 px-4 py-3 text-sm leading-5 text-primaryDark; }
     .workspace-preview form { @apply grid items-end gap-4 sm:grid-cols-2 xl:grid-cols-4; }
-    .workspace-preview label { @apply mb-2 inline-block text-xs font-semibold text-primaryDark; }
-    .workspace-preview input, .workspace-preview select { @apply min-h-[44px] w-full min-w-0 rounded-lg border border-slate-300 bg-surface px-3 py-2 text-sm focus:outline focus:outline-2 focus:outline-offset-2 focus:outline-primary; }
-    .workspace-preview form button { @apply min-h-[44px] cursor-not-allowed rounded-lg bg-background px-4 py-2 text-sm font-semibold text-slate-600; }
-    .workspace-preview form > a { @apply inline-flex min-h-[44px] items-center justify-center rounded-lg border border-slate-200 px-4 py-2 text-sm font-semibold text-primary hover:bg-background; }
-    .workspace-table { @apply overflow-x-auto focus-visible:outline focus-visible:outline-2 focus-visible:outline-primary; }
-    .workspace-table table { @apply w-full min-w-[700px] text-left text-sm; }
-    .workspace-table th { @apply whitespace-nowrap border-b border-slate-100 bg-background/50 px-5 py-3 text-xs font-semibold text-slate-600; }
+    .workspace-preview label { @apply mb-2 inline-block text-sm font-semibold text-primaryDark; }
+    .workspace-preview input, .workspace-preview select { @apply min-h-[44px] w-full min-w-0 rounded-lg border border-slate-300 bg-surface px-3 py-2 text-base focus:outline focus:outline-2 focus:outline-offset-2 focus:outline-primary; }
+    .workspace-preview form button { @apply min-h-[44px] cursor-not-allowed rounded-lg bg-background px-4 py-2 text-base font-semibold text-slate-600; }
+    .workspace-preview form > a { @apply inline-flex min-h-[44px] items-center justify-center rounded-lg border border-slate-200 px-4 py-2 text-base font-semibold text-primary hover:bg-background; }
+    .workspace-table { @apply relative overflow-x-auto focus-visible:outline focus-visible:outline-2 focus-visible:outline-primary; }
+    .workspace-table table { @apply w-full min-w-[700px] text-left text-base; }
+    .workspace-table th { @apply whitespace-nowrap border-b border-slate-100 bg-background/50 px-5 py-3 text-sm font-semibold text-slate-600; }
     .workspace-table td { @apply max-w-xs break-words border-b border-slate-100 px-5 py-4 align-top; }
     .workspace-table td[colspan] { @apply p-0; }
     .workspace-table td a { @apply text-primary; }
-    .workspace-button { @apply inline-flex min-h-[44px] items-center justify-center gap-2 rounded-xl bg-primary px-5 py-2.5 text-sm font-semibold text-white transition hover:bg-primaryDark; }
-    .workspace-button-secondary { @apply inline-flex min-h-[44px] items-center justify-center gap-2 rounded-xl border border-slate-200 bg-surface px-4 py-2.5 text-sm font-semibold text-primary transition hover:bg-background; }
-    .workspace-control { @apply min-h-[44px] w-full min-w-0 rounded-lg border border-slate-300 bg-surface px-3 py-2 text-base focus:outline focus:outline-2 focus:outline-offset-2 focus:outline-primary sm:text-sm; }
+    .workspace-button { @apply inline-flex min-h-[44px] items-center justify-center gap-2 rounded-xl bg-primary px-5 py-2.5 text-base font-semibold text-white transition hover:bg-primaryDark; }
+    .workspace-button-secondary { @apply inline-flex min-h-[44px] items-center justify-center gap-2 rounded-xl border border-slate-200 bg-surface px-4 py-2.5 text-base font-semibold text-primary transition hover:bg-background; }
+    .workspace-control { @apply min-h-[44px] w-full min-w-0 rounded-lg border border-slate-300 bg-surface px-3 py-2 text-base focus:outline focus:outline-2 focus:outline-offset-2 focus:outline-primary sm:text-base; }
     .workspace-control[aria-invalid="true"] { @apply border-danger; }
     .workspace-form { @apply grid gap-5 p-5 sm:grid-cols-2 sm:p-6; }
-    .workspace-form > p { @apply text-sm leading-6 text-slate-600 sm:col-span-2; }
+    .workspace-form > p { @apply text-base leading-6 text-slate-600 sm:col-span-2; }
     .workspace-form-actions { @apply flex flex-wrap gap-3 border-t border-slate-100 pt-5 sm:col-span-2; }
     .workspace-record-actions { @apply flex flex-wrap items-center gap-2; }
-    .workspace-record-actions a, .workspace-record-actions button { @apply inline-flex min-h-[44px] items-center rounded-lg border border-slate-200 px-3 py-2 text-xs font-semibold text-primary hover:bg-background; }
-    .workspace-detail { @apply grid gap-5 text-sm sm:grid-cols-2; }
-    .workspace-detail dt { @apply text-xs text-slate-500; }
+    .workspace-record-actions a, .workspace-record-actions button { @apply inline-flex min-h-[44px] items-center rounded-lg border border-slate-200 px-3 py-2 text-sm font-semibold text-primary hover:bg-background; }
+    .workspace-detail { @apply grid gap-5 text-base sm:grid-cols-2; }
+    .workspace-detail dt { @apply text-sm text-slate-500; }
     .workspace-detail dd { @apply mt-1 break-words font-medium leading-6; }
 }

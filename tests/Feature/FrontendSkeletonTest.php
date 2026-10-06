@@ -2,7 +2,7 @@
 
 namespace Tests\Feature;
 
-use App\Http\Controllers\FrontendSkeletonController;
+use App\Http\Controllers\RoomDetailsController;
 use App\Models\Room;
 use App\Models\User;
 use Illuminate\Support\Facades\Route;
@@ -16,21 +16,25 @@ class FrontendSkeletonTest extends PostgresTestCase
             $html = $this->get($url)->assertOk()->getContent();
             $this->assertSame(1, substr_count($html, '<footer '));
             preg_match('/<footer\b.*?<\/footer>/s', $html, $footer);
-            $this->assertStringContainsString(route('home').'#room-schedule', $footer[0]);
+            $this->assertStringNotContainsString(route('public.schedule'), $footer[0]);
+            $this->assertStringNotContainsString(route('login'), $footer[0]);
+            $this->assertStringContainsString('mailto:', $footer[0]);
             $this->assertStringNotContainsString(route('my-bookings.index'), $footer[0]);
         }
         foreach ([
-            'user' => ['/dashboard', '/schedule', '/my-bookings', 'Booking Ruangan'],
-            'room_pic' => ['/pic/dashboard', '/pic/approvals/history', '/schedule', 'Permintaan Approval'],
-            'super_admin' => ['/admin/dashboard', '/admin/rooms/create', '/admin/schedule', 'Semua Booking'],
+            'user' => ['/dashboard', '/schedule', '/my-bookings'],
+            'room_pic' => ['/pic/dashboard', '/pic/approvals/history', '/schedule'],
+            'super_admin' => ['/admin/dashboard', '/admin/rooms/create', '/admin/schedule'],
         ] as $role => $pages) {
-            $label = array_pop($pages);
             $this->actingAs(User::where('role', $role)->firstOrFail());
             foreach ($pages as $url) {
                 $html = $this->get($url)->assertOk()->getContent();
                 $this->assertSame(1, substr_count($html, '<footer '));
                 preg_match('/<footer\b.*?<\/footer>/s', $html, $footer);
-                $this->assertStringContainsString($label, $footer[0]);
+                $this->assertStringNotContainsString(route('public.schedule'), $footer[0]);
+            $this->assertStringNotContainsString(route('login'), $footer[0]);
+            $this->assertStringContainsString('mailto:', $footer[0]);
+                $this->assertStringNotContainsString(route(auth()->user()->dashboardRouteName()), $footer[0]);
                 if ($role !== 'user') {
                     $this->assertStringNotContainsString('My Booking', $footer[0]);
                 }
@@ -58,11 +62,11 @@ class FrontendSkeletonTest extends PostgresTestCase
             foreach ($this->pages() as $page) {
                 $response = $this->get($page['url']);
                 if (in_array($page['ability'], $abilities, true)) {
-                    $response->assertOk()->assertSee(str_contains($page['url'], 'schedule') ? 'Pratinjau desain' : 'Pratinjau Tahap 3');
+                    $response->assertOk()->assertSee('Detail Ruangan')->assertDontSee('Pratinjau Tahap 3');
                     // Every page link, including preview detail/edit and back, is usable.
                     preg_match_all('/<a\b[^>]*href="([^"]+)"/', $response->getContent(), $links);
                     foreach (array_unique($links[1]) as $url) {
-                        if (str_starts_with($url, '#')) {
+                        if (str_starts_with($url, '#') || preg_match('/^(mailto|tel):/', $url)) {
                             continue;
                         }
                         $this->get(html_entity_decode($url))->assertOk();
@@ -109,8 +113,8 @@ class FrontendSkeletonTest extends PostgresTestCase
             'name="description"', 'name="access_type"', 'name="requires_approval"',
             'name="status"', 'name="is_active"',
         ], false)->assertSee('name="facility_ids[]"', false);
-        $this->get(route('admin.rooms.pics', Room::firstOrFail()))->assertSee('name="pic_ids[]"', false);
-        $this->get(route('admin.rooms.access', Room::where('access_type', 'restricted')->firstOrFail()))->assertSee('name="organizational_unit_ids[]"', false);
+        $this->get(route('admin.rooms.show', Room::firstOrFail()))->assertSee('name="pic_ids[]"', false);
+        $this->get(route('admin.rooms.show', Room::where('access_type', 'restricted')->firstOrFail()))->assertSee('name="organizational_unit_ids[]"', false);
         $this->get(route('admin.bookings.index'))->assertSee('Belum ada booking.');
         $this->get(route('admin.dashboard'))->assertDontSee('Ruangan Saya')->assertDontSee('My Booking');
     }
@@ -150,7 +154,7 @@ class FrontendSkeletonTest extends PostgresTestCase
         $pages = [];
         foreach (Route::getRoutes() as $route) {
             // Admin preview pages now have module controllers, but remain placeholders.
-            if (! str_starts_with($route->getActionName(), FrontendSkeletonController::class)) {
+            if (! str_starts_with($route->getActionName(), RoomDetailsController::class)) {
                 continue;
             }
             $abilities = array_values(array_filter($route->middleware(), fn ($middleware) => str_starts_with($middleware, 'can:')));
@@ -158,7 +162,7 @@ class FrontendSkeletonTest extends PostgresTestCase
             $this->assertCount(1, $abilities);
             $this->assertSame(['GET', 'HEAD'], $route->methods());
             $pages[] = [
-                'url' => '/'.preg_replace('/\{[^}]+\}/', 'preview', $route->uri()),
+                'url' => '/'.preg_replace('/\{[^}]+\}/', (string) Room::where('is_active', true)->firstOrFail()->id, $route->uri()),
                 'ability' => substr($abilities[0], 4),
             ];
         }

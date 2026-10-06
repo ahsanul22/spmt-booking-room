@@ -7,7 +7,7 @@
     </x-workspace-heading>
     <div class="workspace-feedback">@include('admin.organizational-units._feedback')</div>
     <x-workspace-panel title="Daftar Unit Organisasi" description="Kelola susunan direktorat, divisi, dan departemen.">
-        <x-slot:headingActions><span class="rounded-lg bg-background px-3 py-2 text-xs font-semibold text-slate-600">{{ $units->total() }} unit</span></x-slot:headingActions>
+        <x-slot:headingActions><span class="rounded-lg bg-background px-3 py-2 text-sm font-semibold text-slate-600">{{ $units->total() }} unit</span></x-slot:headingActions>
         @if($units->count())
         <div class="workspace-table" role="region" aria-label="Daftar Unit Organisasi, geser untuk melihat semua kolom" tabindex="0">
         <x-table :headers="['Nama', 'Tipe Unit', 'Unit Induk', 'Status Aktif', 'Aksi']">

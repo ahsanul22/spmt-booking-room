@@ -7,7 +7,7 @@
     </x-workspace-heading>
     <div class="workspace-feedback"><x-form-feedback /></div>
     <x-workspace-panel title="Daftar Fasilitas" description="Kelola perlengkapan pendukung ruang rapat.">
-        <x-slot:headingActions><span class="rounded-lg bg-background px-3 py-2 text-xs font-semibold text-slate-600">{{ $facilities->total() }} fasilitas</span></x-slot:headingActions>
+        <x-slot:headingActions><span class="rounded-lg bg-background px-3 py-2 text-sm font-semibold text-slate-600">{{ $facilities->total() }} fasilitas</span></x-slot:headingActions>
         @if($facilities->count())
         <div class="workspace-table" role="region" aria-label="Daftar Fasilitas, geser untuk melihat semua kolom" tabindex="0">
         <x-table :headers="['Nama', 'Deskripsi', 'Status Aktif', 'Aksi']">

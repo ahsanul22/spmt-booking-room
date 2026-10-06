@@ -7,7 +7,7 @@
     </x-workspace-heading>
     <div class="workspace-feedback">@include('admin.users._feedback')</div>
     <x-workspace-panel title="Daftar User" description="Akun pegawai, unit kerja, dan hak akses aplikasi.">
-        <x-slot:headingActions><span class="rounded-lg bg-background px-3 py-2 text-xs font-semibold text-slate-600">{{ $users->total() }} akun</span></x-slot:headingActions>
+        <x-slot:headingActions><span class="rounded-lg bg-background px-3 py-2 text-sm font-semibold text-slate-600">{{ $users->total() }} akun</span></x-slot:headingActions>
         @if($users->count())
         <div class="workspace-table" role="region" aria-label="Daftar User, geser untuk melihat semua kolom" tabindex="0">
         <x-table :headers="['Nama', 'Email', 'Unit Kerja', 'Role', 'Status Aktif', 'Aksi']">
