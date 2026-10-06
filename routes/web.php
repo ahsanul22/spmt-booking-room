@@ -12,7 +12,7 @@ use App\Http\Controllers\Admin\ScheduleController;
 use App\Http\Controllers\Admin\UserController;
 use App\Http\Controllers\DashboardController;
 use App\Http\Controllers\BookingPreparationController;
-use App\Http\Controllers\FrontendSkeletonController;
+use App\Http\Controllers\RoomDetailsController;
 use App\Http\Controllers\UserBookingController;
 use App\Http\Controllers\Pic\ApprovalController;
 use Illuminate\Support\Facades\Route;
@@ -29,11 +29,14 @@ Route::middleware(['auth', 'can:access-employee'])->group(function () {
 Route::middleware(['auth', 'can:access-general'])->group(function () {
     Route::get('/dashboard', DashboardController::class)->defaults('title', 'Dashboard Pegawai')->name('dashboard');
     Route::view('/rooms', 'user.rooms.index')->name('rooms.index');
-    Route::get('/rooms/{room}', FrontendSkeletonController::class)->defaults('view', 'user.rooms.show')->where('room', '(?!search$)[^/]+')->name('rooms.show');
+    Route::get('/rooms/{room}', RoomDetailsController::class)->whereNumber('room')->name('rooms.show');
     Route::view('/schedule', 'shared.schedule')->name('schedule.index');
 });
 
 Route::prefix('pic')->name('pic.')->middleware(['auth', 'can:access-pic'])->group(function () {
+    Route::get('/reports/monthly', [\App\Http\Controllers\MonthlyReportController::class, 'index'])->name('reports.index');
+    Route::get('/reports/monthly/export', [\App\Http\Controllers\MonthlyReportController::class, 'index'])->name('reports.export');
+    Route::get('/reports/monthly/print', [\App\Http\Controllers\MonthlyReportController::class, 'index'])->name('reports.print');
     Route::get('/dashboard', DashboardController::class)->defaults('title', 'Dashboard PIC')->name('dashboard');
     Route::get('/rooms', [\App\Http\Controllers\Pic\RoomController::class, 'index'])->name('rooms.index');
     Route::get('/approvals', [ApprovalController::class, 'index'])->name('approvals.index');
@@ -43,6 +46,9 @@ Route::prefix('pic')->name('pic.')->middleware(['auth', 'can:access-pic'])->grou
 });
 
 Route::prefix('admin')->name('admin.')->middleware(['auth', 'can:access-admin'])->group(function () {
+    Route::get('/reports/monthly', [\App\Http\Controllers\MonthlyReportController::class, 'index'])->name('reports.index');
+    Route::get('/reports/monthly/export', [\App\Http\Controllers\MonthlyReportController::class, 'index'])->name('reports.export');
+    Route::get('/reports/monthly/print', [\App\Http\Controllers\MonthlyReportController::class, 'index'])->name('reports.print');
     Route::get('/dashboard', [AdminDashboardController::class, 'index'])->name('dashboard');
     Route::patch('/users/{user}/status', [UserController::class, 'status'])->whereNumber('user')->name('users.status');
     Route::patch('/users/{user}/password', [UserController::class, 'resetPassword'])->whereNumber('user')->name('users.reset-password');
@@ -55,7 +61,7 @@ Route::prefix('admin')->name('admin.')->middleware(['auth', 'can:access-admin'])
     Route::patch('/facilities/{facility}/status', [FacilityController::class, 'status'])->whereNumber('facility')->name('facilities.status');
     Route::resource('facilities', FacilityController::class)->whereNumber('facility')->except('destroy');
     Route::patch('/rooms/{room}/status', [RoomController::class, 'status'])->whereNumber('room')->name('rooms.status');
-    Route::resource('rooms', RoomController::class)->whereNumber('room')->except('destroy');
+    Route::resource('rooms', RoomController::class)->whereNumber('room');
     Route::get('/rooms/{room}/pics', [RoomPicController::class, 'edit'])->whereNumber('room')->name('rooms.pics');
     Route::put('/rooms/{room}/pics', [RoomPicController::class, 'update'])->whereNumber('room')->name('rooms.pics.update');
     Route::delete('/rooms/{room}/pics/{pic}', [RoomPicController::class, 'destroy'])->whereNumber(['room', 'pic'])->name('rooms.pics.destroy');
