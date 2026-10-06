@@ -6,10 +6,17 @@
             @foreach($bookings as $item)
                 <tr>
                     <td><p class="font-semibold text-primaryDark">{{ $item->room->name }}</p><p class="mt-1">{{ $item->agenda }}</p></td>
-                    <td>{{ $item->applicant->name }}<p class="mt-1 text-xs text-slate-600">{{ $item->unit_name ?? 'Unit belum ditentukan' }}</p></td>
+                    <td>{{ $item->applicant->name }}<p class="mt-1 text-sm text-slate-600">{{ $item->unit_name ?? 'Unit belum ditentukan' }}</p></td>
                     <td>{{ $item->date }}</td><td>{{ substr($item->start_time, 0, 5) }} &ndash; {{ substr($item->end_time, 0, 5) }}</td>
                     <td><x-booking-status :status="$item->status" /></td>
-                    <td><a class="font-semibold hover:underline" href="{{ route($detailRoute, $item->id) }}">Detail<span class="sr-only"> booking {{ $item->id }}</span></a></td>
+                    <td>
+                        @if(($quickDecisions ?? false) && $item->status === 'pending')
+                            <button hidden type="button" data-approval-dialog-trigger="approval-{{ $item->id }}" class="workspace-button" aria-haspopup="dialog" aria-label="Review pengajuan {{ $item->id }}">Review</button>
+                            <noscript><a href="{{ route($detailRoute, $item->id) }}">Review pengajuan</a></noscript>
+                        @else
+                        <a class="font-semibold hover:underline" href="{{ route($detailRoute, $item->id) }}">Detail<span class="sr-only"> booking {{ $item->id }}</span></a>
+                        @endif
+                    </td>
                 </tr>
             @endforeach
         </x-table>

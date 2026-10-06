@@ -85,6 +85,7 @@ class BookingService
 
     public function decide(User $actor, Booking $record, string $decision, ?string $reason): Booking
     {
+        $reason = $reason !== null ? trim($reason) : null;
         Validator::make(['decision' => $decision, 'rejection_reason' => $reason], [
             'decision' => ['required', 'in:approved,rejected'],
             'rejection_reason' => ['required_if:decision,rejected', 'nullable', 'string', 'max:2000'],
@@ -93,9 +94,10 @@ class BookingService
         return DB::transaction(function () use ($actor, $record, $decision, $reason) {
             $room = Room::lockForUpdate()->findOrFail($record->room_id);
             $booking = Booking::lockForUpdate()->findOrFail($record->id);
-            $pic = User::sharedLock()->findOrFail($actor->id);
-            abort_unless($pic->is_active && $pic->role === User::ROLE_ROOM_PIC
-                && $room->pics()->whereKey($pic->id)->exists(), 403);
+            $reviewer = User::sharedLock()->findOrFail($actor->id);
+            abort_unless($reviewer->is_active && ($reviewer->role === User::ROLE_SUPER_ADMIN
+                || ($reviewer->role === User::ROLE_ROOM_PIC && $room->pics()->whereKey($reviewer->id)->exists())), 403);
+            abort_unless($booking->requires_approval, 403);
             if ($booking->status !== 'pending') {
                 throw ValidationException::withMessages(['decision' => 'Pengajuan sudah diproses. Muat ulang halaman untuk melihat status terbaru.']);
             }
@@ -110,8 +112,9 @@ class BookingService
                 $this->assertNoConflict($room->id, $booking->toArray(), $booking->id);
             }
             $booking->update([
+                'decision_notes' => $reason !== '' ? $reason : null,
                 'status' => $decision, 'rejection_reason' => $decision === 'rejected' ? $reason : null,
-                'decided_by' => $pic->id, 'decided_at' => now(),
+                'decided_by' => $reviewer->id, 'decided_at' => now(),
             ]);
 
             return $booking;

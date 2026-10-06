@@ -121,7 +121,7 @@ class BookingWorkflowTest extends PostgresTestCase
         $this->assertDatabaseCount('bookings', 2);
     }
 
-    public function test_only_assigned_pic_can_decide_and_a_second_decision_is_rejected(): void
+    public function test_assigned_pic_can_decide_and_a_second_decision_is_rejected(): void
     {
         $this->room()->update(['requires_approval' => true]);
         $booking = $this->submit();
@@ -129,8 +129,7 @@ class BookingWorkflowTest extends PostgresTestCase
         $otherPic = User::factory()->create(['role' => 'room_pic']);
         $this->actingAs($otherPic)->post($url, ['decision' => 'approved'])->assertNotFound();
         $admin = User::where('role', 'super_admin')->firstOrFail();
-        $this->actingAs($admin)->get(route('pic.approvals.show', $booking->id))->assertOk()->assertDontSee('Setujui Pengajuan');
-        $this->post($url, ['decision' => 'approved'])->assertForbidden();
+        $this->actingAs($admin)->get(route('pic.approvals.show', $booking->id))->assertOk()->assertSee('Setujui Pengajuan');
         $pic = User::where('email', 'pic@example.test')->firstOrFail();
         $this->actingAs($pic)->post($url, ['decision' => 'approved'])->assertRedirect();
         $this->assertSame('approved', $booking->fresh()->status);
@@ -147,6 +146,74 @@ class BookingWorkflowTest extends PostgresTestCase
         $this->actingAs(User::where('role', 'super_admin')->firstOrFail())
             ->get(route('admin.bookings.show', $booking->id))->assertOk()->assertSee($booking->agenda);
         $this->get('/admin/bookings/preview')->assertNotFound();
+    }
+
+    public function test_admin_can_decide_unassigned_rooms_from_the_list_and_decision_is_audited(): void
+    {
+        $this->room()->update(['requires_approval' => true]);
+        $booking = $this->submit();
+        $other = $this->submit(['start_time' => '14:00', 'end_time' => '15:00']);
+        $admin = User::where('role', 'super_admin')->firstOrFail();
+        $this->room()->pics()->detach();
+        $this->actingAs($admin)->get(route('pic.approvals.index'))->assertOk()
+            ->assertSee('data-approval-dialog-trigger="approval-'.$booking->id.'"', false)
+            ->assertSee('Catatan');
+        $this->post(route('pic.approvals.decide', $booking->id), ['decision' => 'approved', 'return_to' => 'list', 'page' => 2])
+            ->assertRedirect(route('pic.approvals.index', ['page' => 1]));
+        $this->assertSame('approved', $booking->fresh()->status);
+        $this->assertSame($admin->id, $booking->fresh()->decided_by);
+        $this->assertNotNull($booking->fresh()->decided_at);
+        $this->post(route('pic.approvals.decide', $booking->id), ['decision' => 'rejected', 'rejection_reason' => 'Ubah keputusan'])
+            ->assertSessionHasErrors('decision');
+        $url = route('pic.approvals.decide', $other->id);
+        $this->from(route('pic.approvals.index'))->post($url, [
+            'decision' => 'rejected', 'rejection_reason' => '', 'approval_id' => $other->id, 'return_to' => 'list',
+        ])->assertSessionHasErrors('rejection_reason');
+        $this->get(route('pic.approvals.index'))->assertSee('data-reopen="rejected"', false);
+        $this->post($url, ['decision' => 'rejected', 'rejection_reason' => 'Perlu penjadwalan ulang.', 'return_to' => 'list'])
+            ->assertRedirect(route('pic.approvals.index', ['page' => 1]));
+        $this->assertSame('rejected', $other->fresh()->status);
+        $this->assertSame('Perlu penjadwalan ulang.', $other->fresh()->rejection_reason);
+        $this->assertSame($admin->id, $other->fresh()->decided_by);
+        $this->get(route('pic.approvals.history'))->assertDontSee('data-approval-dialog-trigger');
+    }
+
+    public function test_admin_approval_keeps_room_time_and_conflict_checks(): void
+    {
+        $this->room()->update(['requires_approval' => true]);
+        $booking = $this->submit();
+        $admin = User::where('role', 'super_admin')->firstOrFail();
+        $service = app(BookingService::class);
+        $this->room()->update(['status' => 'maintenance']);
+        $this->assertInvalid(fn () => $service->decide($admin, $booking, 'approved', null), 'room');
+        $this->room()->update(['status' => 'available']);
+        $conflict = $booking->replicate();
+        $conflict->submission_token = (string) Str::uuid();
+        $conflict->save();
+        $this->assertInvalid(fn () => $service->decide($admin, $booking, 'approved', null), 'start_time');
+        $conflict->update(['status' => 'cancelled']);
+        $this->travel(3)->hours();
+        $this->assertInvalid(fn () => $service->decide($admin, $booking, 'approved', null), 'decision');
+        $this->assertSame('pending', $booking->fresh()->status);
+        $this->assertNull($booking->fresh()->decided_by);
+    }
+
+    public function test_decision_rechecks_current_admin_status_and_pic_assignment(): void
+    {
+        $this->room()->update(['requires_approval' => true]);
+        $booking = $this->submit();
+        $pic = User::where('role', 'room_pic')->firstOrFail();
+        $this->room()->pics()->detach();
+        $this->actingAs($pic)->post(route('pic.approvals.decide', $booking->id), ['decision' => 'approved'])->assertNotFound();
+        $admin = User::where('role', 'super_admin')->firstOrFail();
+        User::whereKey($admin->id)->update(['is_active' => false]);
+        try {
+            app(BookingService::class)->decide($admin, $booking, 'approved', null);
+            $this->fail('Inactive admin must not decide.');
+        } catch (\Symfony\Component\HttpKernel\Exception\HttpException $exception) {
+            $this->assertSame(403, $exception->getStatusCode());
+        }
+        $this->assertSame('pending', $booking->fresh()->status);
     }
 
     public function test_room_status_access_and_pic_are_rechecked_before_save(): void

@@ -4,7 +4,6 @@ namespace App\Http\Controllers\Pic;
 
 use App\Http\Controllers\Controller;
 use App\Models\Booking;
-use App\Models\User;
 use App\Services\BookingService;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Http\RedirectResponse;
@@ -13,6 +12,8 @@ use Illuminate\View\View;
 
 class ApprovalController extends Controller
 {
+    private const PAGE_SIZE = 15;
+
     private function query(Request $request): Builder
     {
         return Booking::with(['room', 'applicant', 'organizationalUnit'])
@@ -23,14 +24,14 @@ class ApprovalController extends Controller
 
     public function index(Request $request): View
     {
-        $approvals = $this->query($request)->where('status', 'pending')->orderBy('date')->orderBy('start_time')->paginate(15);
+        $approvals = $this->query($request)->where('status', 'pending')->orderBy('date')->orderBy('start_time')->paginate(self::PAGE_SIZE);
         $history = false;
         return view('pic.approvals.index', compact('approvals', 'history'));
     }
 
     public function history(Request $request): View
     {
-        $approvals = $this->query($request)->whereIn('status', ['approved', 'rejected'])->latest('decided_at')->paginate(15);
+        $approvals = $this->query($request)->whereIn('status', ['approved', 'rejected'])->latest('decided_at')->paginate(self::PAGE_SIZE);
         $history = true;
         return view('pic.approvals.index', compact('approvals', 'history'));
     }
@@ -38,18 +39,34 @@ class ApprovalController extends Controller
     public function show(Request $request, int $approval): View
     {
         $booking = $this->query($request)->findOrFail($approval);
-        $canDecide = $request->user()->role === User::ROLE_ROOM_PIC && $booking->status === 'pending';
+        $canDecide = $booking->status === 'pending';
         return view('pic.approvals.show', compact('booking', 'canDecide'));
     }
 
     public function decide(Request $request, int $approval, BookingService $service): RedirectResponse
     {
+        // Keep compatibility with the existing detail form and API field.
+        if ($request->has('decision_notes')) {
+            $request->merge(['rejection_reason' => $request->input('decision_notes')]);
+        }
         $data = $request->validate([
             'decision' => ['required', 'in:approved,rejected'],
+            'decision_notes' => ['nullable', 'string', 'max:2000'],
+            'return_to' => ['nullable', 'in:list,detail'],
+            'page' => ['nullable', 'integer', 'min:1'],
             'rejection_reason' => ['required_if:decision,rejected', 'nullable', 'string', 'max:2000'],
+        ], [
+            'rejection_reason.required_if' => 'Alasan penolakan wajib diisi.',
+            'rejection_reason.max' => 'Alasan penolakan maksimal 2.000 karakter.',
         ]);
         $booking = $this->query($request)->findOrFail($approval);
         $service->decide($request->user(), $booking, $data['decision'], $data['rejection_reason'] ?? null);
-        return redirect()->route('pic.approvals.show', $booking->id)->with('status', 'Keputusan pengajuan berhasil disimpan.');
+        $destination = route('pic.approvals.show', $booking->id);
+        if (($data['return_to'] ?? 'detail') === 'list') {
+            $remaining = $this->query($request)->where('status', 'pending')->count();
+            $lastPage = max(1, (int) ceil($remaining / self::PAGE_SIZE));
+            $destination = route('pic.approvals.index', ['page' => min($data['page'] ?? 1, $lastPage)]);
+        }
+        return redirect()->to($destination)->with('status', 'Keputusan pengajuan berhasil disimpan.');
     }
 }
