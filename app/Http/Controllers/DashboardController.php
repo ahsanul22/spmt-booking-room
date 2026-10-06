@@ -9,6 +9,9 @@ class DashboardController extends Controller
 {
     public function __invoke(Request $request): View
     {
+        if ($request->user()->can('access-admin')) {
+            return app(\App\Http\Controllers\Admin\DashboardController::class)->index($request);
+        }
         $user = $request->user()->load('organizationalUnit');
         $stats = [];
 
@@ -50,7 +53,7 @@ class DashboardController extends Controller
 
         return view('dashboard', [
             'user' => $user,
-            'title' => $request->route('title'),
+            'title' => $user->can('access-pic') ? 'Dashboard PIC' : 'Dashboard Pegawai',
             'stats' => $stats,
         ]);
     }

@@ -1,9 +1,9 @@
 <section aria-labelledby="booking-intro" class="mb-6 grid items-center gap-6 overflow-hidden rounded-3xl border border-secondaryLight/50 bg-surface px-5 py-6 sm:px-7 sm:py-7 lg:px-8 lg:py-8 lg:grid-cols-[minmax(0,1.3fr)_minmax(0,0.7fr)]">
     <div class="flex min-w-0 flex-col justify-center">
-        <p class="flex items-center gap-3 text-xs sm:text-sm font-bold uppercase tracking-[0.1em] text-primary">Ruang untuk berkolaborasi</p>
-        <p class="mt-3 break-words text-base font-medium text-slate-600">Selamat datang, {{ $user->name }}.</p>
-        <h2 id="booking-intro" class="mt-3 text-4xl font-bold leading-[1.12] tracking-tight text-primaryDark sm:text-5xl xl:text-6xl">Ruang yang tepat.<br><span class="text-primary">Ide yang hebat.</span></h2>
-        <div class="mt-5 flex flex-wrap gap-3">
+        <p class="flex items-center gap-3 text-sm sm:text-base font-bold uppercase tracking-[0.1em] text-primary">Ruang untuk berkolaborasi</p>
+        <p class="mt-4 break-words text-base font-medium text-slate-600">Selamat datang, {{ $user->name }}.</p>
+        <h2 id="booking-intro" class="mt-4 text-4xl font-bold leading-[1.12] tracking-tight text-primaryDark sm:text-5xl xl:text-6xl">Ruang yang tepat.<br><span class="text-primary">Ide yang hebat.</span></h2>
+        <div class="mt-6 flex flex-wrap gap-3">
             <a href="{{ route('rooms.index') }}" class="workspace-button px-6 py-3.5 text-base">Booking Ruangan<x-schedule-icon name="arrow" class="h-4 w-4" /></a>
             <a href="{{ route('my-bookings.index') }}" class="workspace-button-secondary px-6 py-3.5 text-base">My Booking<x-schedule-icon name="clock" class="h-4 w-4" /></a>
         </div>
@@ -12,9 +12,9 @@
     <figure class="relative mx-auto w-full max-w-[420px] overflow-hidden rounded-2xl border border-secondaryLight/40 bg-background">
         <img src="{{ asset('images/dashboard-meeting-room.jpg') }}" alt="Ilustrasi ruang rapat modern dengan kursi biru dan pemandangan pelabuhan." width="1122" height="1402" fetchpriority="high" class="h-[200px] w-full object-cover sm:h-[240px] lg:h-[260px]">
         <figcaption class="px-4 py-3">
-            <p class="text-xs font-semibold uppercase tracking-[0.1em] text-primary">Satu ruang, banyak ide.</p>
+            <p class="text-sm font-semibold uppercase tracking-[0.1em] text-primary">Satu ruang, banyak ide.</p>
             <p class="mt-2 text-lg font-semibold text-primaryDark">Tempat untuk langkah besar berikutnya.</p>
-            <p class="mt-2 text-sm text-slate-600">Ilustrasi suasana ruang rapat</p>
+            <p class="mt-2 text-base text-slate-600">Ilustrasi suasana ruang rapat</p>
         </figcaption>
     </figure>
 </section>
@@ -28,7 +28,7 @@
         <!-- Bagian Kiri: 3 Langkah (Dari Rencana Menjadi Pertemuan) -->
         <div class="space-y-8">
             <div>
-                <span class="inline-flex items-center gap-2 rounded-full bg-white/20 px-4 py-1.5 text-sm font-semibold tracking-wider text-white backdrop-blur-md">
+                <span class="inline-flex items-center gap-2 rounded-full bg-white/20 px-4 py-1.5 text-base font-semibold tracking-wider text-white backdrop-blur-md">
                     ALUR PEMESANAN
                 </span>
                 <h2 class="mt-5 text-3xl font-bold tracking-tight text-white sm:text-4xl">
@@ -44,31 +44,26 @@
                     <div class="flex h-12 w-12 shrink-0 items-center justify-center rounded-full bg-white/20 font-bold text-white shadow-inner backdrop-blur-md">01</div>
                     <div class="pt-1">
                         <h3 class="text-lg font-semibold text-white">Pilih Ruangan</h3>
-                        <p class="mt-1 text-sm text-blue-200">Cari ruangan dengan fasilitas & kapasitas yang sesuai kebutuhan.</p>
+                        <p class="mt-1 text-base text-blue-200">Pilih ruangan dengan fasilitas yang sesuai kebutuhan.</p>
                     </div>
                 </div>
                 <div class="flex items-start gap-4">
                     <div class="flex h-12 w-12 shrink-0 items-center justify-center rounded-full bg-white/20 font-bold text-white shadow-inner backdrop-blur-md">02</div>
                     <div class="pt-1">
                         <h3 class="text-lg font-semibold text-white">Atur Waktu & Agenda</h3>
-                        <p class="mt-1 text-sm text-blue-200">Tentukan tanggal, jam, dan kelengkapan rapat secara langsung.</p>
+                        <p class="mt-1 text-base text-blue-200">Tentukan tanggal, jam, dan kelengkapan rapat secara langsung.</p>
                     </div>
                 </div>
                 <div class="flex items-start gap-4">
                     <div class="flex h-12 w-12 shrink-0 items-center justify-center rounded-full bg-white/20 font-bold text-white shadow-inner backdrop-blur-md">03</div>
                     <div class="pt-1">
                         <h3 class="text-lg font-semibold text-white">Pantau Pengajuan</h3>
-                        <p class="mt-1 text-sm text-blue-200">Lacak status persetujuan dari pengelola dan kelola pesanan Anda.</p>
+                        <p class="mt-1 text-base text-blue-200">Lacak status persetujuan dari pengelola dan kelola pesanan Anda.</p>
                     </div>
                 </div>
             </div>
             
-            <div class="pt-2">
-                <a href="{{ route('schedule.index') }}" class="group relative inline-flex items-center justify-center gap-3 overflow-hidden rounded-xl bg-white px-8 py-4 font-bold text-primary transition-all duration-300 hover:-translate-y-1 hover:shadow-[0_10px_40px_-10px_rgba(255,255,255,0.4)]">
-                    <x-schedule-icon name="calendar" class="h-5 w-5 transition-transform duration-300 group-hover:-rotate-12" />
-                    Mulai Booking
-                </a>
-            </div>
+
         </div>
         
         <!-- Bagian Kanan: Visi & Modernisasi -->
@@ -82,8 +77,8 @@
                     Efisiensi waktu adalah kunci kesuksesan. Platform Manajemen Ruang ini hadir untuk memberikan kemudahan akses, transparansi ketersediaan, serta pengelolaan kolaborasi secara profesional di lingkungan PT Pelindo Multi Terminal.
                 </p>
                 <div class="mt-2 border-t border-white/10 pt-5">
-                    <p class="text-sm font-semibold uppercase tracking-wider text-blue-200">Fokus pada Produktivitas</p>
-                    <p class="mt-1 text-xs text-blue-100 opacity-80">Kolaborasi hebat selalu dimulai dari ruangan yang tepat.</p>
+                    <p class="text-base font-semibold uppercase tracking-wider text-blue-200">Fokus pada Produktivitas</p>
+                    <p class="mt-1 text-sm text-blue-100 opacity-80">Kolaborasi hebat selalu dimulai dari ruangan yang tepat.</p>
                 </div>
             </div>
         </div>

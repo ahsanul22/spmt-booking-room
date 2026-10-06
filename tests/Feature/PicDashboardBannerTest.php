@@ -3,16 +3,13 @@
 namespace Tests\Feature;
 
 use App\Models\User;
-use Illuminate\Foundation\Testing\RefreshDatabase;
-use Tests\TestCase;
+use Tests\PostgresTestCase;
 
-class PicDashboardBannerTest extends TestCase
+class PicDashboardBannerTest extends PostgresTestCase
 {
-    use RefreshDatabase;
 
     public function test_pic_dashboard_renders_layout_matching_admin_dashboard(): void
     {
-        $this->seed();
 
         $pic = User::where('email', 'pic@example.test')->firstOrFail();
 
@@ -20,7 +17,7 @@ class PicDashboardBannerTest extends TestCase
 
         $response->assertOk();
 
-        // 1. Header with title, subtitle, and primary action button
+        // 1. Header with title and subtitle
         $response->assertSee('Workspace PIC Ruangan');
         $response->assertSee('Dashboard PIC');
         $response->assertSee('Periksa pengajuan dan pastikan ketersediaan ruangan tanggung jawab Anda.');
@@ -28,7 +25,7 @@ class PicDashboardBannerTest extends TestCase
         $response->assertSee(route('pic.approvals.index'));
 
         // 2. Preview note banner
-        $response->assertSee('Pratinjau dashboard PIC');
+        $response->assertSee('Dashboard PIC');
 
         // 3. 3 Stat cards with numeric counts
         $response->assertSee('Menunggu approval');
@@ -39,8 +36,8 @@ class PicDashboardBannerTest extends TestCase
         $response->assertSee('Penggunaan hari ini');
         $response->assertSee((string) $pic->managedRooms()->count());
 
-        // 4. Main shortcuts card
-        $response->assertSee('Kelola Pengajuan dan Ruangan');
+        // 4. Sidebar navigation remains available
+        $response->assertDontSee('Kelola Pengajuan dan Ruangan');
         $response->assertSee('Ruangan Saya');
         $response->assertSee(route('pic.rooms.index'));
         $response->assertSee('Riwayat Approval');
@@ -54,9 +51,9 @@ class PicDashboardBannerTest extends TestCase
         $response->assertSee('Buka permintaan');
 
         // 6. Aside feature card & review guide
-        $response->assertSee('Tinjau cepat.');
-        $response->assertSee('Persetujuan tepat.');
-        $response->assertSee('Saat meninjau pengajuan');
+        $response->assertDontSee('Tinjau cepat.');
+        $response->assertDontSee('Persetujuan tepat.');
+        $response->assertDontSee('Saat meninjau pengajuan');
 
         // 7. Account info
         $response->assertSee('Akun Anda');
