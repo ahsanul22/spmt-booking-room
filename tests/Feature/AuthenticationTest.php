@@ -25,7 +25,7 @@ class AuthenticationTest extends PostgresTestCase
             $this->assertAuthenticatedAs($user);
             $this->get($dashboard)->assertOk()->assertSee($user->name)->assertSee($user->roleLabel())
                 ->assertSee($user->organizationalUnit->name)->assertDontSee($user->password);
-            $this->post('/logout')->assertRedirect('/login');
+            $this->post('/logout')->assertRedirect(route('home'));
             $this->assertGuest();
         }
     }
@@ -102,7 +102,7 @@ class AuthenticationTest extends PostgresTestCase
         $this->post('/login', ['email' => 'pegawai@example.test', 'password' => 'password', 'remember' => 1]);
         $sessionId = session()->getId();
         $token = session()->token();
-        $this->withSession(['private_marker' => 'private'])->post('/logout')->assertRedirect('/login')
+        $this->withSession(['private_marker' => 'private'])->post('/logout')->assertRedirect(route('home'))
             ->assertSessionMissing('private_marker');
         $this->assertGuest();
         $this->assertNotSame($sessionId, session()->getId());

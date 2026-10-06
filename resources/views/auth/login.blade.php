@@ -57,7 +57,7 @@
                     <h2 class="text-2xl sm:text-3xl lg:text-[38px] font-black uppercase leading-tight tracking-tight text-white drop-shadow-md">
                         PORTAL PEMESANAN<br>RUANG RAPAT
                     </h2>
-                    <p class="mt-2 text-xs sm:text-sm font-bold uppercase tracking-[0.18em] text-secondaryLight drop-shadow-sm">
+                    <p class="mt-2 text-sm sm:text-base font-bold uppercase tracking-[0.18em] text-secondaryLight drop-shadow-sm">
                         PELINDO MULTI TERMINAL
                     </p>
                 </div>
@@ -91,17 +91,17 @@
                     <!-- Card Heading -->
                     <div class="mt-3.5 text-center">
                         <h1 class="text-xl sm:text-2xl font-bold tracking-tight text-slate-900">Selamat Datang</h1>
-                        <p class="mt-0.5 text-xs text-slate-500">Silakan Masuk ke Akun Anda</p>
+                        <p class="mt-0.5 text-sm text-slate-500">Silakan Masuk ke Akun Anda</p>
                     </div>
 
                     <!-- Session / Error Alerts -->
                     @if (session('status'))
-                        <div role="status" class="mt-3 rounded-xl border border-secondaryLight bg-secondaryLight/20 px-3 py-2 text-xs text-primaryDark font-medium">
+                        <div role="status" class="mt-3 rounded-xl border border-secondaryLight bg-secondaryLight/20 px-3 py-2 text-sm text-primaryDark font-medium">
                             {{ session('status') }}
                         </div>
                     @endif
                     @if ($errors->any())
-                        <div role="alert" class="mt-3 rounded-xl border border-danger/25 bg-danger/5 px-3 py-2 text-xs text-danger">
+                        <div role="alert" class="mt-3 rounded-xl border border-danger/25 bg-danger/5 px-3 py-2 text-sm text-danger">
                             <p class="font-semibold">Login belum berhasil.</p>
                             <ul class="mt-1 list-disc space-y-0.5 pl-4">
                                 @foreach ($errors->all() as $error)
@@ -111,7 +111,7 @@
                         </div>
                     @endif
                     @if($selectedRoom ?? null)
-                        <div class="mt-3 rounded-xl border border-secondaryLight bg-secondaryLight/20 p-2.5 text-xs text-primaryDark">
+                        <div class="mt-3 rounded-xl border border-secondaryLight bg-secondaryLight/20 p-2.5 text-sm text-primaryDark">
                             Setelah login, lanjutkan booking <strong>{{ $selectedRoom->name }}</strong>.
                         </div>
                     @endif
@@ -131,13 +131,13 @@
                                 <input id="email" name="email" type="email" value="{{ old('email') }}" required autofocus autocomplete="username" placeholder="Email / Username Pegawai"
                                     @if ($errors->has('email')) aria-invalid="true" aria-describedby="email-error" @endif
                                     @class([
-                                        'block w-full rounded-xl border bg-slate-50/50 pl-10 pr-4 py-2.5 text-xs sm:text-sm text-slate-800 placeholder-slate-400 outline-none transition focus:border-primary focus:bg-white focus:ring-2 focus:ring-primary/20',
+                                        'block w-full rounded-xl border bg-slate-50/50 pl-10 pr-4 py-2.5 text-sm sm:text-base text-slate-800 placeholder-slate-400 outline-none transition focus:border-primary focus:bg-white focus:ring-2 focus:ring-primary/20',
                                         'border-danger' => $errors->has('email'),
                                         'border-slate-300' => ! $errors->has('email')
                                     ])>
                             </div>
                             @error('email')
-                                <p id="email-error" class="mt-1 text-[11px] text-danger">{{ $message }}</p>
+                                <p id="email-error" class="mt-1 text-sm text-danger">{{ $message }}</p>
                             @enderror
                         </div>
 
@@ -152,7 +152,7 @@
                                 <input id="password" name="password" type="password" required autocomplete="current-password" placeholder="Kata Sandi"
                                     @if ($errors->has('password')) aria-invalid="true" aria-describedby="password-error" @endif
                                     @class([
-                                        'block w-full rounded-xl border bg-slate-50/50 pl-10 pr-10 py-2.5 text-xs sm:text-sm text-slate-800 placeholder-slate-400 outline-none transition focus:border-primary focus:bg-white focus:ring-2 focus:ring-primary/20',
+                                        'block w-full rounded-xl border bg-slate-50/50 pl-10 pr-10 py-2.5 text-sm sm:text-base text-slate-800 placeholder-slate-400 outline-none transition focus:border-primary focus:bg-white focus:ring-2 focus:ring-primary/20',
                                         'border-danger' => $errors->has('password'),
                                         'border-slate-300' => ! $errors->has('password')
                                     ])>
@@ -167,20 +167,20 @@
                                 </button>
                             </div>
                             @error('password')
-                                <p id="password-error" class="mt-1 text-[11px] text-danger">{{ $message }}</p>
+                                <p id="password-error" class="mt-1 text-sm text-danger">{{ $message }}</p>
                             @enderror
                         </div>
 
                         <!-- Lupa Kata Sandi link -->
                         <div class="flex items-center justify-end">
-                            <button type="button" onclick="alert('Untuk mengatur ulang kata sandi, silakan hubungi Administrator IT atau PIC SPMT.');" class="text-[11px] font-semibold text-primary hover:text-primaryDark transition-colors">
+                            <button type="button" onclick="alert('Untuk mengatur ulang kata sandi, silakan hubungi Administrator IT atau PIC SPMT.');" class="text-sm font-semibold text-primary hover:text-primaryDark transition-colors">
                                 Lupa Kata Sandi?
                             </button>
                         </div>
 
                         <!-- Remember Me checkbox -->
                         <div>
-                            <label for="remember" class="inline-flex cursor-pointer items-center gap-2 text-xs text-slate-600 select-none">
+                            <label for="remember" class="inline-flex cursor-pointer items-center gap-2 text-sm text-slate-600 select-none">
                                 <input id="remember" name="remember" type="checkbox" value="1" @checked(old('remember'))
                                     @if ($errors->has('remember')) aria-invalid="true" aria-describedby="remember-error" @endif
                                     class="h-4 w-4 rounded border-slate-300 text-primary accent-primary focus:ring-primary/20">
@@ -188,20 +188,20 @@
                                 <span class="sr-only">Remember Me</span>
                             </label>
                             @error('remember')
-                                <p id="remember-error" class="mt-1 text-[11px] text-danger">{{ $message }}</p>
+                                <p id="remember-error" class="mt-1 text-sm text-danger">{{ $message }}</p>
                             @enderror
                         </div>
 
                         <!-- Submit Button -->
                         <div class="pt-1">
-                            <button type="submit" class="w-full rounded-xl bg-[#0066b2] hover:bg-[#004f8c] active:scale-[0.99] transition-all py-2.5 px-4 text-xs sm:text-sm font-bold uppercase tracking-wider text-white shadow-md hover:shadow-lg focus:outline-none focus:ring-2 focus:ring-primary focus:ring-offset-2">
+                            <button type="submit" class="w-full rounded-xl bg-[#0066b2] hover:bg-[#004f8c] active:scale-[0.99] transition-all py-2.5 px-4 text-sm sm:text-base font-bold uppercase tracking-wider text-white shadow-md hover:shadow-lg focus:outline-none focus:ring-2 focus:ring-primary focus:ring-offset-2">
                                 MASUK
                             </button>
                         </div>
                     </form>
 
                     <!-- Footer note inside card -->
-                    <p class="mt-3.5 text-center text-xs text-slate-500">
+                    <p class="mt-3.5 text-center text-sm text-slate-500">
                         Belum punya akun? <span class="font-semibold text-primary">Hubungi Admin</span>
                     </p>
                 </div>

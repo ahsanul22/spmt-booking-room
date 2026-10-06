@@ -3,7 +3,7 @@
 @section('content')
 <section aria-labelledby="public-schedule-title" class="mb-8 rounded-3xl border border-secondaryLight/50 bg-surface px-6 py-8 sm:px-8 sm:py-10 lg:px-10">
     <div class="mb-6">
-        <a href="{{ route('home') }}" class="group inline-flex items-center gap-2 text-sm font-semibold text-slate-500 transition-colors hover:text-primary">
+        <a href="{{ route('home') }}" class="group inline-flex items-center gap-2 text-base font-semibold text-slate-500 transition-colors hover:text-primary">
             <svg class="h-4 w-4 transition-transform group-hover:-translate-x-1" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor">
                 <path stroke-linecap="round" stroke-linejoin="round" d="M10.5 19.5L3 12m0 0l7.5-7.5M3 12h18" />
             </svg>
@@ -19,11 +19,6 @@
             <p class="mt-3 max-w-2xl text-base leading-7 text-slate-600">
                 Lihat tanggal, ruangan, dan jam penggunaan sebelum Anda login untuk membuat pengajuan booking. Semua waktu ditampilkan dalam WIB.
             </p>
-        </div>
-        <div class="shrink-0">
-            <a href="{{ route('login') }}" class="inline-flex min-h-[48px] items-center justify-center gap-2 rounded-xl bg-primary px-6 py-3 font-semibold text-white transition-colors hover:bg-primaryDark">
-                Login untuk Booking <x-schedule-icon name="arrow" class="h-4 w-4" />
-            </a>
         </div>
     </div>
     

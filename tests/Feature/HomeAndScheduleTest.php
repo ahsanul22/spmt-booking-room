@@ -49,11 +49,12 @@ class HomeAndScheduleTest extends PostgresTestCase
         ], $changes));
     }
 
-    public function test_home_shows_public_schedule_and_login_without_private_meeting_fields(): void
+    public function test_public_schedule_page_and_home_link_do_not_expose_private_meeting_fields(): void
     {
         $booking = $this->booking();
         $this->room()->update(['description' => 'DESKRIPSI-INTERNAL']);
-        $this->get('/')->assertOk()->assertSeeLivewire(PublicRoomSchedule::class)->assertSee($this->room()->name)
+        $this->get('/')->assertOk()->assertSee(route('public.schedule'), false);
+        $this->get(route('public.schedule'))->assertOk()->assertSeeLivewire(PublicRoomSchedule::class)->assertSee($this->room()->name)
             ->assertSee('12:00')->assertSee('13:00')->assertSee(route('login'), false)
             ->assertDontSee('Kenali pilihan ruangan')
             ->assertDontSee('RAHASIA-AGENDA')->assertDontSee('RAHASIA-CATATAN')->assertDontSee('RAHASIA-UNIT')
@@ -65,12 +66,12 @@ class HomeAndScheduleTest extends PostgresTestCase
         Livewire::test(RoomSchedule::class)->assertForbidden();
     }
 
-    public function test_public_home_handles_empty_schedule_and_escapes_names(): void
+    public function test_public_schedule_handles_empty_schedule_and_escapes_names(): void
     {
         $this->room()->update(['name' => '<script>room-name</script>']);
-        $this->get('/')->assertSee('<script>room-name</script>')->assertDontSee('<script>room-name</script>', false);
+        $this->get(route('public.schedule'))->assertSee('<script>room-name</script>')->assertDontSee('<script>room-name</script>', false);
         Room::query()->update(['is_active' => false]);
-        $this->get('/')->assertOk()->assertSee('Belum ada jadwal ruangan.')->assertSee('Login')->assertDontSee('Login Pegawai');
+        $this->get(route('public.schedule'))->assertOk()->assertSee('Belum ada jadwal ruangan.')->assertSee('Login')->assertDontSee('Login Pegawai');
     }
 
     public function test_public_schedule_scopes_filters_and_refresh_to_public_active_rooms(): void
