@@ -1,22 +1,28 @@
-<section aria-labelledby="booking-intro" class="mb-6 grid items-center gap-6 overflow-hidden rounded-3xl border border-secondaryLight/50 bg-surface px-5 py-6 sm:px-7 sm:py-7 lg:px-8 lg:py-8 lg:grid-cols-[minmax(0,1.3fr)_minmax(0,0.7fr)]">
+<section aria-labelledby="booking-intro" class="mb-6 overflow-hidden rounded-3xl border border-secondaryLight/50 bg-surface p-6 sm:p-8 lg:p-12">
+    <div class="grid min-w-0 items-center gap-8 lg:grid-cols-2 lg:gap-16">
     <div class="flex min-w-0 flex-col justify-center">
         <p class="flex items-center gap-3 text-sm sm:text-base font-bold uppercase tracking-[0.1em] text-primary">Ruang untuk berkolaborasi</p>
-        <p class="mt-4 break-words text-base font-medium text-slate-600">Selamat datang, {{ $user->name }}.</p>
-        <h2 id="booking-intro" class="mt-4 text-4xl font-bold leading-[1.12] tracking-tight text-primaryDark sm:text-5xl xl:text-6xl">Ruang yang tepat.<br><span class="text-primary">Ide yang hebat.</span></h2>
-        <div class="mt-6 flex flex-wrap gap-3">
+        <p class="mt-3 break-words text-base font-medium leading-7 text-slate-600">Selamat datang, {{ $user->name }}.</p>
+        <h2 id="booking-intro" class="mt-6 text-4xl font-bold leading-[1.15] tracking-tight text-primaryDark sm:text-5xl xl:text-6xl">Ruang yang tepat.<br><span class="text-primary">Ide yang hebat.</span></h2>
+        <p class="mt-6 max-w-xl text-base leading-7 text-slate-600 sm:text-lg sm:leading-8">Temukan ruang untuk pertemuan Anda, tentukan waktu dan agenda, lalu ajukan booking. Pantau status pengajuan melalui My Booking agar rencana rapat tetap jelas.</p>
+        <div class="mt-8 flex flex-wrap gap-3">
             <a href="{{ route('rooms.index') }}" class="workspace-button px-6 py-3.5 text-base">Booking Ruangan<x-schedule-icon name="arrow" class="h-4 w-4" /></a>
             <a href="{{ route('my-bookings.index') }}" class="workspace-button-secondary px-6 py-3.5 text-base">My Booking<x-schedule-icon name="clock" class="h-4 w-4" /></a>
         </div>
-
+        <div class="mt-8 flex max-w-xl items-start gap-3 border-t border-secondaryLight/60 pt-5">
+            <x-schedule-icon name="clock" class="mt-1 h-5 w-5 shrink-0 text-primary" />
+            <p class="text-base leading-7 text-slate-600">Ajukan minimal <span class="font-semibold text-primaryDark">{{ config('booking.minimum_notice_hours') }} jam sebelum rapat</span>. Ruangan tertentu memerlukan persetujuan PIC.</p>
+        </div>
     </div>
-    <figure class="relative mx-auto w-full max-w-[420px] overflow-hidden rounded-2xl border border-secondaryLight/40 bg-background">
-        <img src="{{ asset('images/dashboard-meeting-room.jpg') }}" alt="Ilustrasi ruang rapat modern dengan kursi biru dan pemandangan pelabuhan." width="1122" height="1402" fetchpriority="high" class="h-[200px] w-full object-cover sm:h-[240px] lg:h-[260px]">
-        <figcaption class="px-4 py-3">
+    <figure class="relative w-full min-w-0 overflow-hidden rounded-2xl border border-secondaryLight/40 bg-background">
+        <img src="{{ asset('images/dashboard-meeting-room.jpg') }}" alt="Ilustrasi ruang rapat modern dengan kursi biru dan pemandangan pelabuhan." width="1122" height="1402" fetchpriority="high" class="h-[240px] w-full object-cover sm:h-[320px] lg:h-[400px]">
+        <figcaption class="p-5 sm:p-6">
             <p class="text-sm font-semibold uppercase tracking-[0.1em] text-primary">Satu ruang, banyak ide.</p>
             <p class="mt-2 text-lg font-semibold text-primaryDark">Tempat untuk langkah besar berikutnya.</p>
             <p class="mt-2 text-base text-slate-600">Ilustrasi suasana ruang rapat</p>
         </figcaption>
     </figure>
+    </div>
 </section>
 
 <section class="relative my-4 overflow-hidden rounded-3xl bg-gradient-to-r from-primaryDark to-primary px-6 py-10 shadow-2xl sm:px-12 sm:py-14">

@@ -2,8 +2,8 @@
 @section('title', 'Selamat Datang di Booking Room')
 @section('content')
 <div class="grid w-full min-w-0 gap-6 sm:gap-8">
-<section aria-labelledby="welcome-title" class="grid w-full min-w-0 items-center gap-12 overflow-hidden rounded-3xl border border-secondaryLight/50 bg-surface p-6 sm:p-10 lg:p-12 lg:grid-cols-[minmax(0,0.85fr)_minmax(0,1.15fr)]">
-    <div class="flex min-w-0 flex-col justify-center text-primaryDark lg:order-2">
+<section aria-labelledby="welcome-title" class="grid w-full min-w-0 items-center gap-8 overflow-hidden rounded-3xl border border-secondaryLight/50 bg-surface p-6 sm:p-10 lg:p-12 lg:grid-cols-2 lg:gap-16">
+    <div class="flex min-w-0 flex-col items-start justify-center text-primaryDark lg:order-2">
         <p class="flex items-center gap-3 text-base font-bold uppercase tracking-[0.2em] text-primary sm:text-base">Pelindo Multi Terminal</p>
         <h1 id="welcome-title" class="mt-6 text-4xl font-bold leading-[1.12] tracking-tight sm:text-5xl">Pertemuan yang baik.<br><span class="text-primary">Dimulai di sini.</span></h1>
         <p class="mt-6 max-w-lg text-base leading-7 text-slate-600 sm:text-lg sm:leading-8">Selamat datang di Booking Room PT Pelindo Multi Terminal. Ruang untuk bertukar ide, menyatukan rencana, dan membawa kolaborasi lebih jauh.</p>
