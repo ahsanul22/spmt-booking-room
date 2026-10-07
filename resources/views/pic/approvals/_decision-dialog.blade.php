@@ -13,7 +13,7 @@
             @foreach($errors->all() as $error)<li>{{ $error }}</li>@endforeach
         </ul>
     @endif
-    <form method="POST" action="{{ route('pic.approvals.decide', $booking->id) }}" class="mt-5" data-decision-form>
+    <form method="POST" action="{{ route(($approvalRoutePrefix ?? 'pic.approvals').'.decide', $booking->id) }}" class="mt-5" data-decision-form>
         @csrf
         <input type="hidden" name="approval_id" value="{{ $booking->id }}">
         <input type="hidden" name="return_to" value="list">

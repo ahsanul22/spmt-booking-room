@@ -3,8 +3,8 @@
 namespace Tests\Feature;
 
 use App\Livewire\BookingPreparationForm;
-use App\Livewire\RoomSchedule;
 use App\Livewire\PublicRoomSchedule;
+use App\Livewire\RoomSchedule;
 use App\Models\Booking;
 use App\Models\Room;
 use App\Models\User;
@@ -102,7 +102,7 @@ class HomeAndScheduleTest extends PostgresTestCase
         $this->post('/login', ['email' => $this->employee()->email, 'password' => 'wrong'])->assertSessionHasErrors('email');
         $this->get('/login')->assertOk();
         $this->post('/login', ['email' => $this->employee()->email, 'password' => 'password'])
-            ->assertRedirect(route('my-bookings.create', ['room_id' => $this->room()->id]))->assertSessionMissing('booking.login_room');
+            ->assertRedirect(route('rooms.book', $this->room()))->assertSessionMissing('booking.login_room');
     }
 
     public function test_invalid_room_parameter_cannot_create_an_external_login_redirect(): void

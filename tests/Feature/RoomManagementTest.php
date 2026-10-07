@@ -104,7 +104,7 @@ class RoomManagementTest extends PostgresTestCase
         $data = $this->data(['name' => 'Ruang Diperbarui', 'floor_id' => $floor->id, 'capacity' => 0,
             'access_type' => 'all', 'requires_approval' => 0, 'status' => 'maintenance', 'is_active' => 0,
             'facility_ids' => [$replacement->id]]);
-        $this->put($this->url('update', $room), $data)->assertRedirect($this->url('show', $room))->assertSessionHasNoErrors();
+        $this->put($this->url('update', $room), $data)->assertRedirect($this->url('show', $room->fresh()))->assertSessionHasNoErrors();
         $this->assertSame([$replacement->id], $room->facilities()->pluck('facilities.id')->all());
         $this->assertDatabaseMissing('facility_room', ['room_id' => $room->id, 'facility_id' => $existing->id]);
         $this->assertDatabaseHas('rooms', ['id' => $room->id, 'name' => 'Ruang Diperbarui', 'code' => 'TEST-ROOM',

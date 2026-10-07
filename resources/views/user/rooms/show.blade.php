@@ -28,7 +28,7 @@
             <div class="flex flex-wrap gap-3 border-t border-slate-100 pt-5">
                 <a class="workspace-button-secondary" href="{{ route(auth()->user()->can('access-admin') ? 'admin.schedule.index' : 'schedule.index', ['room_id' => $room->id]) }}">Lihat Jadwal</a>
                 @can('access-employee')
-                    @unless($reason)<a class="workspace-button" href="{{ route('my-bookings.create', ['room_id' => $room->id]) }}">Booking Ruangan</a>@endunless
+                    @unless($reason)<a class="workspace-button" href="{{ route('rooms.book', $room) }}">Booking Ruangan</a>@endunless
                 @endcan
             </div>
         </div>

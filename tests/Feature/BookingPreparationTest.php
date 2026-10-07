@@ -70,15 +70,18 @@ class BookingPreparationTest extends PostgresTestCase
     public function test_catalog_selection_opens_the_selected_room_without_dropdown(): void
     {
         $room = $this->room();
-        $url = route('my-bookings.create', ['room_id' => $room->id]);
+        $url = route('rooms.book', $room);
         $this->get('/rooms')->assertOk()->assertSee($url, false);
-        $this->get($url)->assertOk()->assertSee($room->name)->assertSee('Ruangan sudah dipilih')
+        $this->get($url)->assertOk()->assertSee($room->name)->assertSee('Ruangan pilihan')
             ->assertDontSee('<select id="room_id"', false)->assertDontSee('participant_count')->assertSee('WIB');
         $this->get('/my-bookings/create')->assertRedirect(route('rooms.index'));
+        $this->get(route('my-bookings.create', ['room_id' => $room->id]))->assertRedirect($url);
+        $this->get(route('rooms.book', $room->id))->assertOk();
         foreach (['bad', '99999999999999999999999999999', '-1', '9999999'] as $id) {
             $this->get('/my-bookings/create?room_id='.$id)->assertNotFound();
         }
         $this->get('/my-bookings/create?room_id[]=1')->assertNotFound();
+        $this->get('/rooms/99999999999999999999999999999-room/book')->assertNotFound();
     }
 
     public function test_automatic_end_is_a_summary_and_manual_end_accepts_any_minute(): void
@@ -207,8 +210,14 @@ class BookingPreparationTest extends PostgresTestCase
     {
         $room = $this->room();
         $this->post('/my-bookings/create', ['room_id' => $room->id])->assertStatus(405);
+        $this->post(route('rooms.book', $room))->assertStatus(405);
+        $this->post(route('logout'));
+        $this->get(route('rooms.book', $room))->assertRedirect(route('login'));
+        $this->actingAs(User::where('role', 'room_pic')->firstOrFail())
+            ->get(route('rooms.book', $room))->assertOk();
         $this->actingAs(User::where('role', 'super_admin')->firstOrFail());
         $this->get(route('my-bookings.create', ['room_id' => $room->id]))->assertForbidden();
+        $this->get(route('rooms.book', $room))->assertForbidden();
         Livewire::test(BookingPreparationForm::class, ['roomId' => $room->id])->assertForbidden();
     }
 }

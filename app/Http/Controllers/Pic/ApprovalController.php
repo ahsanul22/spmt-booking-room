@@ -26,21 +26,24 @@ class ApprovalController extends Controller
     {
         $approvals = $this->query($request)->where('status', 'pending')->orderBy('date')->orderBy('start_time')->paginate(self::PAGE_SIZE);
         $history = false;
-        return view('pic.approvals.index', compact('approvals', 'history'));
+
+        return view('pic.approvals.index', compact('approvals', 'history') + ['approvalRoutePrefix' => $this->routePrefix($request)]);
     }
 
     public function history(Request $request): View
     {
         $approvals = $this->query($request)->whereIn('status', ['approved', 'rejected'])->latest('decided_at')->paginate(self::PAGE_SIZE);
         $history = true;
-        return view('pic.approvals.index', compact('approvals', 'history'));
+
+        return view('pic.approvals.index', compact('approvals', 'history') + ['approvalRoutePrefix' => $this->routePrefix($request)]);
     }
 
     public function show(Request $request, int $approval): View
     {
         $booking = $this->query($request)->findOrFail($approval);
         $canDecide = $booking->status === 'pending';
-        return view('pic.approvals.show', compact('booking', 'canDecide'));
+
+        return view('pic.approvals.show', compact('booking', 'canDecide') + ['approvalRoutePrefix' => $this->routePrefix($request)]);
     }
 
     public function decide(Request $request, int $approval, BookingService $service): RedirectResponse
@@ -61,12 +64,19 @@ class ApprovalController extends Controller
         ]);
         $booking = $this->query($request)->findOrFail($approval);
         $service->decide($request->user(), $booking, $data['decision'], $data['rejection_reason'] ?? null);
-        $destination = route('pic.approvals.show', $booking->id);
+        $prefix = $this->routePrefix($request);
+        $destination = route($prefix.'.show', $booking->id);
         if (($data['return_to'] ?? 'detail') === 'list') {
             $remaining = $this->query($request)->where('status', 'pending')->count();
             $lastPage = max(1, (int) ceil($remaining / self::PAGE_SIZE));
-            $destination = route('pic.approvals.index', ['page' => min($data['page'] ?? 1, $lastPage)]);
+            $destination = route($prefix.'.index', ['page' => min($data['page'] ?? 1, $lastPage)]);
         }
+
         return redirect()->to($destination)->with('status', 'Keputusan pengajuan berhasil disimpan.');
+    }
+
+    private function routePrefix(Request $request): string
+    {
+        return $request->routeIs('admin.approvals.*') ? 'admin.approvals' : 'pic.approvals';
     }
 }

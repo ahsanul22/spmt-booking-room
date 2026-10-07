@@ -3,7 +3,7 @@
 <head>
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
-    <title>@yield('title', 'Booking Room') Â· Pelindo Multi Terminal</title>
+    <title>@yield('title', 'Booking Room')</title>
     @vite(['resources/css/app.css', 'resources/js/app.js'])
 </head>
 <body class="bg-background font-sans text-text antialiased">
@@ -21,7 +21,7 @@
                             @php
                                 $active = match ($routeName) {
                                     'my-bookings.index' => request()->routeIs('my-bookings.index', 'my-bookings.show'),
-                                    'rooms.index' => request()->routeIs('rooms.index', 'rooms.show', 'my-bookings.create'),
+                                    'rooms.index' => request()->routeIs('rooms.index', 'rooms.show', 'my-bookings.create', 'rooms.book'),
                                     default => request()->routeIs($routeName),
                                 };
                             @endphp
@@ -44,7 +44,7 @@
             </div>
         </header>
         <main id="content" class="mx-auto w-full max-w-[1800px] flex-1 p-5 sm:p-8">
-            @if(request()->routeIs('dashboard', 'schedule.index', 'my-bookings.create', 'rooms.index', 'rooms.show', 'my-bookings.index', 'my-bookings.show'))
+            @if(request()->routeIs('dashboard', 'schedule.index', 'my-bookings.create', 'rooms.book', 'rooms.index', 'rooms.show', 'my-bookings.index', 'my-bookings.show'))
                 @yield('content')
             @else
                 <div class="user-module min-w-0 rounded-2xl border border-slate-200/80 bg-surface p-5 shadow-sm sm:p-6">@yield('content')</div>

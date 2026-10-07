@@ -40,7 +40,7 @@
                     </div>
                 </section>
                 <div class="px-5 pt-5 sm:px-6"><h2 class="text-lg font-bold text-primaryDark">Detail Pertemuan</h2></div>
-                <form wire:submit="submitBooking" method="POST" action="{{ route('my-bookings.create') }}" class="workspace-form">
+                <form wire:submit="submitBooking" method="POST" action="{{ route('rooms.book', $room) }}" class="workspace-form">
                     @csrf
                     <input type="hidden" name="room_id" value="{{ $room->id }}">
                     <p class="text-sm leading-6 text-slate-600 sm:col-span-2">Rapat dimulai minimal <strong>{{ config('booking.minimum_notice_hours') }} jam</strong> setelah pengajuan dan selesai pada tanggal yang sama.</p>

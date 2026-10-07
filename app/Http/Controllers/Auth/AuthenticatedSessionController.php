@@ -3,8 +3,8 @@
 namespace App\Http\Controllers\Auth;
 
 use App\Http\Controllers\Controller;
-use App\Models\Room;
 use App\Http\Requests\Auth\LoginRequest;
+use App\Models\Room;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
@@ -29,6 +29,7 @@ class AuthenticatedSessionController extends Controller
         }
         $selectedRoom = Room::where('is_active', true)->where('access_type', 'all')
             ->find($request->session()->get('booking.login_room'));
+
         return view('auth.login', compact('selectedRoom'));
     }
 
@@ -44,7 +45,8 @@ class AuthenticatedSessionController extends Controller
         $roomId = $request->session()->pull('booking.login_room');
         if ($roomId && $request->user()->can('access-employee')) {
             $room = Room::where('is_active', true)->where('status', 'available')->find($roomId);
-            return $room ? redirect()->route('my-bookings.create', ['room_id' => $room->id])
+
+            return $room ? redirect()->route('rooms.book', $room)
                 : redirect()->route('rooms.index');
         }
 

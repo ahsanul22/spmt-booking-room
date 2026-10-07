@@ -6,9 +6,9 @@ use App\Http\Controllers\Controller;
 use App\Http\Requests\SaveRoomRequest;
 use App\Models\Facility;
 use App\Models\Floor;
+use App\Models\OrganizationalUnit;
 use App\Models\Room;
 use App\Models\User;
-use App\Models\OrganizationalUnit;
 use App\Services\RoomService;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
@@ -54,7 +54,7 @@ class RoomController extends Controller
 
     public function update(SaveRoomRequest $request, Room $room, RoomService $service): RedirectResponse
     {
-        $service->save($request->validated(), $room);
+        $room = $service->save($request->validated(), $room);
 
         return redirect()->route('admin.rooms.show', $room)->with('status', 'Ruangan berhasil diperbarui.');
     }

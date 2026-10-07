@@ -31,7 +31,7 @@ class RoomDetailsTest extends PostgresTestCase
         $room->pics()->detach();
         $this->actingAs($pic)->get(route('rooms.show', $room))->assertNotFound();
         $room->pics()->attach($pic);
-        $this->get(route('rooms.show', $room))->assertOk()->assertDontSee(route('my-bookings.create', ['room_id' => $room->id]), false);
+        $this->get(route('rooms.show', $room))->assertOk()->assertDontSee(route('rooms.book', $room), false);
         $pic->role = User::ROLE_USER;
         $pic->save();
         $this->actingAs($pic)->get(route('rooms.show', $room))->assertNotFound();

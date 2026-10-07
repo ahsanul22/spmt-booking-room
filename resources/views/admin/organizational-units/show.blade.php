@@ -23,7 +23,7 @@
                 </dl>
                 <p class="mt-5 text-base text-slate-600">Status Aktif: {{ $unit->is_active ? 'Aktif' : 'Nonaktif' }}</p>
                 <div class="mt-6 flex flex-wrap items-center gap-3 border-t border-slate-100 pt-5">
-                    <a class="workspace-button" href="{{ route('admin.organizational-units.edit', $unit->id) }}">Edit</a>
+                    <a class="workspace-button" href="{{ route('admin.organizational-units.edit', $unit) }}">Edit</a>
                     <div class="workspace-record-actions">@include('admin.organizational-units._status')</div>
                 </div>
             </div>

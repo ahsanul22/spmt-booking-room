@@ -9,7 +9,7 @@
         </div>
         <p class="relative mt-5 break-words text-sm font-semibold uppercase tracking-wider text-slate-500">Kode ruang · {{ $item->code ?? 'Belum ditentukan' }}</p>
         <h3 id="room-title-{{ $item->id }}" class="relative mt-1.5 break-words text-xl font-bold leading-7 tracking-tight text-primaryDark">
-            <a href="{{ route('admin.rooms.show', $item->id) }}" class="hover:underline">{{ $item->name }}</a>
+            <a href="{{ route('admin.rooms.show', $item) }}" class="hover:underline">{{ $item->name }}</a>
         </h3>
         <dl class="relative mt-5 grid grid-cols-1 gap-4 border-t border-secondaryLight/40 pt-4">
             <div><dt class="text-sm text-slate-500">Lantai</dt><dd class="mt-2 break-words text-base font-semibold text-primaryDark">{{ $item->floor?->name ?? 'Belum ditentukan' }}</dd></div>
@@ -48,7 +48,7 @@
         </div>
 
         <div class="mt-auto grid grid-cols-1 gap-3 border-t border-slate-100 pt-5">
-            <a href="{{ route('admin.rooms.show', $item->id) }}" class="flex min-h-[44px] items-center justify-center gap-2 rounded-xl bg-primary px-4 py-2.5 text-base font-semibold text-white transition hover:bg-primaryDark" aria-label="Detail {{ $item->name }}">Detail / Edit<x-schedule-icon name="arrow" class="h-4 w-4 shrink-0" /></a>
+            <a href="{{ route('admin.rooms.show', $item) }}" class="flex min-h-[44px] items-center justify-center gap-2 rounded-xl bg-primary px-4 py-2.5 text-base font-semibold text-white transition hover:bg-primaryDark" aria-label="Detail {{ $item->name }}">Detail / Edit<x-schedule-icon name="arrow" class="h-4 w-4 shrink-0" /></a>
         </div>
     </div>
 

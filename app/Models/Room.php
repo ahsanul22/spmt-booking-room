@@ -2,12 +2,15 @@
 
 namespace App\Models;
 
+use App\Models\Concerns\HasReadableRouteKey;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\BelongsToMany;
 
 class Room extends Model
 {
+    use HasReadableRouteKey;
+
     protected $fillable = ['name', 'code', 'floor_id', 'capacity', 'description', 'access_type', 'requires_approval', 'status', 'is_active'];
 
     protected $casts = ['capacity' => 'integer', 'requires_approval' => 'boolean', 'is_active' => 'boolean'];

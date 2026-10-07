@@ -83,7 +83,7 @@ class FloorFacilityManagementTest extends PostgresTestCase
             ->assertSee(route('admin.'.$module.'.update', $record), false)->assertSee('value="PUT"', false);
         $data = $this->data($module, ['name' => 'Data Diperbarui', 'is_active' => 0]);
         $this->put(route('admin.'.$module.'.update', $record), $data)
-            ->assertRedirect(route('admin.'.$module.'.show', $record))->assertSessionHasNoErrors();
+            ->assertRedirect(route('admin.'.$module.'.show', $record->fresh()))->assertSessionHasNoErrors();
         $this->assertDatabaseHas($module, array_replace($data, ['id' => $record->id, 'is_active' => false]));
         $this->get(route('admin.'.$module.'.show', $record))->assertSee('Data Diperbarui')->assertSee('Status Aktif: Nonaktif')
             ->assertSee('berhasil diperbarui.')->assertSee('Deskripsi dari form');

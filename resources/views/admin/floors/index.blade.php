@@ -17,8 +17,8 @@
                     <td>{{ data_get($item, 'description') ?? '—' }}</td>
                     <td><x-workspace-status :active="$item->is_active" /></td>
                     <td><div class="workspace-record-actions">
-                        <a href="{{ route('admin.floors.show', $item->id) }}">Detail<span class="sr-only"> {{ $item->name }}</span></a>
-                        <a href="{{ route('admin.floors.edit', $item->id) }}">Edit<span class="sr-only"> {{ $item->name }}</span></a>
+                        <a href="{{ route('admin.floors.show', $item) }}">Detail<span class="sr-only"> {{ $item->name }}</span></a>
+                        <a href="{{ route('admin.floors.edit', $item) }}">Edit<span class="sr-only"> {{ $item->name }}</span></a>
                         @include('admin.floors._status', ['floor' => $item])
                     </div></td>
                 </tr>

@@ -15,7 +15,7 @@ class AuthorizationTest extends PostgresTestCase
 
     private const PIC = ['/pic/dashboard', '/pic/rooms', '/pic/approvals'];
 
-    private const ADMIN = ['/admin/dashboard', '/admin/users', '/admin/organizational-units', '/admin/floors', '/admin/facilities', '/admin/rooms', '/admin/bookings'];
+    private const ADMIN = ['/admin/dashboard', '/admin/users', '/admin/organizational-units', '/admin/floors', '/admin/facilities', '/admin/rooms', '/admin/bookings', '/admin/approvals', '/admin/approvals/history'];
 
     public function test_guests_are_redirected_from_every_protected_page(): void
     {

@@ -42,7 +42,7 @@
                                 <p class="mb-3 text-sm leading-5 text-slate-600">{{ $reasons[$room->id] }}</p>
                                 <button type="button" disabled class="w-full cursor-not-allowed rounded-xl bg-background px-4 py-3 text-base text-slate-600">Belum dapat dipilih</button>
                             @else
-                                <a href="{{ route('my-bookings.create', ['room_id' => $room->id]) }}" aria-label="Pilih ruangan {{ $room->name }}" class="workspace-button w-full after:absolute after:inset-0 after:rounded-2xl focus-visible:after:outline focus-visible:after:outline-2 focus-visible:after:outline-primary">Pilih Ruangan<x-schedule-icon name="arrow" class="h-4 w-4" /></a>
+                                <a href="{{ route('rooms.book', $room) }}" aria-label="Pilih ruangan {{ $room->name }}" class="workspace-button w-full after:absolute after:inset-0 after:rounded-2xl focus-visible:after:outline focus-visible:after:outline-2 focus-visible:after:outline-primary">Pilih Ruangan<x-schedule-icon name="arrow" class="h-4 w-4" /></a>
                             @endif
                         @endcan
                         @endif

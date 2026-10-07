@@ -32,8 +32,8 @@ class FrontendSkeletonTest extends PostgresTestCase
                 $this->assertSame(1, substr_count($html, '<footer '));
                 preg_match('/<footer\b.*?<\/footer>/s', $html, $footer);
                 $this->assertStringNotContainsString(route('public.schedule'), $footer[0]);
-            $this->assertStringNotContainsString(route('login'), $footer[0]);
-            $this->assertStringContainsString('mailto:', $footer[0]);
+                $this->assertStringNotContainsString(route('login'), $footer[0]);
+                $this->assertStringContainsString('mailto:', $footer[0]);
                 $this->assertStringNotContainsString(route(auth()->user()->dashboardRouteName()), $footer[0]);
                 if ($role !== 'user') {
                     $this->assertStringNotContainsString('My Booking', $footer[0]);
@@ -128,7 +128,7 @@ class FrontendSkeletonTest extends PostgresTestCase
         $this->get(route('admin.rooms.show', $room))->assertOk()
             ->assertSee($room->name)->assertDontSee($room->name, false)
             ->assertSee($room->floor->name)
-            ->assertSee(route('admin.rooms.pics', $room->id), false);
+            ->assertSee(route('admin.rooms.pics.update', $room), false);
         $this->get(route('rooms.index'))
             ->assertSee($room->name)->assertDontSee('Belum ada data ruangan.');
     }

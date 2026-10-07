@@ -18,8 +18,8 @@
                     <td>@if($item->parent)<a class="hover:underline" href="{{ route('admin.organizational-units.show', $item->parent) }}">{{ $item->parent->name }}</a>@else<span class="text-slate-500">Tanpa unit induk</span>@endif</td>
                     <td><x-workspace-status :active="$item->is_active" /></td>
                     <td><div class="workspace-record-actions">
-                        <a href="{{ route('admin.organizational-units.show', $item->id) }}">Detail<span class="sr-only"> {{ $item->name }}</span></a>
-                        <a href="{{ route('admin.organizational-units.edit', $item->id) }}">Edit<span class="sr-only"> {{ $item->name }}</span></a>
+                        <a href="{{ route('admin.organizational-units.show', $item) }}">Detail<span class="sr-only"> {{ $item->name }}</span></a>
+                        <a href="{{ route('admin.organizational-units.edit', $item) }}">Edit<span class="sr-only"> {{ $item->name }}</span></a>
                         @include('admin.organizational-units._status', ['unit' => $item])
                     </div></td>
                 </tr>

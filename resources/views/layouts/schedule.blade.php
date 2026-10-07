@@ -3,7 +3,7 @@
 <head>
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
-    <title>@yield('title', 'Jadwal Ruangan') · Pelindo Multi Terminal</title>
+    <title>@yield('title', 'Jadwal Ruangan')</title>
     @vite(['resources/css/app.css', 'resources/js/app.js'])
 </head>
 <body class="bg-background font-sans text-text antialiased">
@@ -41,7 +41,7 @@
                         @endif
                     </a>
                     @if(auth()->user()->role !== \App\Models\User::ROLE_ROOM_PIC)
-                    <a @class(['schedule-nav', 'schedule-nav-active' => request()->routeIs('admin.rooms.*', 'rooms.index', 'my-bookings.create')]) @if(request()->routeIs('admin.rooms.*', 'rooms.index', 'my-bookings.create')) aria-current="page" @endif href="{{ route(auth()->user()->can('access-admin') ? 'admin.rooms.index' : 'rooms.index') }}"><x-schedule-icon name="room" />{{ auth()->user()->can('access-admin') ? 'Daftar Ruangan' : 'Booking Ruangan' }}</a>
+                    <a @class(['schedule-nav', 'schedule-nav-active' => request()->routeIs('admin.rooms.*', 'rooms.index', 'my-bookings.create', 'rooms.book')]) @if(request()->routeIs('admin.rooms.*', 'rooms.index', 'my-bookings.create', 'rooms.book')) aria-current="page" @endif href="{{ route(auth()->user()->can('access-admin') ? 'admin.rooms.index' : 'rooms.index') }}"><x-schedule-icon name="room" />{{ auth()->user()->can('access-admin') ? 'Daftar Ruangan' : 'Booking Ruangan' }}</a>
                     @can('access-employee')
                         <a @class(['schedule-nav', 'schedule-nav-active' => request()->routeIs('my-bookings.index', 'my-bookings.show')]) @if(request()->routeIs('my-bookings.index', 'my-bookings.show')) aria-current="page" @endif href="{{ route('my-bookings.index') }}"><x-schedule-icon name="clock" />My Booking</a>
                     @endcan
@@ -50,7 +50,7 @@
                         <a @class(['schedule-nav', 'schedule-nav-active' => request()->routeIs('admin.bookings.*')]) @if(request()->routeIs('admin.bookings.*')) aria-current="page" @endif href="{{ route('admin.bookings.index') }}"><x-schedule-icon name="clock" />Semua Booking</a>
                     @endcan
                     @can('access-admin')
-                        <a @class(['schedule-nav', 'schedule-nav-active' => request()->routeIs('pic.approvals.*')]) @if(request()->routeIs('pic.approvals.*')) aria-current="page" @endif href="{{ route('pic.approvals.index') }}"><x-schedule-icon name="grid" />Approval Ruangan</a>
+                        <a @class(['schedule-nav', 'schedule-nav-active' => request()->routeIs('admin.approvals.*', 'pic.approvals.*')]) @if(request()->routeIs('admin.approvals.*', 'pic.approvals.*')) aria-current="page" @endif href="{{ route('admin.approvals.index') }}"><x-schedule-icon name="grid" />Approval Ruangan</a>
                     @endcan
                     @can('access-pic')
                         <a @class(['schedule-nav', 'schedule-nav-active' => request()->routeIs('*.reports.*')]) @if(request()->routeIs('*.reports.*')) aria-current="page" @endif href="{{ route(auth()->user()->can('access-admin') ? 'admin.reports.index' : 'pic.reports.index') }}"><x-schedule-icon name="calendar" />Laporan Bulanan</a>

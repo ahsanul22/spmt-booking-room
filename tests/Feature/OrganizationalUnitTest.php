@@ -120,7 +120,7 @@ class OrganizationalUnitTest extends PostgresTestCase
         $this->get($this->url('edit', $unit))->assertOk()->assertSee('value="'.$unit->name.'"', false)
             ->assertSee('value="'.$unit->parent_id.'" selected', false)->assertSee($this->url('update', $unit), false);
         $data = array_replace($this->data('division', $other->id), ['name' => 'Divisi Diperbarui']);
-        $this->put($this->url('update', $unit), $data)->assertRedirect($this->url('show', $unit))->assertSessionHasNoErrors();
+        $this->put($this->url('update', $unit), $data)->assertRedirect($this->url('show', $unit->fresh()))->assertSessionHasNoErrors();
         $this->assertDatabaseHas('organizational_units', ['id' => $unit->id, 'name' => $data['name'], 'parent_id' => $other->id]);
         $this->get($this->url('show', $unit))->assertSee($data['name'])->assertSee($other->name)->assertSee('berhasil diperbarui');
         $this->get($this->url('index'))->assertSee($data['name']);

@@ -44,7 +44,7 @@ class OrganizationalUnitController extends Controller
 
     public function update(SaveOrganizationalUnitRequest $request, OrganizationalUnit $unit, OrganizationalUnitService $service): RedirectResponse
     {
-        $service->save($request->validated(), $unit);
+        $unit = $service->save($request->validated(), $unit);
 
         return redirect()->route('admin.organizational-units.show', $unit)->with('status', 'Unit organisasi berhasil diperbarui.');
     }

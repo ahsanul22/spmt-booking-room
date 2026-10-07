@@ -1,5 +1,13 @@
 # Decisions
 
+## DEC-039 - URL Master Data Terbaca dan Area Approval Admin
+
+- Permintaan perapian route diterapkan dengan route key `ID-slug-nama` pada Room, Floor, Facility, dan OrganizationalUnit melalui trait `HasReadableRouteKey`. Contoh: `/rooms/12-selat-malaka` dan `/admin/rooms/12-selat-malaka`. Slug diturunkan dari nama menggunakan `Str::slug`, tanpa kolom, migration, atau dependency tambahan. ID tetap identitas record agar nama duplikat tidak bentrok. Nama kosong/tidak menghasilkan slug memakai ID saja.
+- Model binding menerima ID lama dan ID dengan suffix slug, termasuk suffix sebelum pergantian nama; nama route, method form, field ID database, query filter, dan authorization tetap berlaku. Tautan baru memakai model agar menghasilkan nama terkini. Parameter tidak valid atau di luar jangkauan bigint ditolak dengan 404. URL lama tetap dapat dibuka tanpa redirect wajib.
+- Account/User, Booking, dan Approval tetap memakai ID: nama akun, agenda, atau catatan rapat tidak dijadikan slug URL. Nama path utama mengikuti bahasa Inggris existing; `/jadwal-ruangan` publik dipertahankan untuk kompatibilitas. Perubahan ini tidak mengubah bahasa antarmuka.
+- Approval Admin mempunyai route `/admin/approvals`, `/admin/approvals/history`, dan `/admin/approvals/{approval}` serta POST keputusan khusus middleware Admin. Sidebar, tautan, form, dan redirect di area ini tetap dalam prefix Admin. Controller/view review existing digunakan bersama tanpa menduplikasi business logic. URL PIC existing masih kompatibel dengan kewenangan Admin DEC-037; PIC tetap hanya room penugasannya.
+- Form booking room terpilih memakai `/rooms/{ID-slug}/book` (`rooms.book`) dengan model binding dan middleware employee. Tautan katalog/detail serta redirect login room terpilih memakai URL ini. `/my-bookings/create?room_id={id}` tetap tersedia sebagai redirect kompatibilitas (302); tanpa room menuju katalog. Query filter jadwal/laporan tetap menggunakan ID karena merupakan filter, bukan identitas halaman detail. Submit tetap melalui Livewire dengan validasi/otorisasi existing; tidak menambah endpoint POST biasa.
+
 ## DEC-038 - Pengelolaan Ruangan Terpadu dan Review Booking
 
 - Atas permintaan pengguna, detail/edit Admin memakai satu view; informasi, fasilitas, status, PIC, dan akses unit tersedia di halaman yang sama. URL GET PIC/akses lama diarahkan ke bagian terkait; endpoint penulisan existing dipertahankan. Form per bagian tetap terpisah agar perubahan PIC/akses tidak ikut mengubah data ruangan. Old input checkbox dibatasi menurut bagian form yang gagal.
