@@ -10,6 +10,7 @@
             <div><dt>Agenda</dt><dd>{{ $booking->agenda }}</dd></div>
             <div><dt>Tanggal</dt><dd>{{ $booking->date }}</dd></div>
             <div><dt>Waktu (WIB)</dt><dd>{{ substr($booking->start_time, 0, 5) }} &ndash; {{ substr($booking->end_time, 0, 5) }}</dd></div>
+            @include('shared.meeting-preparation-details')
             <div><dt>Catatan</dt><dd class="whitespace-pre-line">{{ $booking->notes ?? 'Tidak ada catatan.' }}</dd></div>
             @if($booking->decision_notes || $booking->rejection_reason)<div><dt>Catatan Keputusan</dt><dd class="whitespace-pre-line">{{ $booking->decision_notes ?? $booking->rejection_reason }}</dd></div>@endif
             @if($booking->decided_at)<div><dt>Waktu Keputusan (WIB)</dt><dd>{{ $booking->decided_at->timezone(config('booking.timezone'))->format('d/m/Y H:i') }}</dd></div>@endif

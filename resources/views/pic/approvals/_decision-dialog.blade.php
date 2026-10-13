@@ -6,6 +6,7 @@
         <p>{{ $booking->agenda }}</p>
         <p>Pemohon: {{ $booking->applicant->name }}</p><p>Unit: {{ $booking->unit_name ?? 'Belum ditentukan' }}</p><p>Tanggal: {{ $booking->date }}</p>
         <p>{{ substr($booking->start_time, 0, 5) }}â€“{{ substr($booking->end_time, 0, 5) }} WIB</p>
+        <dl class="workspace-detail">@include('shared.meeting-preparation-details')</dl>
         <p class="whitespace-pre-line break-words">Catatan pemohon: {{ $booking->notes ?: 'Tidak ada catatan.' }}</p>
     </div>
     @if($hasDecisionError)

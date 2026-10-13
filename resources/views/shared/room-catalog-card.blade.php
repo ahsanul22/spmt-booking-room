@@ -1,16 +1,16 @@
             <article wire:key="room-{{ $room->id }}" class="relative flex min-w-0 flex-col overflow-hidden rounded-2xl border border-slate-200/80 bg-surface shadow-sm transition hover:border-secondaryLight hover:shadow-md">
-                <div class="flex items-center justify-between gap-3 border-b border-slate-100 bg-background/50 px-6 py-5">
+                <div @class(['flex items-center justify-between gap-3 border-b border-slate-100 bg-background/50', 'px-5 py-4' => $compact ?? false, 'px-6 py-5' => ! ($compact ?? false)])>
                     <span class="inline-flex rounded-xl border border-secondaryLight/50 bg-surface p-3 text-primary"><x-schedule-icon name="room" class="h-7 w-7" /></span>
                     <span @class(['rounded-full border px-3 py-1 text-sm font-medium', 'border-slate-200 bg-surface text-slate-600' => $room->is_active && $room->status === 'available', 'border-danger/20 bg-danger/5 text-danger' => ! $room->is_active || $room->status !== 'available'])>
                         {{ ! $room->is_active ? 'Nonaktif' : match ($room->status) { 'available' => 'Operasional', 'maintenance' => 'Dalam perawatan', default => 'Tidak operasional' } }}
                     </span>
                 </div>
-                <div class="flex flex-1 flex-col p-6">
+                <div @class(['flex flex-1 flex-col', 'p-5' => $compact ?? false, 'p-6' => ! ($compact ?? false)])>
                     <p class="break-words text-sm font-medium text-slate-500">{{ $room->floor?->name ?? 'Lantai belum ditentukan' }}</p>
-                    <h3 class="mt-2 break-words text-xl font-bold text-primaryDark">@if($public){{ $room->name }}@else<a class="hover:underline" href="{{ route('rooms.show', $room) }}">{{ $room->name }}</a>@endif</h3>
-                    @unless($public)
+                    <h3 @class(['mt-2 break-words font-bold text-primaryDark', 'text-lg leading-6' => $compact ?? false, 'text-xl' => ! ($compact ?? false)])>@if($public){{ $room->name }}@else<a class="hover:underline" href="{{ route('rooms.show', $room) }}">{{ $room->name }}</a>@endif</h3>
+                    @if(! $public && ! ($compact ?? false))
                     <p class="mt-4 break-words text-base leading-6 text-slate-600">{{ $room->description ?: 'Deskripsi ruangan belum ditambahkan.' }}</p>
-                    @endunless
+                    @endif
                     <div class="mt-5">
                         <h4 class="text-sm font-semibold uppercase tracking-wider text-slate-500">Fasilitas</h4>
                         <ul class="mt-2 flex flex-wrap gap-2">

@@ -11,7 +11,7 @@
         </div>
         <div class="mt-8 flex max-w-xl items-start gap-3 border-t border-secondaryLight/60 pt-5">
             <x-schedule-icon name="clock" class="mt-1 h-5 w-5 shrink-0 text-primary" />
-            <p class="text-base leading-7 text-slate-600">Ajukan minimal <span class="font-semibold text-primaryDark">{{ config('booking.minimum_notice_hours') }} jam sebelum rapat</span>. Ruangan tertentu memerlukan persetujuan PIC.</p>
+            <p class="text-base leading-7 text-slate-600">Booking dapat diajukan tanpa batas minimal waktu sebelum rapat. Ruangan tertentu memerlukan persetujuan PIC.</p>
         </div>
     </div>
     <figure class="relative w-full min-w-0 overflow-hidden rounded-2xl border border-secondaryLight/40 bg-background">

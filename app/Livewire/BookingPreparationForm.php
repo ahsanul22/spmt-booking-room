@@ -4,10 +4,11 @@ namespace App\Livewire;
 
 use App\Models\Room;
 use App\Services\BookingPreparation;
-use App\Services\BookingService;
 use App\Services\BookingSchedule;
-use Illuminate\Support\Str;
+use App\Services\BookingService;
 use Illuminate\Support\Facades\Gate;
+use Illuminate\Support\Str;
+use Illuminate\Validation\Rule;
 use Illuminate\View\View;
 use Livewire\Attributes\Locked;
 use Livewire\Component;
@@ -21,12 +22,24 @@ class BookingPreparationForm extends Component
     public string $submissionToken;
 
     public string $date = '';
+
     public string $start_time = '';
+
     public string $end_time = '';
+
     public string $agenda = '';
+
     public string $notes = '';
+
     public string $duration = '60';
+
     public bool $outsideWorkHours = false;
+
+    public bool $meeting_preparation = false;
+
+    public $participant_count = null;
+
+    public bool $needs_consumption = false;
 
     #[Locked]
     public bool $checked = false;
@@ -47,6 +60,10 @@ class BookingPreparationForm extends Component
     {
         $this->checked = false;
         $this->resetValidation();
+        if ($property === 'meeting_preparation' && ! $this->meeting_preparation) {
+            $this->participant_count = null;
+            $this->needs_consumption = false;
+        }
         if ($property === 'end_time') {
             $this->duration = 'custom';
         }
@@ -63,6 +80,7 @@ class BookingPreparationForm extends Component
         $durations = config('booking.duration_options');
         if (! isset($durations[$this->duration]) || ! preg_match('/^(?:[01]\d|2[0-3]):[0-5]\d$/', $this->start_time)) {
             $this->end_time = '';
+
             return;
         }
         [$hour, $minute] = array_map('intval', explode(':', $this->start_time));
@@ -79,9 +97,10 @@ class BookingPreparationForm extends Component
         $reason = $preparation->unavailableReason($room, auth()->user()->fresh());
         if ($reason) {
             $this->addError('room', $reason);
+
             return;
         }
-        $preparation->validate($this->only(['date', 'start_time', 'end_time', 'agenda', 'notes']));
+        $preparation->validate($this->only(['date', 'start_time', 'end_time', 'agenda', 'notes', 'meeting_preparation', 'participant_count', 'needs_consumption']), $room);
         app(BookingService::class)->assertPicAvailable($room);
         app(BookingService::class)->assertNoConflict($room->id, $this->only(['date', 'start_time', 'end_time']));
         $this->checked = true;
@@ -94,7 +113,7 @@ class BookingPreparationForm extends Component
         $this->resetValidation();
         $this->prepareTime();
         $booking = $service->submit(auth()->user(), $this->roomId,
-            $this->only(['date', 'start_time', 'end_time', 'agenda', 'notes']), $this->submissionToken);
+            $this->only(['date', 'start_time', 'end_time', 'agenda', 'notes', 'meeting_preparation', 'participant_count', 'needs_consumption']), $this->submissionToken);
         session()->flash('status', $booking->status === 'approved'
             ? 'Booking berhasil. Ruangan telah dipesan.' : 'Pengajuan berhasil dikirim. Menunggu persetujuan PIC.');
         $this->redirectRoute('my-bookings.show', ['booking' => $booking->id]);
@@ -102,7 +121,7 @@ class BookingPreparationForm extends Component
 
     private function prepareTime(): void
     {
-        $this->validate(['duration' => ['required', \Illuminate\Validation\Rule::in([
+        $this->validate(['duration' => ['required', Rule::in([
             ...array_map('strval', array_keys(config('booking.duration_options'))), 'custom',
         ])]], ['duration.in' => 'Pilih durasi yang tersedia atau atur jam selesai sendiri.']);
         $this->calculateEndTime();

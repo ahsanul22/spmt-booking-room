@@ -1,18 +1,27 @@
-<div wire:poll.30s x-data="{ changed: false }" x-on:input="changed = true" x-on:change="changed = true" x-on:plan-checked.window="changed = false" class="mx-auto max-w-6xl [&_.workspace-control]:text-base">
+<div wire:poll.30s x-data="{ changed: false }" x-on:input="changed = true" x-on:change="changed = true" x-on:plan-checked.window="changed = false" class="mx-auto w-full max-w-7xl [&_.workspace-control]:text-base">
     <div class="mb-7 flex flex-wrap items-center justify-between gap-4">
         <div><p class="mb-2 text-base font-semibold text-primary">Langkah 2 dari 2 &middot; Detail pertemuan</p><h1 class="text-3xl font-bold text-primaryDark">Booking Ruangan</h1></div>
         <a href="{{ route('rooms.index') }}" class="workspace-button-secondary">Kembali ke pilihan ruangan</a>
     </div>
-    <div class="grid items-start gap-6 lg:grid-cols-[minmax(0,1fr)_280px]">
+    <div class="grid items-start gap-6 lg:grid-cols-[minmax(0,1fr)_320px]">
         <div class="min-w-0 lg:order-2">
             <x-workspace-panel title="Ruangan pilihan">
                 <div class="space-y-4 p-5 sm:p-6">
                     <div><h2 class="break-words text-xl font-bold text-primaryDark">{{ $room->name }}</h2><p class="mt-2 text-base text-slate-600">{{ $room->floor?->name ?? 'Lantai belum ditentukan' }}</p></div>
                     <p class="text-base leading-6 text-slate-600">{{ $room->requires_approval ? 'Pengajuan memerlukan persetujuan PIC.' : 'Ruangan tidak memerlukan persetujuan PIC.' }}</p>
-                    <details class="border-t border-slate-100 pt-3 text-base text-slate-600">
-                        <summary class="cursor-pointer py-2 font-semibold text-primary">Fasilitas ruangan</summary>
-                        <ul class="mt-2 flex flex-wrap gap-2">@forelse($room->facilities as $facility)<li class="break-words rounded-lg bg-background px-3 py-1.5">{{ $facility->name }}</li>@empty<li>Fasilitas belum dicantumkan.</li>@endforelse</ul>
-                    </details>
+                    <div class="border-t border-slate-100 pt-4 text-base">
+                        <h3 class="font-semibold text-primaryDark">Fasilitas ruangan</h3>
+                        @if($room->facilities->isNotEmpty())
+                            <ul class="mt-3 flex flex-wrap gap-2" aria-label="Fasilitas ruangan terpilih">
+                                @foreach($room->facilities as $facility)
+                                    <li wire:key="room-facility-{{ $facility->id }}" class="max-w-full break-words rounded-lg border border-slate-200 bg-background px-3 py-1.5 text-sm leading-6 text-slate-700">{{ $facility->name }}</li>
+                                @endforeach
+                            </ul>
+                        @else
+                            <p class="mt-2 leading-6 text-slate-600">Fasilitas ruangan ini belum dicantumkan.</p>
+                            <p class="mt-2 text-sm leading-6 text-slate-600">Admin dapat melengkapi fasilitas melalui Kelola Ruangan.</p>
+                        @endif
+                    </div>
                     <p class="text-base leading-6 text-slate-600">Mengganti ruangan membuka form baru. Isian belum disimpan.</p>
                     <a href="{{ route('rooms.index') }}" class="font-semibold text-primary hover:underline">Ganti ruangan</a>
                 </div>
@@ -43,7 +52,7 @@
                 <form wire:submit="submitBooking" method="POST" action="{{ route('rooms.book', $room) }}" class="workspace-form">
                     @csrf
                     <input type="hidden" name="room_id" value="{{ $room->id }}">
-                    <p class="text-sm leading-6 text-slate-600 sm:col-span-2">Rapat dimulai minimal <strong>{{ config('booking.minimum_notice_hours') }} jam</strong> setelah pengajuan dan selesai pada tanggal yang sama.</p>
+                    <p class="text-sm leading-6 text-slate-600 sm:col-span-2">Tidak ada batas minimal waktu pengajuan. Jam mulai belum boleh lewat dan rapat selesai pada tanggal yang sama.</p>
                     <label class="flex min-h-[44px] items-center gap-3 text-base text-primaryDark sm:col-span-2">
                         <input type="checkbox" wire:model.live="outsideWorkHours" class="h-4 w-4 rounded border-slate-300 accent-primary focus:ring-2 focus:ring-primary">
                         Tampilkan jam di luar jam kerja ({{ config('booking.workday_start') }}&ndash;{{ config('booking.workday_end') }} WIB)
@@ -79,6 +88,43 @@
                     </div>
                     <div class="sm:col-span-2"><x-workspace-field wire:model="agenda" name="agenda" label="Judul / Agenda Rapat" maxlength="255" required /></div>
                     <div class="sm:col-span-2"><x-workspace-field wire:model="notes" name="notes" label="Catatan (opsional)" type="textarea" rows="2" maxlength="2000" /></div>
+                    @if($room->allows_meeting_preparation)
+                        <fieldset class="min-w-0 overflow-hidden rounded-xl border border-slate-200 bg-surface sm:col-span-2" aria-describedby="meeting-preparation-help">
+                            <legend class="sr-only">Persiapan rapat (opsional)</legend>
+                            <div class="p-4 sm:p-5">
+                                <label for="meeting-preparation-toggle" class="flex cursor-pointer items-start gap-3">
+                                    <input id="meeting-preparation-toggle" type="checkbox" wire:model.live="meeting_preparation" name="meeting_preparation" aria-controls="meeting-preparation-fields" aria-describedby="meeting-preparation-help" class="mt-1 h-5 w-5 shrink-0 rounded border-slate-300 text-primary focus:ring-primary focus:ring-offset-2">
+                                    <span class="min-w-0">
+                                        <span class="flex flex-wrap items-center gap-x-3 gap-y-1">
+                                            <span class="text-base font-semibold leading-6 text-primaryDark">Tambahkan kebutuhan persiapan rapat</span>
+                                            <span class="rounded-md bg-background px-2 py-1 text-sm font-medium text-slate-600">Opsional</span>
+                                        </span>
+                                        <span id="meeting-preparation-help" class="mt-1 block text-sm leading-6 text-slate-600">Isi perkiraan peserta dan kebutuhan konsumsi untuk ditinjau PIC.</span>
+                                    </span>
+                                </label>
+                                @error('meeting_preparation')<p role="alert" class="mt-3 text-base text-danger">{{ $message }}</p>@enderror
+                            </div>
+                            <div id="meeting-preparation-fields">
+                                @if($meeting_preparation)
+                                    <div class="space-y-4 border-t border-slate-200 bg-background/40 p-4 sm:p-5">
+                                        <div class="grid items-start gap-5 sm:grid-cols-2">
+                                            <x-workspace-field wire:model="participant_count" type="number" name="participant_count" label="Perkiraan Jumlah Peserta" min="1" max="2147483647" step="1" hint="Jumlah orang yang diperkirakan hadir." required />
+                                            <div class="min-w-0">
+                                                <p id="consumption-label" class="mb-2 text-base font-semibold text-primaryDark">Kebutuhan Konsumsi</p>
+                                                <label for="needs-consumption" class="flex min-h-[44px] cursor-pointer items-center gap-3 rounded-lg border border-slate-300 bg-surface px-3 py-2 transition hover:border-primary focus-within:ring-2 focus-within:ring-primary/30">
+                                                    <input id="needs-consumption" type="checkbox" wire:model="needs_consumption" name="needs_consumption" aria-describedby="consumption-help{{ $errors->has('needs_consumption') ? ' consumption-error' : '' }}" aria-invalid="{{ $errors->has('needs_consumption') ? 'true' : 'false' }}" class="h-5 w-5 shrink-0 rounded border-slate-300 text-primary focus:ring-primary focus:ring-offset-2">
+                                                    <span class="text-base leading-6 text-text">Perlu konsumsi</span>
+                                                </label>
+                                                <p id="consumption-help" class="mt-2 text-sm leading-5 text-slate-600">Centang jika rapat membutuhkan konsumsi.</p>
+                                                @error('needs_consumption')<p id="consumption-error" role="alert" class="mt-2 text-base text-danger">{{ $message }}</p>@enderror
+                                            </div>
+                                        </div>
+                                        <p class="border-t border-slate-200 pt-4 text-sm leading-6 text-slate-600">Kebutuhan konsumsi akan ditinjau PIC, belum merupakan konfirmasi penyediaan.</p>
+                                    </div>
+                                @endif
+                            </div>
+                        </fieldset>
+                    @endif
                     @if($errors->any())<div role="alert" class="text-base text-danger sm:col-span-2">Rencana belum lolos pemeriksaan. Periksa pesan pada kolom yang perlu diperbaiki.@error('room')<p>{{ $message }}</p>@enderror</div>@endif
                     @if($checked && ! $unavailableReason)
                         <div x-show="!changed" role="status" class="rounded-xl border border-secondaryLight bg-background p-4 text-base leading-6 text-primaryDark sm:col-span-2">Waktu dan isian lolos pemeriksaan saat ini. <strong>Ruangan belum dipesan.</strong> Klik tombol booking di bawah; ketersediaan akan diperiksa ulang saat dikirim.</div>
