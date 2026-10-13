@@ -48,7 +48,7 @@
         </div>
 
         <div class="mt-auto grid grid-cols-1 gap-3 border-t border-slate-100 pt-5">
-            <a href="{{ route('admin.rooms.show', $item) }}" class="flex min-h-[44px] items-center justify-center gap-2 rounded-xl bg-primary px-4 py-2.5 text-base font-semibold text-white transition hover:bg-primaryDark" aria-label="Detail {{ $item->name }}">Detail / Edit<x-schedule-icon name="arrow" class="h-4 w-4 shrink-0" /></a>
+            <a href="{{ route('admin.rooms.show', $item) }}" class="flex min-h-[44px] items-center justify-center gap-2 rounded-xl bg-primary px-4 py-2.5 text-base font-semibold text-white transition hover:bg-primaryDark" aria-label="Kelola {{ $item->name }}">Kelola<x-schedule-icon name="arrow" class="h-4 w-4 shrink-0" /></a>
         </div>
     </div>
 

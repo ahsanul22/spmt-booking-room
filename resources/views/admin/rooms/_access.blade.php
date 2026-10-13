@@ -29,13 +29,13 @@
                 </form>
             </x-workspace-panel>
         @else
-            <x-workspace-panel title="Akses Terbuka">
+            {{-- <x-workspace-panel title="Akses Terbuka">
                 <div class="space-y-4 p-5 sm:p-6">
                     <p class="leading-7">Akses terbuka untuk semua unit. Daftar unit tersimpan di bawah tidak digunakan.</p>
                     <p class="text-base leading-6 text-slate-600">Untuk membatasi booking ke unit tertentu, ubah jenis akses menjadi Unit tertentu pada pengaturan ruangan.</p>
                     <a class="workspace-button" href="{{ route('admin.rooms.show', $room).'#room-data' }}">Edit tipe akses ruangan</a>
                 </div>
-            </x-workspace-panel>
+            </x-workspace-panel> --}}
         @endif
         <x-workspace-panel title="Unit Tersimpan" description="Daftar ini menunjukkan pengaturan yang sudah disimpan.">
             <ul class="divide-y divide-slate-100">

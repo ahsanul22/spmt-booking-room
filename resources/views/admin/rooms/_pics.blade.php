@@ -49,9 +49,9 @@
                     @endforelse
                 </ul>
             </x-workspace-panel>
-            <section class="rounded-2xl border border-secondaryLight bg-secondaryLight/20 p-5 sm:p-6" aria-labelledby="assignment-note">
+            {{-- <section class="rounded-2xl border border-secondaryLight bg-secondaryLight/20 p-5 sm:p-6" aria-labelledby="assignment-note">
                 <h2 id="assignment-note" class="font-semibold text-primaryDark">Penugasan per ruangan</h2>
                 <p class="mt-2 text-base leading-7 text-slate-600">Ruangan ini akan muncul pada halaman Ruangan Saya milik PIC yang ditugaskan. Perubahan di sini tidak mengubah akun, role, atau penugasan PIC pada ruangan lain.</p>
-            </section>
+            </section> --}}
         </div>
     </div>

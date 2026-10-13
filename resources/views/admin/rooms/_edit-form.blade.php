@@ -1,1 +1,1 @@
-@include('admin.rooms._form')
+@include('admin.rooms._form', ['roomManagement' => true])

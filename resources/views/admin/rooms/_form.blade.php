@@ -1,5 +1,6 @@
 <input type="hidden" name="_section" value="room">
 @php($hasRoomInput = old('_section') === 'room' || (! old('_section') && array_key_exists('name', session()->getOldInput())))
+<div @class(['grid items-start gap-6', 'xl:grid-cols-2' => $roomManagement ?? false])>
 <x-workspace-panel title="Informasi Dasar" description="Kolom bertanda * wajib diisi.">
 <div class="grid gap-5 p-5 sm:grid-cols-2 sm:p-6">
 <x-workspace-field name="name" label="Nama Ruangan" type="text" required maxlength="255" :value="old('name', data_get($room ?? null, 'name'))" />
@@ -12,28 +13,9 @@
         <option disabled>Belum ada pilihan tersedia.</option>
     @endforelse
 </x-workspace-field>
-<div class="sm:col-span-2"><x-workspace-field type="textarea" name="description" label="Deskripsi" maxlength="5000" :value="old('description', data_get($room ?? null, 'description'))" /></div>
+<div class="sm:col-span-2"><x-workspace-field type="textarea" name="description" label="Deskripsi" maxlength="5000" rows="3" :value="old('description', data_get($room ?? null, 'description'))" /></div>
 </div>
 </x-workspace-panel>
-<fieldset class="min-w-0 rounded-2xl border border-slate-200 bg-surface p-5 shadow-sm sm:p-6" aria-describedby="facilities-hint{{ $errors->has('facility_ids') || $errors->has('facility_ids.*') ? ' facilities-error' : '' }}">
-    <legend class="px-2 text-lg font-bold text-primaryDark">Fasilitas</legend>
-    <p id="facilities-hint" class="mb-5 text-base leading-6 text-slate-600">Pilih perlengkapan yang dimiliki ruangan. Fasilitas boleh dikosongkan.</p>
-    <div class="grid gap-3 sm:grid-cols-2">
-    @forelse($facilities ?? [] as $facility)
-        <label class="flex min-h-[52px] cursor-pointer items-start gap-3 rounded-xl border border-slate-200 p-3 text-base text-slate-700 transition hover:border-secondary hover:bg-secondaryLight/10">
-        <input class="mt-0.5 h-4 w-4 shrink-0 accent-primary focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-primary" type="checkbox" name="facility_ids[]" value="{{ $facility->id }}" @checked(in_array($facility->id, (array) old('facility_ids', $hasRoomInput ? [] : ($selectedFacilityIds ?? []))))><span class="min-w-0 break-words">{{ $facility->name }}{{ $facility->is_active ? '' : ' - Nonaktif' }}</span></label>
-    @empty
-        <p>Belum ada fasilitas yang dapat dipilih.</p>
-    @endforelse
-    </div>
-    @if($errors->has('facility_ids') || $errors->has('facility_ids.*'))
-        <div id="facilities-error" class="mt-3 space-y-1 text-base text-danger">
-            @foreach(array_merge($errors->get('facility_ids'), $errors->get('facility_ids.*')) as $message)
-                @foreach((array) $message as $detail)<p>{{ $detail }}</p>@endforeach
-            @endforeach
-        </div>
-    @endif
-</fieldset>
 <x-workspace-panel title="Akses dan Operasional" description="Atur penggunaan ruangan dan kebutuhan persetujuan.">
 <div class="grid gap-5 p-5 sm:grid-cols-2 sm:p-6">
 <x-workspace-field type="select" name="access_type" label="Jenis Akses" required>
@@ -47,6 +29,10 @@
     <option value="1" @selected((string) old('requires_approval', isset($room) ? (int) $room->requires_approval : 0) === '1')>Ya</option>
     <option value="0" @selected((string) old('requires_approval', isset($room) ? (int) $room->requires_approval : 0) === '0')>Tidak</option>
 </x-workspace-field>
+<x-workspace-field type="select" name="allows_meeting_preparation" label="Persiapan Rapat" required>
+    <option value="1" @selected((string) old('allows_meeting_preparation', isset($room) ? (int) $room->allows_meeting_preparation : 0) === '1')>Aktif (peserta dan konsumsi opsional)</option>
+    <option value="0" @selected((string) old('allows_meeting_preparation', isset($room) ? (int) $room->allows_meeting_preparation : 0) === '0')>Tidak aktif</option>
+</x-workspace-field>
 <x-workspace-field type="select" name="status" label="Status Operasional" required>
     <option value="">Pilih Status Operasional</option>
     <option value="available" @selected(old('status', data_get($room ?? null, 'status', 'available')) === 'available')>Operasional</option>
@@ -58,6 +44,27 @@
     <option value="1" @selected((string) old('is_active', isset($room) ? (int) $room->is_active : 1) === '1')>Aktif</option>
     <option value="0" @selected((string) old('is_active', isset($room) ? (int) $room->is_active : 1) === '0')>Nonaktif</option>
 </x-workspace-field>
-<p class="rounded-xl bg-background p-4 text-sm leading-6 text-slate-600 sm:col-span-2">PIC dan unit akses tersedia di bagian bawah setelah ruangan disimpan. Status operasional tidak menunjukkan ketersediaan jadwal.</p>
+<p class="rounded-xl bg-background p-4 text-sm leading-6 text-slate-600 sm:col-span-2">Status operasional tidak menunjukkan ketersediaan jadwal. Pengaturan PIC dan unit akses disimpan melalui formulir masing-masing.</p>
 </div>
 </x-workspace-panel>
+</div>
+<fieldset id="facilities" class="scroll-mt-6 min-w-0 rounded-2xl border border-slate-200 bg-surface p-5 shadow-sm sm:p-6" aria-describedby="facilities-hint{{ $errors->has('facility_ids') || $errors->has('facility_ids.*') ? ' facilities-error' : '' }}">
+    <legend class="sr-only">Fasilitas Ruangan</legend>
+    <h2 class="mb-2 text-lg font-bold text-primaryDark">Fasilitas Ruangan</h2>
+    <p id="facilities-hint" class="mb-5 text-base leading-6 text-slate-600">Centang fasilitas yang tersedia di ruangan ini, lalu simpan formulir. Hanya pilihan yang disimpan akan tampil di halaman booking.</p>
+    <div @class(['grid gap-3 sm:grid-cols-2', 'xl:grid-cols-3' => $roomManagement ?? false])>
+    @forelse($facilities ?? [] as $facility)
+        <label @class(['flex min-h-[52px] cursor-pointer items-start gap-3 rounded-xl border p-3 text-base text-slate-700 transition hover:border-secondary focus-within:ring-2 focus-within:ring-primary/30', 'border-primary/40 bg-secondaryLight/20' => in_array($facility->id, (array) old('facility_ids', $hasRoomInput ? [] : ($selectedFacilityIds ?? []))), 'border-slate-200 bg-surface' => ! in_array($facility->id, (array) old('facility_ids', $hasRoomInput ? [] : ($selectedFacilityIds ?? [])))])>
+        <input class="mt-0.5 h-4 w-4 shrink-0 accent-primary focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-primary" type="checkbox" name="facility_ids[]" value="{{ $facility->id }}" @checked(in_array($facility->id, (array) old('facility_ids', $hasRoomInput ? [] : ($selectedFacilityIds ?? []))))><span class="min-w-0 break-words">{{ $facility->name }}{{ $facility->is_active ? '' : ' - Nonaktif' }}</span></label>
+    @empty
+        <p>Belum ada fasilitas yang dapat dipilih.</p>
+    @endforelse
+    </div>
+    @if($errors->has('facility_ids') || $errors->has('facility_ids.*'))
+        <div id="facilities-error" class="mt-3 space-y-1 text-base text-danger">
+            @foreach(array_merge($errors->get('facility_ids'), $errors->get('facility_ids.*')) as $message)
+                @foreach((array) $message as $detail)<p>{{ $detail }}</p>@endforeach
+            @endforeach
+        </div>
+    @endif
+</fieldset>

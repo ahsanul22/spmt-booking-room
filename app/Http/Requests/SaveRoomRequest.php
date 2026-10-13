@@ -30,6 +30,7 @@ class SaveRoomRequest extends FormRequest
             'description' => ['nullable', 'string', 'max:5000'],
             'access_type' => ['required', Rule::in(['all', 'restricted'])],
             'requires_approval' => ['required', 'boolean'],
+            'allows_meeting_preparation' => ['sometimes', 'boolean'],
             'status' => ['required', Rule::in(['available', 'maintenance', 'unavailable'])],
             'is_active' => ['required', 'boolean'],
             'facility_ids' => ['present', 'array'],
