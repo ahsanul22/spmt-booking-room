@@ -1,5 +1,8 @@
 <x-workspace-field name="name" label="Nama" type="text" autocomplete="name" required maxlength="255" :value="old('name', data_get($userRecord ?? null, 'name'))" />
-<x-workspace-field name="email" label="Email" type="email" autocomplete="email" required maxlength="255" :value="old('email', data_get($userRecord ?? null, 'email'))" />
+@php($emailInput = old('email', data_get($userRecord ?? null, 'email')))
+<x-workspace-field name="email" label="Email" type="email" autocomplete="email" required maxlength="255" :value="is_string($emailInput) ? $emailInput : ''" />
+@php($whatsappInput = old('whatsapp_number', data_get($userRecord ?? null, 'whatsapp_number')))
+<x-workspace-field name="whatsapp_number" label="Nomor WhatsApp" type="tel" autocomplete="tel" maxlength="30" hint="Opsional. Masukkan 08… atau +62…; nomor disimpan dalam format internasional dan dipakai jika akun dipilih sebagai penerima notifikasi." :value="is_string($whatsappInput) ? $whatsappInput : ''" />
 <p>Password awal dan konfirmasi diperlukan saat tambah user; pada edit, kosongkan bila tidak diubah.</p>
 <x-workspace-field name="password" minlength="8" hint="Minimal 8 karakter. Kosongkan saat edit jika password tetap." label="Password Awal / Baru" type="password" :required="! ($editing ?? false)" autocomplete="new-password" />
 <x-workspace-field name="password_confirmation" label="Konfirmasi Password" type="password" :required="! ($editing ?? false)" autocomplete="new-password" />

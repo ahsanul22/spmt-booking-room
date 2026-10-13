@@ -6,12 +6,14 @@ use App\Http\Controllers\Controller;
 use App\Http\Requests\SaveUserRequest;
 use App\Models\OrganizationalUnit;
 use App\Models\User;
+use Illuminate\Database\QueryException;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Str;
 use Illuminate\Validation\Rules\Password;
+use Illuminate\Validation\ValidationException;
 use Illuminate\View\View;
 
 class UserController extends Controller
@@ -82,10 +84,20 @@ class UserController extends Controller
         $user->role = $data['role'];
         $user->organizational_unit_id = $data['organizational_unit_id'] ?? null;
         $user->is_active = $data['is_active'];
+        if (array_key_exists('whatsapp_number', $data)) {
+            $user->whatsapp_number = $data['whatsapp_number'];
+        }
         if (! empty($data['password'])) {
             $this->setPassword($user, $data['password']);
         }
-        $user->save();
+        try {
+            $user->save();
+        } catch (QueryException $error) {
+            if ((string) $error->getCode() === '23505') {
+                throw ValidationException::withMessages(['email' => 'Email sudah digunakan oleh akun lain.']);
+            }
+            throw $error;
+        }
     }
 
     private function setPassword(User $user, string $password): void

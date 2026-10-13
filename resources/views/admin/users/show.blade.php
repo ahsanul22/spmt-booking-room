@@ -13,6 +13,7 @@
                 <dl class="workspace-detail">
                     <div><dt>Nama</dt><dd>{{ $userRecord->name }}</dd></div>
                     <div><dt>Email</dt><dd>{{ $userRecord->email }}</dd></div>
+                    <div><dt>WhatsApp</dt><dd>{{ $userRecord->whatsapp_number ?? 'Belum diisi' }}</dd></div>
                     <div><dt>Unit Kerja</dt><dd>{{ $userRecord->organizationalUnit?->name ?? 'Tanpa Unit Kerja' }}</dd></div>
                     <div><dt>Role</dt><dd>{{ $userRecord->roleLabel() }}</dd></div>
                 </dl>
