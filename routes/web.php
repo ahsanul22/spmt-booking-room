@@ -10,6 +10,7 @@ use App\Http\Controllers\Admin\RoomController;
 use App\Http\Controllers\Admin\RoomPicController;
 use App\Http\Controllers\Admin\ScheduleController;
 use App\Http\Controllers\Admin\UserController;
+use App\Http\Controllers\Admin\WhatsappController;
 use App\Http\Controllers\BookingPreparationController;
 use App\Http\Controllers\DashboardController;
 use App\Http\Controllers\HomeController;
@@ -55,6 +56,10 @@ Route::prefix('pic')->name('pic.')->middleware(['auth', 'can:access-pic'])->grou
 });
 
 Route::prefix('admin')->name('admin.')->middleware(['auth', 'can:access-admin'])->group(function () {
+    Route::get('/whatsapp', [WhatsappController::class, 'index'])->name('whatsapp.index');
+    Route::put('/whatsapp/{template}', [WhatsappController::class, 'update'])->whereNumber('template')->name('whatsapp.update');
+    Route::post('/whatsapp/{template}/preview', [WhatsappController::class, 'preview'])->whereNumber('template')->name('whatsapp.preview');
+    Route::post('/whatsapp/messages/{message}/retry', [WhatsappController::class, 'retry'])->whereNumber('message')->name('whatsapp.retry');
     Route::get('/approvals', [ApprovalController::class, 'index'])->name('approvals.index');
     Route::get('/approvals/history', [ApprovalController::class, 'history'])->name('approvals.history');
     Route::get('/approvals/{approval}', [ApprovalController::class, 'show'])->whereNumber('approval')->name('approvals.show');
