@@ -27,12 +27,13 @@ class BookingRoomsSeeder extends Seeder
                 foreach (range(1, $count) as $index) {
                     $code = sprintf('SPMT-L%d-%02d', $number, $index);
                     $room = Room::firstOrCreate(['code' => $code], [
-                        'name' => $number === 7 ? 'Selat Malaka '.['I', 'II', 'III'][$index - 1] : 'Ruang Rapat Lantai '.$number.' - '.$index,
+                        'name' => $number === 7 ? 'Selat Malaka '.['I', 'II', 'III'][$index - 1] : $number.chr(64 + $index),
                         'floor_id' => $floor->id, 'capacity' => 0,
                         'description' => 'Nama sementara sesuai lantai. Kapasitas dan fasilitas belum dikonfirmasi.',
-                        'access_type' => 'all', 'requires_approval' => $number === 7,
+                        'access_type' => 'all', 'requires_approval' => true, 'allows_meeting_preparation' => $number === 7,
                         'status' => 'available', 'is_active' => true,
                     ]);
+                    $room->update(['requires_approval' => true]);
                     if ($room->wasRecentlyCreated && $number === 7) {
                         $room->pics()->syncWithoutDetaching($picIds);
                     }

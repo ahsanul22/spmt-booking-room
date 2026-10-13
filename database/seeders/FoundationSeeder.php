@@ -64,20 +64,24 @@ class FoundationSeeder extends Seeder
             $facilities = collect(['Projector', 'TV / Display', 'HDMI', 'Whiteboard', 'Video Conference', 'Microphone', 'Speaker'])
                 ->mapWithKeys(fn (string $name) => [$name => Facility::firstOrCreate(['name' => $name])]);
 
+            if (! app()->environment('testing') && Room::where('code', 'like', 'SPMT-L%')->exists()) {
+                return;
+            }
             $examples = [
-                ['DEMO-SM', 'Selat Malaka', 7, 20, 'all', false, 'available'],
+                ['DEMO-SM', 'Selat Malaka', 7, 20, 'all', true, 'available'],
                 ['DEMO-01', 'Ruang Demo Terbatas', 2, 10, 'restricted', true, 'available'],
                 ['DEMO-02', 'Ruang Demo Bersama', 3, 15, 'all', true, 'maintenance'],
-                ['DEMO-03', 'Ruang Demo Unit', 7, 8, 'restricted', false, 'unavailable'],
+                ['DEMO-03', 'Ruang Demo Unit', 7, 8, 'restricted', true, 'unavailable'],
             ];
 
             foreach ($examples as [$code, $name, $floor, $capacity, $access, $approval, $status]) {
                 $room = Room::firstOrCreate(['code' => $code], [
                     'name' => $name, 'floor_id' => $floors[$floor]->id, 'capacity' => $capacity,
                     'description' => 'Data dummy development; bukan data resmi perusahaan.',
-                    'access_type' => $access, 'requires_approval' => $approval, 'status' => $status,
+                    'access_type' => $access, 'requires_approval' => $approval, 'allows_meeting_preparation' => $code === 'DEMO-SM', 'status' => $status,
                 ]);
 
+                $room->update(['requires_approval' => true]);
                 Validator::make(['pic_id' => $pic->id], ['pic_id' => [new EligibleRoomPic]])->validate();
                 $room->pics()->syncWithoutDetaching([$pic->id]);
                 $room->facilities()->syncWithoutDetaching([
