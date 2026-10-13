@@ -137,7 +137,7 @@ class HomeAndScheduleTest extends PostgresTestCase
         $this->actingAs($this->employee());
         $this->get('/schedule')->assertOk()->assertSeeLivewire(RoomSchedule::class)
             ->assertSee('12:00')->assertSee('13:00')->assertSee($this->room()->name)
-            ->assertDontSee('RAHASIA-AGENDA')->assertDontSee('RAHASIA-CATATAN')->assertDontSee('RAHASIA-UNIT')
+            ->assertDontSee('RAHASIA-AGENDA')->assertDontSee('RAHASIA-CATATAN')->assertSee('RAHASIA-UNIT')
             ->assertDontSee($booking->submission_token)->assertDontSee('Pratinjau desain');
         $this->get('/admin/schedule')->assertForbidden();
         $this->actingAs(User::where('role', 'super_admin')->firstOrFail())->get('/admin/schedule')->assertOk()->assertSee('12:00');

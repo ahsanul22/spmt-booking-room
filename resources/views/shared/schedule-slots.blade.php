@@ -6,6 +6,7 @@
             <li wire:key="slot-{{ $slot['id'] }}" @class(['rounded-xl border-l-4 bg-background/60 p-4', 'border-warning' => $slot['state'] === 'pending', 'border-danger' => $slot['state'] === 'ongoing', 'border-primary' => $slot['state'] === 'scheduled', 'border-slate-300' => $slot['state'] === 'elapsed'])>
                 <div class="flex flex-wrap items-center justify-between gap-3"><p class="text-base font-bold tabular-nums text-primaryDark">{{ $slot['start'] }} &ndash; {{ $slot['end'] }} <span class="text-sm font-normal">WIB</span></p><x-schedule-status :state="$slot['state']" :label="$slot['label']" /></div>
                 <p class="mt-2 break-words text-base font-semibold text-text">{{ $slot['room_name'] }}</p>
+                @if(array_key_exists('unit_name', $slot))<p class="mt-2 break-words text-sm leading-6 text-slate-600">Unit kerja: {{ $slot['unit_name'] ?: 'Belum ditentukan' }}</p>@endif
                 @if(! $slot['room_operational'])<p class="mt-2 text-sm text-danger">Ruangan saat ini tidak operasional. Jadwal tersimpan tetap ditampilkan.</p>@endif
                 @if($slot['state'] === 'pending')<p class="mt-2 text-sm leading-5 text-slate-600">Slot ditahan selama menunggu persetujuan PIC.</p>@endif
             </li>

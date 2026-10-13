@@ -18,16 +18,18 @@ class BookingSchedule
 
     public function slots(string $from, string $to, ?int $roomId = null, bool $publicOnly = false): Collection
     {
-        // Deliberately select occupancy fields only. Meeting names, people, units,
-        // notes and submission tokens never enter the shared schedule response.
+        // The authenticated schedule may show unit snapshots; public responses
+        // exclude them, as well as agendas, people, notes and submission tokens.
         $now = CarbonImmutable::now(config('booking.timezone'));
+
         return Booking::query()->select(['id', 'room_id', 'date', 'start_time', 'end_time', 'status'])
+            ->when(! $publicOnly, fn ($query) => $query->addSelect('unit_name'))
             ->with('room:id,name,is_active,status')->whereBetween('date', [$from, $to])
             ->whereIn('status', ['pending', 'approved', 'completed'])
             ->when($publicOnly, fn ($query) => $query->whereHas('room', fn ($rooms) => $rooms->where('is_active', true)->where('access_type', 'all')))
             ->when($roomId, fn ($query) => $query->where('room_id', $roomId))
             ->orderBy('date')->orderBy('start_time')->orderBy('room_id')->get()
-            ->map(function ($booking) use ($now) {
+            ->map(function ($booking) use ($now, $publicOnly) {
                 $start = CarbonImmutable::parse($booking->date.' '.$booking->start_time, config('booking.timezone'));
                 $end = CarbonImmutable::parse($booking->date.' '.$booking->end_time, config('booking.timezone'));
                 $state = match (true) {
@@ -36,7 +38,9 @@ class BookingSchedule
                     $start->lte($now) => 'ongoing',
                     default => 'scheduled',
                 };
+
                 return [
+                    ...($publicOnly ? [] : ['unit_name' => $booking->unit_name]),
                     'id' => $booking->id, 'room_id' => $booking->room_id,
                     'room_name' => $booking->room->name, 'room_operational' => $booking->room->is_active && $booking->room->status === 'available',
                     'date' => $booking->date, 'start' => substr($booking->start_time, 0, 5), 'end' => substr($booking->end_time, 0, 5),
