@@ -20,7 +20,7 @@ Sistem digunakan untuk kebutuhan internal perusahaan. Beranda sebelum login memp
 
 ## Scope yang Tidak Dikerjakan Saat Ini
 
-Jangan mengembangkan catering, snack, konsumsi, rapat eksternal, pengelolaan tamu eksternal, WhatsApp integration, SMS, payment, atau fitur di luar kebutuhan booking ruang rapat. Email juga tidak diperlukan pada tahap awal.
+Pencatatan kebutuhan konsumsi ya/tidak diizinkan sebagai persiapan booking (DEC-040), tanpa pengelolaan catering/snack. Notifikasi WhatsApp booking ke PIC/Admin dan konsumsi memakai Fonnte, penerima dari akun user/PIC serta pengaturan Admin (DEC-043); pengiriman mengikuti konfigurasi perangkat/token dan scheduler server. Jangan mengembangkan pemesanan atau penyediaan konsumsi, rapat eksternal, pengelolaan tamu eksternal, SMS, payment, atau fitur di luar kebutuhan booking ruang rapat. Email juga tidak diperlukan pada tahap awal.
 
 ## Struktur Organisasi
 
@@ -71,7 +71,7 @@ Dapat:
 
 ## Ruangan
 
-Gedung memiliki master Lantai 1 sampai Lantai 8. Data ruangan sesuai rincian pengguna: lantai 2 satu, lantai 3 dua, lantai 4 dua, lantai 6 dua, lantai 7 tiga. Total rincian 10, masih menunggu koreksi atas angka awal 9. Lantai 7 sementara Selat Malaka I/II/III. Ruangan lain terbuka untuk seluruh pegawai tanpa approval; Selat Malaka menerima pengajuan dengan approval PIC (DEC-029).
+Gedung memiliki master Lantai 1 sampai Lantai 8. Data ruangan sesuai rincian pengguna: 2A, 3A/3B, 4A/4B, 6A/6B dan Selat Malaka I/II/III di lantai 7 (DEC-045). Total rincian 10, masih menunggu koreksi atas angka awal 9. Ruangan demo tanpa booking sudah dihapus dari database lokal. Seeder mengatur seluruh ruangan membutuhkan approval PIC (DEC-040); akses tetap mengikuti pengaturan ruangan dan PIC aktif harus ditetapkan.
 
 Informasi ruang minimal nantinya:
 
@@ -103,15 +103,15 @@ Validasi booking tetap berlaku untuk kedua alur.
 
 ## Pemilihan Ruangan
 
-Menu Booking Ruangan berisi katalog kartu ruangan. User memilih satu kartu, lalu mengisi tanggal, waktu, dan agenda tanpa dropdown ruangan. Dashboard menampilkan ringkasan tiga kartu dari katalog yang sama. My Booking khusus pengajuan dan riwayat pribadi. Halaman Cari Ruangan dihapus sesuai permintaan pengguna. Jumlah peserta dan kapasitas ruangan tidak ditampilkan atau dikumpulkan melalui UI. Pemeriksaan status operasional, hak akses, dan bentrok jadwal berjalan di server saat pemeriksaan dan submit booking.
+Menu Booking Ruangan berisi katalog kartu ruangan. User memilih satu kartu, lalu mengisi tanggal, waktu, dan agenda tanpa dropdown ruangan. Dashboard menampilkan ringkasan tiga kartu dari katalog yang sama. My Booking khusus pengajuan dan riwayat pribadi. Halaman Cari Ruangan dihapus sesuai permintaan pengguna. Kapasitas tidak ditampilkan. Ruangan dengan persiapan rapat aktif dapat mencatat perkiraan jumlah peserta dan kebutuhan konsumsi setelah checkbox persiapan dicentang (DEC-040). Pemeriksaan status operasional, hak akses, dan bentrok jadwal berjalan di server saat pemeriksaan dan submit booking.
 
 ## Jadwal Ruangan
 
-Kalender menampilkan booking tersimpan dengan ringkasan per tanggal dan daftar room/jam WIB. Pending berwarna kuning, Approved terjadwal biru, Approved yang waktunya sedang berjalan merah, dan waktu lewat abu-abu. Rejected/Cancelled tidak mengisi jadwal. Nama pemohon/agenda/catatan tidak ditampilkan di jadwal bersama. Panel yang sama tersedia di atas form booking untuk room dan tanggal terpilih. Pembaruan otomatis tetap disertai validasi konflik ulang saat submit.
+Kalender menampilkan booking tersimpan dengan ringkasan per tanggal dan daftar room/jam WIB. Pending berwarna kuning, Approved terjadwal biru, Approved yang waktunya sedang berjalan merah, dan waktu lewat abu-abu. Rejected/Cancelled tidak mengisi jadwal. Jadwal internal menampilkan snapshot unit kerja pemohon (DEC-040); jadwal publik tidak menampilkan unit. Nama pemohon/agenda/catatan tidak ditampilkan di jadwal bersama. Panel yang sama tersedia di atas form booking untuk room dan tanggal terpilih. Pembaruan otomatis tetap disertai validasi konflik ulang saat submit.
 
 ## Booking
 
-Pengajuan harus dilakukan minimal dua jam sebelum jam mulai rapat. Pemeriksaan rencana saat ini memakai waktu server dengan WIB (`Asia/Jakarta`, asumsi konfigurasi untuk alur ini), dan mengulang pemeriksaan ketika tombol Periksa Rencana ditekan. Backend submit menegakkan aturan yang sama pada waktu submit, bukan mengandalkan hasil pemeriksaan sebelumnya. Form saat ini mendukung satu tanggal; akhir harus setelah awal, lintas hari belum tersedia.
+Pengajuan tidak lagi mempunyai batas minimal dua jam sebelum rapat (DEC-044). Booking boleh diajukan mendekati waktu mulai; waktu mulai yang sudah lewat tetap ditolak. Pemeriksaan rencana dan submit menggunakan waktu server WIB (`Asia/Jakarta`) dengan presisi menit, dihitung ulang pada setiap pemeriksaan/submit. Form mendukung satu tanggal; akhir harus setelah awal, lintas hari belum tersedia. Ruangan yang membutuhkan approval tetap harus disetujui sebelum waktu mulai.
 
 Data booking yang disimpan:
 
@@ -123,6 +123,7 @@ Data booking yang disimpan:
 - Jam mulai.
 - Jam selesai.
 - Catatan opsional.
+- Persiapan rapat opsional, perkiraan jumlah peserta dan kebutuhan konsumsi.
 - Status.
 
 ## Bentrok Jadwal
@@ -146,6 +147,8 @@ Admin dan PIC dapat membuat laporan berdasarkan bulan tanggal rapat dan filter r
 
 ## Notification Internal
 
+Email akun harus unik tanpa membedakan huruf besar/kecil. Nomor WhatsApp boleh dipakai beberapa akun (DEC-046); format/normalisasi tetap divalidasi dan penerima bernomor sama dideduplikasi per booking/jenis pesan.
+
 Tahap awal menggunakan notification internal website, misalnya:
 
 - Booking berhasil dibuat.
@@ -153,7 +156,7 @@ Tahap awal menggunakan notification internal website, misalnya:
 - Booking rejected.
 - PIC mendapatkan request approval.
 
-Tidak perlu email, WhatsApp, atau SMS saat ini.
+Email dan SMS belum diperlukan. WhatsApp memakai outbox pengajuan Pending dan konsumsi setelah Approved serta adapter Fonnte. Admin mengelola nomor user, penerima akun, opsi PIC ruangan otomatis, template, pratinjau dan riwayat/retry melalui `/admin/whatsapp` (DEC-043). Satu Device Fonnte menjadi pengirim seluruh aplikasi; nomor akun user hanya penerima. Notification internal website dan webhook delivery belum dibuat. Panduan ada di `docs/WHATSAPP.md`.
 
 ## Frontend
 

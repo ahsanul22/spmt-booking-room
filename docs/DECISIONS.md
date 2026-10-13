@@ -1,5 +1,55 @@
 # Decisions
 
+## DEC-046 - Email Unik, Nomor WhatsApp Boleh Bersama
+
+- Konfirmasi pengguna 2026-10-13 membatalkan keunikan nomor pada DEC-045: beberapa akun boleh memakai nomor WhatsApp yang sama, terutama untuk uji coba. Nomor tetap nullable, dinormalisasi dan divalidasi format canonical. Tidak menghapus nomor duplikat existing atau menentukan akun pemilik tunggal.
+- Email tetap lowercase/trim dan unik case-insensitive pada validasi dan database. Migration kontak yang belum diterapkan pada database proyek disesuaikan sebelum dijalankan agar tidak menambah unique nomor, tetapi tetap menjaga format nomor dan unique email normalized.
+- Pengiriman tetap deduplikasi nomor per booking/event; dua akun penerima bernomor sama menghasilkan satu pesan pengajuan, dan satu pesan konsumsi jika event tersebut terjadi. Pesan antarjenis atau antarbooking tetap berbeda.
+
+## DEC-045 - Pembersihan Ruangan Demo dan Kontak Unik
+
+- Permintaan pengguna 2026-10-13 mengizinkan penghapusan ruangan demo dan penamaan ruangan biasa berdasarkan lantai+huruf: 2A, 3A/3B, 4A/4B, 6A/6B. Selat Malaka I/II/III tetap memakai nama yang diberikan pengguna. Penghapusan hanya fixture code/description demo yang tidak mempunyai booking, melalui RoomService/lock/transaksi existing; tidak menghapus akun PIC demo atau riwayat booking.
+- Seeder ruangan memakai format nama baru untuk record baru; data existing/ID/code dipertahankan. FoundationSeeder tidak membuat ulang ruangan demo di luar testing bila master ruangan SPMT sudah ada; fixture test tetap tersedia. Penugasan tujuh ruangan yang belum punya PIC menunggu pilihan pengguna; tidak menebak akun atau mengubah role.
+- Nomor WhatsApp unik setelah normalisasi internasional, nullable untuk akun tanpa nomor. Email dinormalisasi lowercase/trim dan unik tanpa membedakan huruf besar/kecil. Validasi create/update mengabaikan akun sendiri; login ikut menormalisasi email. Migration menambah index email normalized, unique nomor, serta check format nomor canonical. Konflik/format invalid pada data existing menghentikan migrasi tanpa menghapus kontak; pemilik nomor duplikat harus ditentukan pengguna dahulu.
+
+## DEC-044 - Pengajuan Tanpa Batas Minimal Dua Jam
+
+- Permintaan pengguna 2026-10-13 menghapus batas minimal dua jam sebelum rapat, menggantikan bagian batas waktu pengajuan pada DEC-028/DEC-029/DEC-034. Booking dapat diajukan kurang dari dua jam sebelum mulai; tidak menambahkan batas pengajuan baru.
+- Pemeriksaan/submit tetap menolak waktu mulai yang sudah lewat, memakai waktu server WIB dan presisi input menit (ceilMinute). Waktu diperiksa ulang saat submit; form yang dibiarkan terbuka tidak membolehkan waktu lampau. Jam selesai harus setelah mulai pada tanggal sama, akses/status/konflik serta idempotensi tetap berlaku. Approval tetap harus diputuskan sebelum mulai sesuai aturan existing.
+- Konfigurasi minimum_notice_hours dihapus; panduan beranda, dashboard dan form diperbarui. Default tanggal mengikuti waktu saat ini, bukan sekarang ditambah dua jam. Durasi pilihan 2 jam adalah durasi rapat dan tetap tersedia.
+
+## DEC-043 - Penerima dari Akun dan Pengelolaan Notifikasi Admin
+
+- Penugasan pengguna 2026-10-13 mengaktifkan pengelolaan nomor pada Kelola User serta halaman Admin `/admin/whatsapp` untuk penerima, template, pratinjau, riwayat/filter/pagination dan retry. Hanya Admin aktif dapat mengelola; PIC tidak memperoleh akses master pengaturan atau nomor akun lain.
+- Nomor bersumber dari `users.whatsapp_number` yang tetap guarded/hidden. Input Admin menerima format lokal Indonesia atau internasional, dinormalisasi dan divalidasi; nomor opsional dan pengiriman tidak mensyaratkan nomor pemohon. Request lama tanpa field mempertahankan nomor; input kosong menghapus nomor.
+- Pengajuan memakai PIC aktif pada room jika opsi otomatis dipilih, ditambah akun Admin aktif terpilih. Konsumsi memakai akun aktif terpilih tanpa mengubah role/hak akses. `whatsapp_recipients.user_id` mereferensikan akun; nomor legacy disimpan nonaktif bila tidak dapat dipetakan ke satu akun eligible, tanpa menebak akun/role. Migrasi tidak mengubah nomor akun dan menjaga pesan historis. Kedua jenis pesan awalnya nonaktif untuk review Admin.
+- `whatsapp_templates` menyimpan body plain text (maksimal 2.000 karakter), daftar variabel terbatas, status aktif dan opsi PIC otomatis. Tidak mengevaluasi Blade/PHP. Pratinjau menggunakan booking terbaru tanpa menulis pengaturan/mengirim pesan. Riwayat dan pratinjau di-escape.
+- Outbox tetap snapshot nomor/isi serta `recipient_user_id`. Nomor terbaru dipakai untuk pesan berikutnya; sebelum kirim/retry, server mengecek status booking, akun/nomor, pilihan penerima, penugasan dan jenis notifikasi aktif. Perubahan menyebabkan skip/penolakan retry, bukan memindahkan pesan historis. Nomor sama pada beberapa akun dideduplikasi per booking/event.
+- Retry UI hanya requeue failed, tanpa HTTP dalam request Admin; cron/scheduler tetap mengirim. Token/perangkat/global enable tetap konfigurasi server, bukan field user atau token yang ditampilkan UI. Unknown/processing tidak otomatis diulang. Migrasi referensi user tidak mendukung rollback otomatis karena pemetaan multi-akun tidak dapat dikembalikan tanpa kehilangan konfigurasi; pemulihan deployment memakai backup.
+
+## DEC-042 - Antrean WhatsApp dan Penerima Uji Coba
+
+- Instruksi pengguna 2026-10-13 mengizinkan penyimpanan penerima tanpa akun tambahan, pesan pengajuan Pending dan kebutuhan konsumsi setelah Approved. Dua tujuan tersimpan pada `whatsapp_recipients`; nomor asli diinput operasional, bukan seeder/source. Nomor akun sebelumnya adalah calon pengirim; koneksi pengirim ditentukan perangkat/token provider, bukan field user.
+- Fonnte digunakan sebagai adapter uji coba berdasarkan opsi yang dibahas, pengiriman default nonaktif sampai token/perangkat dihubungkan. Token hanya konfigurasi server. Tidak mengirim pesan nyata dalam implementasi/test ini.
+- Outbox `whatsapp_messages` ditulis dalam transaksi BookingService; unique booking/event/nomor dan idempotensi booking mencegah pencatatan ganda. Scheduler memproses maksimal 50 pesan per menit di luar transaksi booking; lock dan status processing mencegah dua worker mengambil pesan sama. Tidak memakai queue sync untuk HTTP.
+- Approved langsung yang meminta konsumsi juga memicu pesan konsumsi. Tidak ada backfill/pesan ke pemohon/distribusi PIC produksi. Pesan approval lama atau penerima yang berubah dinonaktifkan sebelum kirim dilewati.
+- Accepted berarti diterima API, bukan sampai/dibaca. Retry eksplisit hanya untuk provider rejection (failed); unknown/processing tertinggal tidak otomatis diulang karena risiko duplikat eksternal. Panduan operasional ada di `docs/WHATSAPP.md`.
+
+## DEC-041 - Persiapan Penerima Notifikasi WhatsApp
+
+- Klarifikasi pengguna 2026-10-13: nomor pada akun uji coba sebelumnya akan dipakai sebagai pengirim, bukan penerima. Penerima uji coba memakai nomor lain yang diberikan pengguna dan tidak memerlukan akun aplikasi hanya untuk menerima pesan. Nomor pribadi tidak dicatat di dokumentasi/source. Notifikasi kebutuhan konsumsi dikirim setelah booking disetujui; layanan pengirim belum dipilih dan pengiriman belum aktif.
+- Permintaan pengguna 2026-10-12 mengizinkan pengembangan bertahap notifikasi WhatsApp untuk booking ke PIC/Admin dan kebutuhan konsumsi, menggantikan pengecualian WhatsApp DEC-008. Layanan pengiriman, penerima konsumsi, dan waktu pemberitahuan konsumsi belum diputuskan; pengiriman belum diaktifkan.
+- Tahap pertama hanya menyiapkan akun uji coba role Pegawai aktif, tanpa assignment PIC/Admin atau unit kerja yang diasumsikan. Nomor penerima disimpan di `users.whatsapp_number` nullable dalam format internasional dengan awalan `+`; nomor bukan konfigurasi pengirim. Data akun pribadi tidak dimasukkan ke seeder atau source frontend.
+- Nomor tetap guarded dan hidden dari serialisasi User. Pengaturan nomor melalui UI, verifikasi kepemilikan nomor, serta channel/provider WhatsApp belum dibuat. Tidak mengirim pesan atau mengubah alur booking/approval dalam tahap persiapan ini.
+
+## DEC-040 - Persiapan Rapat Opsional dan Unit Kerja di Jadwal Internal
+
+- Arahan VP yang disetujui pengguna mengaktifkan pencatatan persiapan rapat, menggantikan pembatasan jumlah peserta/konsumsi pada DEC-029/DEC-033 dan konteks lama. Ini hanya perkiraan peserta serta kebutuhan konsumsi ya/tidak, tanpa pemesanan catering, porsi, biaya, atau konfirmasi penyediaan.
+- Room memiliki `allows_meeting_preparation`, dapat diubah Admin. Migration mengaktifkannya satu kali pada ruangan existing bernama Selat Malaka; seeder mengaktifkannya pada Selat Malaka baru. Ruangan lain default nonaktif; seeder ulang mempertahankan perubahan pengaturan Admin.
+- Checkbox persiapan membuka jumlah peserta wajib integer positif dan checkbox konsumsi. Melepas checkbox membuang detail; server memeriksa pengaturan room kembali saat check/submit. Snapshot booking disimpan dan tampil pada detail pemohon/Admin/PIC serta dialog review, termasuk setelah pengaturan room berubah. Jumlah peserta tidak dibatasi kapasitas yang belum dikonfirmasi.
+- Seeder Foundation dan BookingRooms mewajibkan approval seluruh room yang dikelolanya, termasuk record existing saat seeder diulang. Tidak mengubah status booking historis. Assignment PIC existing dipertahankan; tidak menyalin PIC Selat Malaka ke ruang biasa secara otomatis. Admin perlu menetapkan PIC aktif sebelum room tersebut menerima pengajuan.
+- Jadwal internal setelah login menampilkan snapshot `unit_name` dengan label Unit kerja (akun dapat terhubung ke departemen/divisi/direktorat). Unit kosong memakai fallback; jadwal publik tidak memilih/mengirim field unit. Agenda, pemohon, catatan, detail persiapan dan token tetap tidak ditampilkan pada jadwal bersama.
+
 ## DEC-039 - URL Master Data Terbaca dan Area Approval Admin
 
 - Permintaan perapian route diterapkan dengan route key `ID-slug-nama` pada Room, Floor, Facility, dan OrganizationalUnit melalui trait `HasReadableRouteKey`. Contoh: `/rooms/12-selat-malaka` dan `/admin/rooms/12-selat-malaka`. Slug diturunkan dari nama menggunakan `Str::slug`, tanpa kolom, migration, atau dependency tambahan. ID tetap identitas record agar nama duplikat tidak bentrok. Nama kosong/tidak menghasilkan slug memakai ID saja.

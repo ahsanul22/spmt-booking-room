@@ -52,7 +52,7 @@ Master data admin sampai assignment PIC/unit sudah aktif. Baca controller, Form 
 
 Menu/aksi mengikuti `@can` existing; keamanan server tetap ditangani middleware/Gate. Jangan mengganti authorization dengan penyembunyian tombol di JavaScript. Jangan menambah query database di Blade atau mengubah schema, role, dan kebijakan bisnis untuk keperluan styling.
 
-Booking/pengajuan dan approve/reject PIC sudah aktif sesuai DEC-029; pertahankan submit, validasi server, CSRF, authorization, idempotensi, status, dan pagination. Kalender data nyata sudah aktif sesuai DEC-030; pertahankan Gate, privasi field jadwal, waktu WIB, dan sinkronisasi tanggal form. Statistik, notifikasi, pembatalan, serta lifecycle lanjutan belum tersedia. Hanya modul yang belum aktif memakai penanda pratinjau dan aksi tulis nonaktif. Kalender kosong tidak berarti ruangan tersedia. Jangan membuat data bisnis contoh permanen, statistik palsu, atau endpoint baru hanya untuk mengisi desain.
+Booking/pengajuan dan approve/reject PIC sudah aktif sesuai DEC-029; pertahankan submit, validasi server, CSRF, authorization, idempotensi, status, dan pagination. Kalender data nyata sudah aktif sesuai DEC-030; pertahankan Gate, privasi field jadwal, waktu WIB, dan sinkronisasi tanggal form. Dashboard Admin memakai data nyata (DEC-036); notifikasi WhatsApp dan pengaturan Admin aktif sesuai DEC-043. Notifikasi internal website, pembatalan, serta lifecycle lanjutan belum tersedia. Hanya modul yang belum aktif memakai penanda pratinjau dan aksi tulis nonaktif. Kalender kosong tidak berarti ruangan tersedia. Jangan membuat data bisnis contoh permanen, statistik palsu, atau endpoint baru hanya untuk mengisi desain.
 
 ## Alur kerja CLI
 

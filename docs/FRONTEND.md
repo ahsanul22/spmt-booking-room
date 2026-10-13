@@ -1,8 +1,10 @@
+> Pembaruan DEC-043: Kelola User memiliki field nomor WhatsApp. Halaman Admin `/admin/whatsapp` mengelola penerima dari akun, opsi PIC otomatis per room, template/pratinjau, kesiapan nomor PIC dan riwayat/filter/retry. Akses khusus Admin; memakai layout schedule dan komponen workspace. Catatan notifikasi belum tersedia di riwayat berikut tidak berlaku untuk modul WhatsApp ini.
+
 > Pembaruan DEC-037: daftar approval memiliki aksi Setujui/Tolak melalui dialog (alasan penolakan wajib). Admin aktif dapat memutuskan Pending seluruh ruangan; PIC mengikuti assignment. Footer bersama berada setelah area header/konten setinggi viewport, sehingga tampil setelah scroll.
 
 ## Penyederhanaan alur 2026-10-05 (DEC-038)
 
-- Admin mengelola ruangan melalui satu view `admin.rooms.edit` pada URL detail/edit existing. Bagian PIC dan akses memakai partial `_pics`/`_access` dengan endpoint simpan existing; URL GET lama redirect ke anchor bagian tersebut. Kartu hanya menautkan Detail / Edit.
+- Admin mengelola ruangan melalui satu view `admin.rooms.edit` pada URL detail/edit existing. Bagian PIC dan akses memakai partial `_pics`/`_access` dengan endpoint simpan existing; URL GET lama redirect ke anchor bagian tersebut. Kartu menautkan Kelola ke halaman pengelolaan terpadu (label diperbarui 2026-10-08).
 - DELETE `admin.rooms.destroy` memakai konfirmasi modal. Booking yang sudah terhubung mencegah penghapusan permanen; tampilkan pesan untuk menonaktifkan ruangan. PIC tetap hanya membaca detail dan memutuskan booking ruangan tugasnya.
 - Approval Pending menggunakan dialog Review; detail existing hanya fallback tanpa JavaScript/riwayat. Catatan keputusan untuk approved/rejected tersimpan di `decision_notes`, dengan kompatibilitas `rejection_reason`.
 - Footer tanpa menu Jadwal/Login/Dashboard, navbar pegawai berupa teks, tombol Keluar PIC/Admin bersama profil header. Logout menuju Beranda dengan invalidasi session existing.
