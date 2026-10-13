@@ -227,5 +227,6 @@
             }
         }
     </script>
+    @include('shared.page-loading')
 </body>
 </html>

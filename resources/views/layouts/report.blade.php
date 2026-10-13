@@ -10,5 +10,6 @@
         <p class="mb-5 font-bold text-primaryDark">PT Pelindo Multi Terminal · Booking Ruang Rapat</p>
         @yield('content')
     </main>
+    @include('shared.page-loading')
 </body>
 </html>

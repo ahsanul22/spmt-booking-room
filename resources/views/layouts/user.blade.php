@@ -52,5 +52,6 @@
         </main>
     </div>
     @include('shared.footer')
+    @include('shared.page-loading')
 </body>
 </html>

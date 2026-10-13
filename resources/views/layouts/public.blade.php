@@ -17,5 +17,6 @@
     <main id="content" class="mx-auto w-full max-w-[1800px] flex-1 p-5 sm:p-8">@yield('content')</main>
     </div>
     @include('shared.footer')
+    @include('shared.page-loading')
 </body>
 </html>

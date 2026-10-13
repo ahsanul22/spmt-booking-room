@@ -59,6 +59,7 @@
                 @can('access-admin')
                     <p class="px-3 pb-3 pt-8 text-sm font-semibold uppercase tracking-[0.2em] text-secondaryLight">Administrasi</p>
                     <nav aria-label="Master data" class="space-y-1">
+                        <a @class(['schedule-nav', 'schedule-nav-active' => request()->routeIs('admin.whatsapp.*')]) @if(request()->routeIs('admin.whatsapp.*')) aria-current="page" @endif href="{{ route('admin.whatsapp.index') }}"><x-schedule-icon name="clock" />Notifikasi WhatsApp</a>
                         <a @class(['schedule-nav', 'schedule-nav-active' => request()->routeIs('admin.users.*')]) @if(request()->routeIs('admin.users.*')) aria-current="page" @endif href="{{ route('admin.users.index') }}"><x-schedule-icon name="grid" />Kelola User</a>
                         <a @class(['schedule-nav', 'schedule-nav-active' => request()->routeIs('admin.organizational-units.*')]) @if(request()->routeIs('admin.organizational-units.*')) aria-current="page" @endif href="{{ route('admin.organizational-units.index') }}"><x-schedule-icon name="grid" />Unit Organisasi</a>
                         <a @class(['schedule-nav', 'schedule-nav-active' => request()->routeIs('admin.facilities.*')]) @if(request()->routeIs('admin.facilities.*')) aria-current="page" @endif href="{{ route('admin.facilities.index') }}"><x-schedule-icon name="grid" />Fasilitas</a>
@@ -84,5 +85,6 @@
             @include('shared.footer')
         </div>
     </div>
+    @include('shared.page-loading')
 </body>
 </html>
