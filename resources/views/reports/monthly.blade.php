@@ -8,7 +8,7 @@
                 <button type="button" data-print-report class="workspace-button">Cetak / Simpan PDF</button>
                 <a class="workspace-button-secondary" href="{{ route($routePrefix.'.reports.index', ['month' => $month->format('Y-m'), 'room_id' => $roomId]) }}">Kembali ke Laporan</a>
             @else
-                <a class="workspace-button-secondary" href="{{ route($routePrefix.'.reports.export', ['month' => $month->format('Y-m'), 'room_id' => $roomId]) }}">Unduh CSV</a>
+                <a download class="workspace-button-secondary" href="{{ route($routePrefix.'.reports.export', ['month' => $month->format('Y-m'), 'room_id' => $roomId]) }}">Unduh CSV</a>
                 <a class="workspace-button" href="{{ route($routePrefix.'.reports.print', ['month' => $month->format('Y-m'), 'room_id' => $roomId]) }}">Versi Cetak / PDF</a>
             @endif
         </div>
@@ -26,12 +26,12 @@
             <button class="workspace-button" type="submit">Tampilkan Laporan</button>
         </form>
     @endunless
-    <section class="mb-6 rounded-2xl border border-secondaryLight bg-secondaryLight/20 p-5" aria-label="Periode dan cakupan laporan">
+    {{-- <section class="mb-6 rounded-2xl border border-secondaryLight bg-secondaryLight/20 p-5" aria-label="Periode dan cakupan laporan">
         <h2 class="text-xl font-bold text-primaryDark">{{ $month->locale('id')->translatedFormat('F Y') }}</h2>
         <p class="mt-2 break-words">{{ $scope }}{{ $selectedRoom ? ' · '.$selectedRoom->name : '' }}</p>
         <p class="mt-2 text-base text-slate-600">Dibuat oleh {{ auth()->user()->name }} · {{ $generatedAt->format('d/m/Y H:i') }} WIB. Status mengikuti data saat laporan dibuka.</p>
         <p class="mt-2 text-base leading-6 text-slate-600">Jam terjadwal adalah total durasi Approved dan Completed, bukan bukti pemakaian aktual. Pending yang waktunya lewat tetap dihitung sebagai Pending. Perubahan status atau penugasan PIC dapat mengubah laporan berikutnya.</p>
-    </section>
+    </section> --}}
     <div class="mb-6 grid gap-4 sm:grid-cols-3">
         <x-workspace-panel title="Total Booking"><p class="p-5 text-3xl font-bold text-primaryDark">{{ $summary['total'] }}</p></x-workspace-panel>
         <x-workspace-panel title="Jam Terjadwal"><p class="p-5 text-3xl font-bold text-primaryDark">{{ number_format($summary['hours'], 2, ',', '.') }}</p></x-workspace-panel>

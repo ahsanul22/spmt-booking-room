@@ -13,7 +13,7 @@
         <p class="mt-5 max-w-md text-base leading-7 text-slate-600">Jadwal dapat dilihat di halaman terpisah. Login untuk melakukan booking.</p>
     </div>
     <figure class="relative w-full min-w-0 overflow-hidden rounded-2xl border border-secondaryLight/40 bg-background lg:order-1">
-        <img src="{{ asset('images/welcome-collaboration.png') }}" alt="Ilustrasi area diskusi dengan meja bundar dan kursi biru menghadap pelabuhan." width="1254" height="1254" fetchpriority="high" class="h-[240px] w-full object-cover sm:h-[320px] lg:h-[400px]">
+        <img src="{{ asset('images/Beranda.jpeg') }}" alt="Ilustrasi area diskusi dengan meja bundar dan kursi biru menghadap pelabuhan." width="1254" height="1254" fetchpriority="high" class="h-[240px] w-full object-cover sm:h-[320px] lg:h-[400px]">
         <figcaption class="space-y-3 p-6 sm:p-8">
             <p class="text-base font-bold uppercase tracking-[0.2em] text-primary">Ruang untuk berkolaborasi</p>
             <p class="mt-2 text-xl font-semibold text-primaryDark">Satu meja. Banyak kemungkinan.</p>
@@ -47,7 +47,7 @@
     </ol>
     <div class="mt-12 flex w-full items-start gap-4 rounded-2xl bg-secondaryLight/20 p-5 sm:p-6">
         <x-schedule-icon name="clock" class="mt-1 h-5 w-5 shrink-0 text-primary" />
-        <p class="text-base leading-7 text-primaryDark">Ajukan minimal {{ config('booking.minimum_notice_hours') }} jam sebelum rapat. Ruangan tertentu memerlukan persetujuan PIC.</p>
+        <p class="text-base leading-7 text-primaryDark">Booking dapat diajukan tanpa batas minimal waktu sebelum rapat. Ruangan tertentu memerlukan persetujuan PIC.</p>
     </div>
 </section>
 

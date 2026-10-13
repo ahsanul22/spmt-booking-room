@@ -61,14 +61,6 @@
         </div>
 
         <aside class="min-w-0 space-y-5">
-            <section class="relative overflow-hidden rounded-2xl bg-primaryDark p-6 text-white" aria-labelledby="welcome-title">
-                <div aria-hidden="true" class="pointer-events-none absolute -right-8 -top-8 h-32 w-32 rounded-full border-[20px] border-secondary/10"></div>
-                <span class="relative inline-flex rounded-xl bg-white/10 p-3 text-secondaryLight"><x-schedule-icon name="room" class="h-6 w-6" /></span>
-                <h2 id="welcome-title" class="relative mt-5 text-xl font-semibold leading-7">Ruang tertata.<br>Kolaborasi terjaga.</h2>
-                <p class="relative mt-3 text-sm leading-6 text-secondaryLight">Pastikan informasi ruangan, fasilitas, dan penanggung jawab selalu sesuai kebutuhan tim.</p>
-                <a href="{{ route('admin.rooms.index') }}" class="relative mt-5 inline-flex items-center gap-2 text-base font-semibold hover:underline">Tinjau ruangan<x-schedule-icon name="arrow" class="h-4 w-4" /></a>
-            </section>
-
             <section class="rounded-2xl border border-slate-200/80 bg-surface p-6 shadow-sm" aria-labelledby="account-title">
                 <h2 id="account-title" class="font-bold text-primaryDark">Akun Anda</h2>
                 <dl class="mt-5 space-y-4 text-base">
