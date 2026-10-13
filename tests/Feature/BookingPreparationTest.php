@@ -73,7 +73,7 @@ class BookingPreparationTest extends PostgresTestCase
         $url = route('rooms.book', $room);
         $this->get('/rooms')->assertOk()->assertSee($url, false);
         $this->get($url)->assertOk()->assertSee($room->name)->assertSee('Ruangan pilihan')
-            ->assertDontSee('<select id="room_id"', false)->assertDontSee('participant_count')->assertSee('WIB');
+            ->assertDontSee('<select id="room_id"', false)->assertDontSee('<input id="participant_count"', false)->assertSee('WIB');
         $this->get('/my-bookings/create')->assertRedirect(route('rooms.index'));
         $this->get(route('my-bookings.create', ['room_id' => $room->id]))->assertRedirect($url);
         $this->get(route('rooms.book', $room->id))->assertOk();
@@ -82,6 +82,25 @@ class BookingPreparationTest extends PostgresTestCase
         }
         $this->get('/my-bookings/create?room_id[]=1')->assertNotFound();
         $this->get('/rooms/99999999999999999999999999999-room/book')->assertNotFound();
+        $form = Livewire::test(BookingPreparationForm::class, ['roomId' => $room->id]);
+        foreach ($room->facilities as $facility) {
+            $form->assertSee($facility->name);
+        }
+        $savedFacility = $room->facilities->firstOrFail();
+        $employee = auth()->user();
+        $room->facilities()->detach();
+        $form->call('$refresh')->assertSee('Fasilitas ruangan ini belum dicantumkan.')
+            ->assertDontSee('<summary', false);
+        $this->actingAs(User::where('role', 'super_admin')->firstOrFail())
+            ->put(route('admin.rooms.update', $room), [
+                'name' => $room->name, 'code' => $room->code, 'floor_id' => $room->floor_id,
+                'access_type' => $room->access_type, 'requires_approval' => (int) $room->requires_approval,
+                'status' => $room->status, 'is_active' => (int) $room->is_active,
+                'facility_ids' => [$savedFacility->id],
+            ])->assertSessionHasNoErrors();
+        $this->actingAs($employee);
+        $form->call('$refresh')->assertSee($savedFacility->name)
+            ->assertDontSee('Fasilitas ruangan ini belum dicantumkan.');
     }
 
     public function test_automatic_end_is_a_summary_and_manual_end_accepts_any_minute(): void
@@ -136,25 +155,27 @@ class BookingPreparationTest extends PostgresTestCase
         $this->assertStringNotContainsString('Daftar Ruangan', $response->getContent());
     }
 
-    public function test_exact_two_hours_is_valid_but_does_not_claim_a_reservation(): void
+    public function test_valid_plan_does_not_claim_a_reservation(): void
     {
         $this->form()->call('checkPlan')->assertHasNoErrors()->assertSet('checked', true)
             ->assertSee('Ruangan belum dipesan.')->assertSee('ketersediaan akan diperiksa ulang');
     }
 
-    public function test_less_than_two_hours_and_past_dates_are_rejected(): void
+    public function test_near_term_booking_is_allowed_but_past_dates_and_times_are_rejected(): void
     {
-        $this->form()->set('start_time', '11:59')->call('checkPlan')->assertHasErrors('start_time');
+        $this->form()->set('start_time', '10:01')->call('checkPlan')->assertHasNoErrors();
+        $this->form()->set('start_time', '10:00')->call('checkPlan')->assertHasNoErrors();
+        $this->form()->set('start_time', '09:59')->call('checkPlan')->assertHasErrors('start_time');
         $this->form()->set('date', '2026-09-26')->call('checkPlan')->assertHasErrors('start_time');
         $this->travelTo(CarbonImmutable::parse('2026-09-27 10:00:30', 'Asia/Jakarta'));
-        $this->form()->call('checkPlan')->assertHasErrors('start_time');
-        $this->form()->set('start_time', '12:01')->call('checkPlan')->assertHasNoErrors();
+        $this->form()->set('start_time', '10:00')->call('checkPlan')->assertHasErrors('start_time');
+        $this->form()->set('start_time', '10:01')->call('checkPlan')->assertHasNoErrors();
     }
 
     public function test_time_is_rechecked_after_the_form_has_been_left_open(): void
     {
-        $form = $this->form()->call('checkPlan')->assertSet('checked', true);
-        $this->travel(1)->minutes();
+        $form = $this->form()->set('start_time', '10:01')->call('checkPlan')->assertSet('checked', true);
+        $this->travel(2)->minutes();
         $form->call('checkPlan')->assertHasErrors('start_time')->assertSet('checked', false);
     }
 
@@ -169,13 +190,16 @@ class BookingPreparationTest extends PostgresTestCase
         $this->form()->set('notes', str_repeat('x', 2001))->call('checkPlan')->assertHasErrors('notes');
     }
 
-    public function test_two_hour_window_can_cross_midnight_in_wib(): void
+    public function test_no_notice_period_keeps_current_wib_date_and_allows_next_day(): void
     {
         $this->travelTo(CarbonImmutable::parse('2026-09-27 23:30:00', 'Asia/Jakarta'));
-        $this->form()->set('date', '2026-09-28')->set('start_time', '01:30')->set('end_time', '02:30')
+        Livewire::test(BookingPreparationForm::class, ['roomId' => $this->room()->id])->assertSet('date', '2026-09-27')
+            ->set('agenda', 'Rapat malam')->set('start_time', '23:45')->set('end_time', '23:59')
             ->call('checkPlan')->assertHasNoErrors();
-        $this->form()->set('date', '2026-09-28')->set('start_time', '01:29')->set('end_time', '02:30')
-            ->call('checkPlan')->assertHasErrors('start_time');
+        $this->form()->set('date', '2026-09-28')->set('start_time', '00:00')->set('end_time', '01:00')
+            ->call('checkPlan')->assertHasNoErrors();
+        $this->travelTo(CarbonImmutable::parse('2026-09-27 23:59:30', 'Asia/Jakarta'));
+        Livewire::test(BookingPreparationForm::class, ['roomId' => $this->room()->id])->assertSet('date', '2026-09-28');
     }
 
     public function test_changed_room_state_is_checked_again_on_the_server(): void

@@ -9,7 +9,7 @@ class Booking extends Model
 {
     protected $guarded = ['id'];
 
-    protected $casts = ['requires_approval' => 'boolean', 'decided_at' => 'immutable_datetime'];
+    protected $casts = ['requires_approval' => 'boolean', 'meeting_preparation' => 'boolean', 'participant_count' => 'integer', 'needs_consumption' => 'boolean', 'decided_at' => 'immutable_datetime'];
 
     public function applicant(): BelongsTo
     {

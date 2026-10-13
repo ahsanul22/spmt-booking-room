@@ -11,9 +11,9 @@ class Room extends Model
 {
     use HasReadableRouteKey;
 
-    protected $fillable = ['name', 'code', 'floor_id', 'capacity', 'description', 'access_type', 'requires_approval', 'status', 'is_active'];
+    protected $fillable = ['name', 'code', 'floor_id', 'capacity', 'description', 'access_type', 'requires_approval', 'allows_meeting_preparation', 'status', 'is_active'];
 
-    protected $casts = ['capacity' => 'integer', 'requires_approval' => 'boolean', 'is_active' => 'boolean'];
+    protected $casts = ['capacity' => 'integer', 'requires_approval' => 'boolean', 'allows_meeting_preparation' => 'boolean', 'is_active' => 'boolean'];
 
     public function floor(): BelongsTo
     {

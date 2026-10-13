@@ -19,11 +19,17 @@ class BookingService
     {
         Validator::make(['token' => $token], ['token' => ['required', 'uuid']])->validate();
         // Only the expected form fields contribute to the idempotency fingerprint.
-        $input = array_intersect_key($input, array_flip(['date', 'start_time', 'end_time', 'agenda', 'notes']));
+        $input = array_intersect_key($input, array_flip(['date', 'start_time', 'end_time', 'agenda', 'notes', 'meeting_preparation', 'participant_count', 'needs_consumption']));
         $input['agenda'] = is_string($input['agenda'] ?? null) ? trim($input['agenda']) : ($input['agenda'] ?? null);
         $input['notes'] = is_string($input['notes'] ?? null) ? trim($input['notes']) : ($input['notes'] ?? '');
-        ksort($input);
-        $hash = hash('sha256', json_encode([$roomId, $input], JSON_THROW_ON_ERROR));
+        $input += ['meeting_preparation' => false, 'participant_count' => null, 'needs_consumption' => false];
+        $fingerprint = $input;
+        // Keep retries of submissions made before preparation fields were introduced valid.
+        if ($input['meeting_preparation'] === false && $input['participant_count'] === null && $input['needs_consumption'] === false) {
+            unset($fingerprint['meeting_preparation'], $fingerprint['participant_count'], $fingerprint['needs_consumption']);
+        }
+        ksort($fingerprint);
+        $hash = hash('sha256', json_encode([$roomId, $fingerprint], JSON_THROW_ON_ERROR));
 
         return DB::transaction(function () use ($actor, $roomId, $input, $token, $hash) {
             // All booking writes/decisions lock the room first. Overlap check and insert
@@ -36,24 +42,31 @@ class BookingService
                 if (! hash_equals($existing->request_hash, $hash)) {
                     throw ValidationException::withMessages(['agenda' => 'Form ini sudah dikirim dengan isian berbeda. Buka form booking baru.']);
                 }
+
                 return $existing;
             }
-            $data = $this->preparation->validate($input);
+            $data = $this->preparation->validate($input, $room);
             $this->assertRoomAllowed($room, $user);
             $this->assertPicAvailable($room);
             $this->assertNoConflict($roomId, $data);
 
-            return Booking::create([
+            $booking = Booking::create([
                 'user_id' => $user->id, 'room_id' => $room->id,
                 'organizational_unit_id' => $user->organizational_unit_id,
                 'unit_name' => $user->organizationalUnit?->name,
                 'agenda' => $data['agenda'], 'date' => $data['date'],
                 'start_time' => $data['start_time'], 'end_time' => $data['end_time'],
                 'notes' => $data['notes'] ?: null,
+                'meeting_preparation' => $data['meeting_preparation'],
+                'participant_count' => $data['participant_count'],
+                'needs_consumption' => $data['needs_consumption'],
                 'status' => $room->requires_approval ? 'pending' : 'approved',
                 'requires_approval' => $room->requires_approval,
                 'submission_token' => $token, 'request_hash' => $hash,
             ]);
+            app(BookingWhatsapp::class)->record($booking);
+
+            return $booking;
         }, 3);
     }
 
@@ -116,6 +129,7 @@ class BookingService
                 'status' => $decision, 'rejection_reason' => $decision === 'rejected' ? $reason : null,
                 'decided_by' => $reviewer->id, 'decided_at' => now(),
             ]);
+            app(BookingWhatsapp::class)->record($booking);
 
             return $booking;
         }, 3);

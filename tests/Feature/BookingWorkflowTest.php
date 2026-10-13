@@ -22,6 +22,7 @@ class BookingWorkflowTest extends PostgresTestCase
         parent::setUp();
         $this->travelTo(CarbonImmutable::parse('2026-09-27 10:00:00', 'Asia/Jakarta'));
         $this->actingAs(User::where('role', 'user')->firstOrFail());
+        $this->room()->update(['requires_approval' => false]);
     }
 
     protected function tearDown(): void
@@ -72,20 +73,31 @@ class BookingWorkflowTest extends PostgresTestCase
         $this->get('/my-bookings')->assertOk()->assertSee('Approved')->assertSee($this->room()->name);
     }
 
-    public function test_submission_rechecks_notice_window_even_after_successful_check(): void
+    public function test_submission_rechecks_past_start_even_after_successful_check(): void
     {
         $component = Livewire::test(BookingPreparationForm::class, ['roomId' => $this->room()->id]);
-        foreach ($this->data() as $field => $value) { $component->set($field, $value); }
+        foreach ($this->data(['start_time' => '10:01', 'end_time' => '11:01']) as $field => $value) { $component->set($field, $value); }
         $component->call('checkPlan')->assertHasNoErrors();
-        $this->travel(1)->minutes();
+        $this->travel(2)->minutes();
         $component->call('submitBooking')->assertHasErrors('start_time');
         $this->assertDatabaseCount('bookings', 0);
+    }
+
+    public function test_submission_with_less_than_two_hours_notice_is_persisted(): void
+    {
+        $booking = $this->submit(['start_time' => '10:15', 'end_time' => '11:15']);
+        $this->assertSame('approved', $booking->status);
+        $this->assertSame('10:15:00', $booking->fresh()->start_time);
+        $this->assertDatabaseCount('bookings', 1);
     }
 
     public function test_retry_is_idempotent_and_reusing_token_for_different_data_is_rejected(): void
     {
         $token = (string) Str::uuid();
         $first = $this->submit(token: $token);
+        $legacyInput = $this->data();
+        ksort($legacyInput);
+        $this->assertSame(hash('sha256', json_encode([$this->room()->id, $legacyInput], JSON_THROW_ON_ERROR)), $first->request_hash);
         $this->travel(3)->hours();
         $second = $this->submit(token: $token);
         $this->assertSame($first->id, $second->id);
@@ -236,13 +248,17 @@ class BookingWorkflowTest extends PostgresTestCase
         $active = Room::with('floor')->where('is_active', true)->get();
         $this->assertCount(10, $active);
         $this->assertSame([2 => 1, 3 => 2, 4 => 2, 6 => 2, 7 => 3], $active->groupBy('floor.floor_number')->map->count()->sortKeys()->all());
-        $this->assertCount(7, $active->where('requires_approval', false));
-        $this->assertCount(3, $active->where('requires_approval', true));
+        $this->assertCount(0, $active->where('requires_approval', false));
+        $this->assertCount(10, $active->where('requires_approval', true));
         $this->assertTrue($active->every(fn ($room) => $room->access_type === 'all' && $room->status === 'available'));
         $this->assertDatabaseCount('rooms', 14);
         Livewire::test(\App\Livewire\RoomCatalog::class)->call('selectFilter', 'featured')->assertViewHas('rooms', fn ($rooms) => $rooms->total() === 3);
         Livewire::test(\App\Livewire\RoomCatalog::class)->call('selectFilter', 'other')->assertViewHas('rooms', fn ($rooms) => $rooms->total() === 7);
         foreach ($active as $room) {
+            if (! $room->pics()->exists()) {
+                $this->assertInvalid(fn () => app(BookingService::class)->submit(auth()->user(), $room->id, $this->data(), (string) Str::uuid()), 'room');
+                $room->pics()->attach(User::where('role', 'room_pic')->firstOrFail()->id);
+            }
             $result = app(BookingService::class)->submit(auth()->user(), $room->id, $this->data(), (string) Str::uuid());
             $this->assertSame($room->requires_approval ? 'pending' : 'approved', $result->status);
         }

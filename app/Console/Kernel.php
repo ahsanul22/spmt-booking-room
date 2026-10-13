@@ -12,7 +12,8 @@ class Kernel extends ConsoleKernel
      */
     protected function schedule(Schedule $schedule): void
     {
-        // $schedule->command('inspire')->hourly();
+        $schedule->command('whatsapp:send')->everyMinute()->withoutOverlapping()
+            ->when(fn () => config('whatsapp.enabled') && config('whatsapp.token'));
     }
 
     /**
