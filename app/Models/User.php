@@ -52,6 +52,26 @@ class User extends Authenticatable
         return $this->hasMany(WhatsappRecipient::class);
     }
 
+    protected ?int $pendingApprovalsCountCache = null;
+
+    public function pendingApprovalsCount(): int
+    {
+        if ($this->pendingApprovalsCountCache !== null) {
+            return $this->pendingApprovalsCountCache;
+        }
+
+        if (! $this->can('access-pic')) {
+            return $this->pendingApprovalsCountCache = 0;
+        }
+
+        return $this->pendingApprovalsCountCache = Booking::query()
+            ->where('requires_approval', true)
+            ->where('status', 'pending')
+            ->when(! $this->can('access-admin'), fn ($query) => $query
+                ->whereHas('room.pics', fn ($pics) => $pics->where('users.id', $this->id)))
+            ->count();
+    }
+
     /**
      * The attributes that are mass assignable.
      *

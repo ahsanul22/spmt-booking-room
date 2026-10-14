@@ -29,7 +29,15 @@
                     <a @class(['schedule-nav', 'schedule-nav-active' => request()->routeIs('dashboard', 'pic.dashboard', 'admin.dashboard')]) @if(request()->routeIs('dashboard', 'pic.dashboard', 'admin.dashboard')) aria-current="page" @endif href="{{ route(auth()->user()->dashboardRouteName()) }}"><x-schedule-icon name="grid" />Dashboard</a>
                     @can('access-pic')
                         @cannot('access-admin')
-                            <a @class(['schedule-nav', 'schedule-nav-active' => request()->routeIs('pic.approvals.index', 'pic.approvals.show')]) @if(request()->routeIs('pic.approvals.index', 'pic.approvals.show')) aria-current="page" @endif href="{{ route('pic.approvals.index') }}"><x-schedule-icon name="clock" />Permintaan Approval</a>
+                            <a @class(['schedule-nav', 'schedule-nav-active' => request()->routeIs('pic.approvals.index', 'pic.approvals.show')]) @if(request()->routeIs('pic.approvals.index', 'pic.approvals.show')) aria-current="page" @endif href="{{ route('pic.approvals.index') }}">
+                                <x-schedule-icon name="clock" />
+                                <span>Permintaan Approval</span>
+                                @if(($pendingApprovalsCount ?? 0) > 0)
+                                    <span class="ml-auto inline-flex items-center justify-center rounded-full bg-danger px-2 py-0.5 text-xs font-bold text-white shadow-sm" aria-label="{{ $pendingApprovalsCount }} permintaan approval baru">
+                                        {{ $pendingApprovalsCount > 99 ? '99+' : $pendingApprovalsCount }}
+                                    </span>
+                                @endif
+                            </a>
                             <a @class(['schedule-nav', 'schedule-nav-active' => request()->routeIs('pic.rooms.*')]) @if(request()->routeIs('pic.rooms.*')) aria-current="page" @endif href="{{ route('pic.rooms.index') }}"><x-schedule-icon name="room" />Ruangan Saya</a>
                             <a @class(['schedule-nav', 'schedule-nav-active' => request()->routeIs('pic.approvals.history')]) @if(request()->routeIs('pic.approvals.history')) aria-current="page" @endif href="{{ route('pic.approvals.history') }}"><x-schedule-icon name="calendar" />Riwayat Approval</a>
                         @endcannot
@@ -50,7 +58,15 @@
                         <a @class(['schedule-nav', 'schedule-nav-active' => request()->routeIs('admin.bookings.*')]) @if(request()->routeIs('admin.bookings.*')) aria-current="page" @endif href="{{ route('admin.bookings.index') }}"><x-schedule-icon name="clock" />Semua Booking</a>
                     @endcan
                     @can('access-admin')
-                        <a @class(['schedule-nav', 'schedule-nav-active' => request()->routeIs('admin.approvals.*', 'pic.approvals.*')]) @if(request()->routeIs('admin.approvals.*', 'pic.approvals.*')) aria-current="page" @endif href="{{ route('admin.approvals.index') }}"><x-schedule-icon name="grid" />Approval Ruangan</a>
+                        <a @class(['schedule-nav', 'schedule-nav-active' => request()->routeIs('admin.approvals.*', 'pic.approvals.*')]) @if(request()->routeIs('admin.approvals.*', 'pic.approvals.*')) aria-current="page" @endif href="{{ route('admin.approvals.index') }}">
+                            <x-schedule-icon name="grid" />
+                            <span>Approval Ruangan</span>
+                            @if(($pendingApprovalsCount ?? 0) > 0)
+                                <span class="ml-auto inline-flex items-center justify-center rounded-full bg-danger px-2 py-0.5 text-xs font-bold text-white shadow-sm" aria-label="{{ $pendingApprovalsCount }} pengajuan approval baru">
+                                    {{ $pendingApprovalsCount > 99 ? '99+' : $pendingApprovalsCount }}
+                                </span>
+                            @endif
+                        </a>
                     @endcan
                     @can('access-pic')
                         <a @class(['schedule-nav', 'schedule-nav-active' => request()->routeIs('*.reports.*')]) @if(request()->routeIs('*.reports.*')) aria-current="page" @endif href="{{ route(auth()->user()->can('access-admin') ? 'admin.reports.index' : 'pic.reports.index') }}"><x-schedule-icon name="calendar" />Laporan Bulanan</a>

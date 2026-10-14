@@ -8,6 +8,13 @@
 - Audit read-only menemukan 2A, 3A, 3B, 4A, 4B, 6A, dan 6B membutuhkan approval tetapi belum mempunyai PIC aktif. BookingService menolak pengajuan kondisi tersebut dengan pesan `PIC aktif belum ditetapkan`. Penugasan akun tetap menunggu pilihan sesuai DEC-045; belum mengubah data atau aturan approval.
 - Verifikasi aktual: `test_livewire_submission_persists_approved_booking_and_redirects_to_real_detail` lulus (1 test, 16 assertions, 35.68s), memakai schema PostgreSQL terisolasi. Belum mengubah kode karena pesan error dan ruangan yang terdampak belum diketahui.
 
+2026-10-14 - Badge notifikasi angka pada menu Permintaan Approval PIC dan Approval Ruangan Admin.
+
+- Ditambahkan badge angka notifikasi pada menu navigasi sidebar "Permintaan Approval" untuk PIC (dan "Approval Ruangan" untuk Admin) saat ada pengajuan booking yang memerlukan persetujuan (`status = 'pending'`, `requires_approval = true`). Badge juga tersedia pada tombol Permintaan Approval di halaman Ruangan Saya (`pic/rooms/index.blade.php`) dan shortcut dashboard (`shared/dashboard-shortcuts.blade.php`).
+- Logika hitung dienkapsulasi pada method `User::pendingApprovalsCount()` dengan memoization per-request, dan dialirkan ke views menggunakan View Composer di `AppServiceProvider` sehingga tidak ada query database di dalam template Blade. Badge hanya ditampilkan jika jumlah pengajuan pending > 0 (format 99+ jika lebih dari 99) dan menggunakan token Tailwind `bg-danger` dengan label aksesibilitas aria.
+- Verifikasi aktual: test baru `PicApprovalNotificationBadgeTest` lulus (3 tests, 20 assertions, 1m28.9s); `PicDashboardBannerTest` lulus (1 test, 36 assertions, 34.1s); `php vendor/bin/pint` passed; `view:cache` dan `view:clear` berhasil; `git diff --check` tanpa whitespace/error.
+2026-10-14 - Konflik pull main diselesaikan dengan mempertahankan catatan lokal dan remote. Verifikasi marker konflik dan whitespace dilakukan; test aplikasi tidak diulang karena resolusi hanya dokumentasi.
+
 2026-10-13 - Persiapan commit dan push seluruh perubahan dalam sepuluh commit berdasarkan fungsi.
 
 - Review menemukan field wajib `access_type` dikomentari pada form ruangan; input dipulihkan agar create/update tetap dapat mengirim nilai yang diwajibkan backend.

@@ -17,7 +17,7 @@
         <h3 class="mt-6 border-t border-slate-100 pt-5 text-base font-semibold text-primaryDark">Area PIC Ruangan</h3>
         <div class="mt-4 grid gap-3 sm:grid-cols-2">
             <x-dashboard-shortcut :href="route('pic.rooms.index')" title="Ruangan Saya" icon="room">Lihat informasi dan jadwal ruangan yang menjadi tanggung jawab Anda.</x-dashboard-shortcut>
-            <x-dashboard-shortcut :href="route('pic.approvals.index')" title="Permintaan Approval" icon="clock">Tinjau dan putuskan permintaan booking ruangan Anda.</x-dashboard-shortcut>
+            <x-dashboard-shortcut :href="route('pic.approvals.index')" title="Permintaan Approval" icon="clock" :badge="($pendingApprovalsCount ?? 0) > 0 ? ($pendingApprovalsCount > 99 ? '99+' : $pendingApprovalsCount) : null">Tinjau dan putuskan permintaan booking ruangan Anda.</x-dashboard-shortcut>
             <x-dashboard-shortcut :href="route('pic.approvals.history')" title="Riwayat Approval" icon="calendar">Riwayat keputusan atas pengajuan booking.</x-dashboard-shortcut>
         </div>
     @endcannot

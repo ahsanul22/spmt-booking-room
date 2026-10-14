@@ -2,6 +2,8 @@
 
 namespace App\Http\Controllers;
 
+use App\Models\Booking;
+use Carbon\CarbonImmutable;
 use Illuminate\Http\Request;
 use Illuminate\View\View;
 
@@ -10,25 +12,20 @@ class DashboardController extends Controller
     public function __invoke(Request $request): View
     {
         if ($request->user()->can('access-admin')) {
-            return app(\App\Http\Controllers\Admin\DashboardController::class)->index($request);
+            return app(Admin\DashboardController::class)->index($request);
         }
         $user = $request->user()->load('organizationalUnit');
         $stats = [];
 
         if ($user->can('access-pic')) {
-            $today = \Carbon\CarbonImmutable::now(config('booking.timezone'))->toDateString();
+            $today = CarbonImmutable::now(config('booking.timezone'))->toDateString();
             $isAdmin = $user->can('access-admin');
 
             $stats = [
                 [
                     'label' => 'Menunggu approval',
                     'icon' => 'clock',
-                    'value' => \App\Models\Booking::query()
-                        ->where('requires_approval', true)
-                        ->where('status', 'pending')
-                        ->when(! $isAdmin, fn ($query) => $query
-                            ->whereHas('room.pics', fn ($pics) => $pics->where('users.id', $user->id)))
-                        ->count(),
+                    'value' => $user->pendingApprovalsCount(),
                     'description' => 'Pengajuan perlu ditinjau',
                 ],
                 [
@@ -40,7 +37,7 @@ class DashboardController extends Controller
                 [
                     'label' => 'Jadwal hari ini',
                     'icon' => 'calendar',
-                    'value' => \App\Models\Booking::query()
+                    'value' => Booking::query()
                         ->where('date', $today)
                         ->whereIn('status', ['pending', 'approved', 'completed'])
                         ->when(! $isAdmin, fn ($query) => $query

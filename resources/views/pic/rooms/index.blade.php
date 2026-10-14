@@ -8,7 +8,15 @@
             <h1 class="text-3xl font-bold text-primaryDark sm:text-4xl">Ruangan Saya</h1>
             <p class="mt-3 text-base leading-6 text-slate-600">Informasi dan jadwal ruangan yang menjadi tanggung jawab Anda. Tinjau penggunaannya sebelum memberikan keputusan pengajuan.</p>
         </div>
-        <a href="{{ route('pic.approvals.index') }}" class="workspace-button"><x-schedule-icon name="clock" class="h-4 w-4" />Permintaan Approval</a>
+        <a href="{{ route('pic.approvals.index') }}" class="workspace-button inline-flex items-center gap-2">
+            <x-schedule-icon name="clock" class="h-4 w-4" />
+            <span>Permintaan Approval</span>
+            @if(($pendingApprovalsCount ?? 0) > 0)
+                <span class="inline-flex items-center justify-center rounded-full bg-danger px-2 py-0.5 text-xs font-bold text-white shadow-sm" aria-label="{{ $pendingApprovalsCount }} permintaan approval baru">
+                    {{ $pendingApprovalsCount > 99 ? '99+' : $pendingApprovalsCount }}
+                </span>
+            @endif
+        </a>
     </div>
     <div class="mb-6 flex flex-wrap items-center justify-between gap-3 rounded-2xl border border-secondaryLight bg-secondaryLight/20 p-5">
         <p class="text-base font-semibold text-primaryDark">{{ $rooms->total() }} ruangan ditugaskan kepada Anda</p>
