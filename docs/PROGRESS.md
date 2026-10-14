@@ -2,7 +2,12 @@
 
 ## Last Update
 
-2026-10-13 - Persiapan commit dan push seluruh perubahan dalam sepuluh commit berdasarkan fungsi.
+2026-10-14 - Badge notifikasi angka pada menu Permintaan Approval PIC dan Approval Ruangan Admin.
+
+- Ditambahkan badge angka notifikasi pada menu navigasi sidebar "Permintaan Approval" untuk PIC (dan "Approval Ruangan" untuk Admin) saat ada pengajuan booking yang memerlukan persetujuan (`status = 'pending'`, `requires_approval = true`). Badge juga tersedia pada tombol Permintaan Approval di halaman Ruangan Saya (`pic/rooms/index.blade.php`) dan shortcut dashboard (`shared/dashboard-shortcuts.blade.php`).
+- Logika hitung dienkapsulasi pada method `User::pendingApprovalsCount()` dengan memoization per-request, dan dialirkan ke views menggunakan View Composer di `AppServiceProvider` sehingga tidak ada query database di dalam template Blade. Badge hanya ditampilkan jika jumlah pengajuan pending > 0 (format 99+ jika lebih dari 99) dan menggunakan token Tailwind `bg-danger` dengan label aksesibilitas aria.
+- Verifikasi aktual: test baru `PicApprovalNotificationBadgeTest` lulus (3 tests, 20 assertions, 1m28.9s); `PicDashboardBannerTest` lulus (1 test, 36 assertions, 34.1s); `php vendor/bin/pint` passed; `view:cache` dan `view:clear` berhasil; `git diff --check` tanpa whitespace/error.
+
 
 - Review menemukan field wajib `access_type` dikomentari pada form ruangan; input dipulihkan agar create/update tetap dapat mengirim nilai yang diwajibkan backend.
 - Verifikasi aktual: `npm run build` berhasil; test `test_create_persists_room_and_facilities_and_renders_database_fields` lulus (1 test, 33 assertions); `php artisan view:cache` berhasil dan cache view dibersihkan. `git diff --check` berhasil. Full test suite tidak diulang pada tahap push ini.
