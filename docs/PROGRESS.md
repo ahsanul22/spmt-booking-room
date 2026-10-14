@@ -2,6 +2,12 @@
 
 ## Last Update
 
+2026-10-14 - Investigasi error pengajuan booking, menunggu teks error/ruangan.
+
+- Koneksi database berhasil dan seluruh 18 migration berstatus Ran. Log Laravel terakhir bertanggal 13 Oktober; belum ada exception baru yang dapat dikaitkan dengan laporan pengguna.
+- Audit read-only menemukan 2A, 3A, 3B, 4A, 4B, 6A, dan 6B membutuhkan approval tetapi belum mempunyai PIC aktif. BookingService menolak pengajuan kondisi tersebut dengan pesan `PIC aktif belum ditetapkan`. Penugasan akun tetap menunggu pilihan sesuai DEC-045; belum mengubah data atau aturan approval.
+- Verifikasi aktual: `test_livewire_submission_persists_approved_booking_and_redirects_to_real_detail` lulus (1 test, 16 assertions, 35.68s), memakai schema PostgreSQL terisolasi. Belum mengubah kode karena pesan error dan ruangan yang terdampak belum diketahui.
+
 2026-10-13 - Persiapan commit dan push seluruh perubahan dalam sepuluh commit berdasarkan fungsi.
 
 - Review menemukan field wajib `access_type` dikomentari pada form ruangan; input dipulihkan agar create/update tetap dapat mengirim nilai yang diwajibkan backend.
