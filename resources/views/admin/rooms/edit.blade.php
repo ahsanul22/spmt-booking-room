@@ -16,7 +16,7 @@
             <x-workspace-status :active="$room->is_active" />
         </div>
         <nav aria-label="Bagian pengaturan ruangan" class="mt-5 flex flex-wrap gap-2 border-t border-slate-100 pt-4">
-            @foreach(['room-data' => 'Informasi', 'facilities' => 'Fasilitas', 'pics' => 'PIC', 'access' => 'Akses'] as $section => $label)
+            @foreach(['room-data' => 'Informasi', 'booking-options' => 'Opsi Lanjutan', 'facilities' => 'Fasilitas', 'pics' => 'PIC', 'access' => 'Akses'] as $section => $label)
                 <a href="#{{ $section }}" class="inline-flex min-h-[44px] items-center rounded-lg bg-background px-4 py-2 text-base font-semibold text-primaryDark hover:bg-secondaryLight/30 focus-visible:outline focus-visible:outline-2 focus-visible:outline-primary">{{ $label }}</a>
             @endforeach
         </nav>
@@ -26,7 +26,7 @@
         @method('PUT')
         @include('admin.rooms._edit-form')
         <div class="flex flex-wrap items-center justify-between gap-4 rounded-2xl border border-slate-200 bg-surface p-5 sm:px-6">
-            <p class="text-sm leading-5 text-slate-600">Simpan informasi, fasilitas, dan pengaturan operasional di sini.</p>
+            <p class="text-sm leading-5 text-slate-600">Simpan informasi, opsi lanjutan booking, fasilitas, dan pengaturan operasional di sini.</p>
             <div class="flex flex-wrap gap-3"><a class="workspace-button-secondary" href="{{ route('admin.rooms.index') }}">Batal</a><button class="workspace-button" type="submit">Simpan Perubahan</button></div>
         </div>
     </form>

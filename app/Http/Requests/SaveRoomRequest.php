@@ -43,6 +43,7 @@ class SaveRoomRequest extends FormRequest
         return [
             'name' => 'nama ruangan', 'code' => 'kode ruangan', 'floor_id' => 'lantai',
             'capacity' => 'kapasitas', 'description' => 'deskripsi', 'access_type' => 'jenis akses',
+            'allows_meeting_preparation' => 'opsi lanjutan booking',
             'requires_approval' => 'kebutuhan approval', 'status' => 'status operasional',
             'is_active' => 'status aktif', 'facility_ids' => 'fasilitas', 'facility_ids.*' => 'fasilitas',
         ];

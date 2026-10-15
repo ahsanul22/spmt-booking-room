@@ -29,10 +29,7 @@
     <option value="1" @selected((string) old('requires_approval', isset($room) ? (int) $room->requires_approval : 0) === '1')>Ya</option>
     <option value="0" @selected((string) old('requires_approval', isset($room) ? (int) $room->requires_approval : 0) === '0')>Tidak</option>
 </x-workspace-field>
-<x-workspace-field type="select" name="allows_meeting_preparation" label="Persiapan Rapat" required>
-    <option value="1" @selected((string) old('allows_meeting_preparation', isset($room) ? (int) $room->allows_meeting_preparation : 0) === '1')>Aktif (peserta dan konsumsi opsional)</option>
-    <option value="0" @selected((string) old('allows_meeting_preparation', isset($room) ? (int) $room->allows_meeting_preparation : 0) === '0')>Tidak aktif</option>
-</x-workspace-field>
+
 <x-workspace-field type="select" name="status" label="Status Operasional" required>
     <option value="">Pilih Status Operasional</option>
     <option value="available" @selected(old('status', data_get($room ?? null, 'status', 'available')) === 'available')>Operasional</option>
@@ -48,6 +45,18 @@
 </div>
 </x-workspace-panel>
 </div>
+<fieldset id="booking-options" class="scroll-mt-6 min-w-0 rounded-2xl border border-slate-200 bg-surface p-5 shadow-sm sm:p-6" aria-describedby="booking-options-hint">
+    <legend class="sr-only">Opsi Lanjutan Booking</legend>
+    <h2 class="text-lg font-bold text-primaryDark">Opsi Lanjutan Booking</h2>
+    <p id="booking-options-hint" class="mt-2 text-base leading-6 text-slate-600">Tentukan apakah pegawai boleh mengisi jumlah peserta dan meminta konsumsi saat booking ruangan ini.</p>
+    <input type="hidden" name="allows_meeting_preparation" value="0">
+    <label for="allows-meeting-preparation" class="mt-5 flex cursor-pointer items-start gap-3 rounded-xl border border-slate-200 bg-background/40 p-4 focus-within:ring-2 focus-within:ring-primary/30">
+        <input id="allows-meeting-preparation" type="checkbox" name="allows_meeting_preparation" value="1" @checked((string) old('allows_meeting_preparation', isset($room) ? (int) $room->allows_meeting_preparation : 0) === '1') aria-describedby="booking-options-help{{ $errors->has('allows_meeting_preparation') ? ' booking-options-error' : '' }}" aria-invalid="{{ $errors->has('allows_meeting_preparation') ? 'true' : 'false' }}" class="mt-1 h-5 w-5 shrink-0 rounded border-slate-300 text-primary focus:ring-primary">
+        <span class="min-w-0"><span class="block text-base font-semibold text-primaryDark">Tampilkan jumlah peserta dan permintaan konsumsi</span><span id="booking-options-help" class="mt-2 block text-sm leading-6 text-slate-600">Jika dicentang, pegawai dapat membuka persiapan rapat dan memilih Snack, Makanan, atau keduanya. Jika tidak dicentang, bagian ini tidak tersedia pada form booking ruangan.</span></span>
+    </label>
+    @error('allows_meeting_preparation')<p id="booking-options-error" role="alert" class="mt-3 text-base text-danger">{{ $message }}</p>@enderror
+    <p class="mt-4 text-sm leading-6 text-slate-600">Konsumsi yang diminta tetap memerlukan persetujuan PIC/Admin. Pengaturan berlaku setelah formulir ruangan disimpan; riwayat pengajuan tetap tersimpan.</p>
+</fieldset>
 <fieldset id="facilities" class="scroll-mt-6 min-w-0 rounded-2xl border border-slate-200 bg-surface p-5 shadow-sm sm:p-6" aria-describedby="facilities-hint{{ $errors->has('facility_ids') || $errors->has('facility_ids.*') ? ' facilities-error' : '' }}">
     <legend class="sr-only">Fasilitas Ruangan</legend>
     <h2 class="mb-2 text-lg font-bold text-primaryDark">Fasilitas Ruangan</h2>
