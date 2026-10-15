@@ -3,12 +3,40 @@
         <div><p class="mb-2 text-base font-semibold text-primary">Langkah 2 dari 2 &middot; Detail pertemuan</p><h1 class="text-3xl font-bold text-primaryDark">Booking Ruangan</h1></div>
         <a href="{{ route('rooms.index') }}" class="workspace-button-secondary">Kembali ke pilihan ruangan</a>
     </div>
+    <section aria-labelledby="booking-schedule-title" class="mb-6 overflow-hidden rounded-2xl border border-slate-200 bg-surface">
+        <h2 id="booking-schedule-title" class="px-5 pt-5 text-lg font-bold text-primaryDark sm:px-6">Jadwal Ruangan Ini</h2>
+        <div class="space-y-4 p-5 sm:p-6">
+            <div class="flex flex-wrap items-end gap-3">
+                <div class="w-full sm:w-60"><x-workspace-field wire:model.live="date" name="date" label="Tanggal booking (WIB)" type="date" :min="$earliestStart->format('Y-m-d')" :value="$date" required /></div>
+                @if($scheduleDateValid)<a href="{{ route('schedule.index', ['room_id' => $room->id, 'date' => $date]) }}" target="_blank" rel="noopener" class="workspace-button-secondary"><x-schedule-icon name="calendar" class="h-5 w-5" />Lihat kalender<span class="sr-only"> ruangan (tab baru)</span></a>@endif
+            </div>
+            @if($scheduleDateValid)
+                <div class="max-h-64 overflow-y-auto rounded-xl" tabindex="0" role="region" aria-label="Jam penggunaan ruangan">@include('shared.schedule-slots', ['slots' => $daySlots])</div>
+
+            @else
+                <p class="text-base text-slate-600">Pilih tanggal yang valid untuk melihat jadwal ruangan.</p>
+            @endif
+            <div class="space-y-3">
+                <button type="button" wire:click="addDate" wire:loading.attr="disabled" class="workspace-button-secondary">+ Tambah booking</button>
+                <p class="text-sm text-slate-600">Tambah booking untuk hari lain dengan jam, agenda, peserta, dan permintaan konsumsi yang sama. Setiap booking ditinjau terpisah. Jika satu jadwal bermasalah, seluruh pengajuan belum disimpan.</p>
+                @foreach($additionalDates as $index => $extraDate)
+                    <div wire:key="extra-date-{{ $index }}" class="flex flex-wrap items-end gap-3">
+                        <x-workspace-field wire:model.live="additionalDates.{{ $index }}" name="additionalDates.{{ $index }}" label="Tanggal booking {{ $index + 2 }}" type="date" :min="$earliestStart->format('Y-m-d')" required />
+                        <button type="button" wire:click="removeDate({{ $index }})" class="workspace-button-secondary" aria-label="Hapus booking {{ $index + 2 }}">Hapus</button>
+                        @if($extraDate)<a href="{{ route('schedule.index', ['room_id' => $room->id, 'date' => $extraDate]) }}" target="_blank" rel="noopener" class="font-semibold text-primary underline">Lihat jadwal<span class="sr-only"> (tab baru)</span></a>@endif
+                    </div>
+                @endforeach
+                @error('additionalDates')<p role="alert" class="text-danger">{{ $message }}</p>@enderror
+            </div>
+            {{-- <p class="text-base leading-6 text-slate-600">Diperbarui otomatis &middot; {{ $scheduleUpdatedAt }} WIB.</p> --}}
+        </div>
+    </section>
     <div class="grid items-start gap-6 lg:grid-cols-[minmax(0,1fr)_320px]">
         <div class="min-w-0 lg:order-2">
             <x-workspace-panel title="Ruangan pilihan">
                 <div class="space-y-4 p-5 sm:p-6">
                     <div><h2 class="break-words text-xl font-bold text-primaryDark">{{ $room->name }}</h2><p class="mt-2 text-base text-slate-600">{{ $room->floor?->name ?? 'Lantai belum ditentukan' }}</p></div>
-                    <p class="text-base leading-6 text-slate-600">{{ $room->requires_approval ? 'Pengajuan memerlukan persetujuan PIC.' : 'Ruangan tidak memerlukan persetujuan PIC.' }}</p>
+                    <p class="text-base leading-6 text-slate-600">{{ $room->requires_approval ? 'Pengajuan memerlukan persetujuan PIC.' : 'Ruangan dapat langsung dibooking. Permintaan konsumsi tetap memerlukan review PIC / Admin.' }}</p>
                     <div class="border-t border-slate-100 pt-4 text-base">
                         <h3 class="font-semibold text-primaryDark">Fasilitas ruangan</h3>
                         @if($room->facilities->isNotEmpty())
@@ -32,22 +60,6 @@
                 <div role="alert" class="mb-5 rounded-xl border border-danger/30 bg-surface p-5 text-base leading-6 text-danger">{{ $unavailableReason }} <a href="{{ route('rooms.index') }}" class="font-semibold underline">Pilih ruangan lain</a></div>
             @endif
             <div class="overflow-hidden rounded-2xl border border-slate-200 bg-surface">
-                <section aria-labelledby="booking-schedule-title" class="border-b border-slate-200">
-                    <h2 id="booking-schedule-title" class="px-5 pt-5 text-lg font-bold text-primaryDark sm:px-6">Jadwal Ruangan Ini</h2>
-                    <div class="space-y-4 p-5 sm:p-6">
-                        <div class="flex flex-wrap items-end gap-3">
-                            <div class="w-full sm:w-60"><x-workspace-field wire:model.live="date" name="date" label="Tanggal booking (WIB)" type="date" :min="$earliestStart->format('Y-m-d')" :value="$date" required /></div>
-                            @if($scheduleDateValid)<a href="{{ route('schedule.index', ['room_id' => $room->id, 'date' => $date]) }}" target="_blank" rel="noopener" class="workspace-button-secondary"><x-schedule-icon name="calendar" class="h-5 w-5" />Lihat kalender<span class="sr-only"> ruangan (tab baru)</span></a>@endif
-                        </div>
-                        @if($scheduleDateValid)
-                            <div class="max-h-64 overflow-y-auto rounded-xl" tabindex="0" role="region" aria-label="Jam penggunaan ruangan">@include('shared.schedule-slots', ['slots' => $daySlots])</div>
-
-                        @else
-                            <p class="text-base text-slate-600">Pilih tanggal yang valid untuk melihat jadwal ruangan.</p>
-                        @endif
-                        {{-- <p class="text-base leading-6 text-slate-600">Diperbarui otomatis &middot; {{ $scheduleUpdatedAt }} WIB.</p> --}}
-                    </div>
-                </section>
                 <div class="px-5 pt-5 sm:px-6"><h2 class="text-lg font-bold text-primaryDark">Detail Pertemuan</h2></div>
                 <form wire:submit="submitBooking" method="POST" action="{{ route('rooms.book', $room) }}" class="workspace-form">
                     @csrf
@@ -111,12 +123,19 @@
                                             <x-workspace-field wire:model="participant_count" type="number" name="participant_count" label="Perkiraan Jumlah Peserta" min="1" max="2147483647" step="1" hint="Jumlah orang yang diperkirakan hadir." required />
                                             <div class="min-w-0">
                                                 <p id="consumption-label" class="mb-2 text-base font-semibold text-primaryDark">Kebutuhan Konsumsi</p>
-                                                <label for="needs-consumption" class="flex min-h-[44px] cursor-pointer items-center gap-3 rounded-lg border border-slate-300 bg-surface px-3 py-2 transition hover:border-primary focus-within:ring-2 focus-within:ring-primary/30">
-                                                    <input id="needs-consumption" type="checkbox" wire:model="needs_consumption" name="needs_consumption" aria-describedby="consumption-help{{ $errors->has('needs_consumption') ? ' consumption-error' : '' }}" aria-invalid="{{ $errors->has('needs_consumption') ? 'true' : 'false' }}" class="h-5 w-5 shrink-0 rounded border-slate-300 text-primary focus:ring-primary focus:ring-offset-2">
-                                                    <span class="text-base leading-6 text-text">Perlu konsumsi</span>
-                                                </label>
-                                                <p id="consumption-help" class="mt-2 text-sm leading-5 text-slate-600">Centang jika rapat membutuhkan konsumsi.</p>
-                                                @error('needs_consumption')<p id="consumption-error" role="alert" class="mt-2 text-base text-danger">{{ $message }}</p>@enderror
+                                                <div class="space-y-2">
+                                                    <label for="consumption-snack" class="flex min-h-[44px] cursor-pointer items-center gap-3 rounded-lg border border-slate-300 bg-surface px-3 py-2 transition hover:border-primary focus-within:ring-2 focus-within:ring-primary/30">
+                                                        <input id="consumption-snack" type="checkbox" wire:model.live="consumption_snack" name="consumption_snack" aria-describedby="consumption-help{{ $errors->has('consumption_snack') ? ' consumption-snack-error' : '' }}" aria-invalid="{{ $errors->has('consumption_snack') ? 'true' : 'false' }}" class="h-5 w-5 shrink-0 rounded border-slate-300 text-primary focus:ring-primary focus:ring-offset-2">
+                                                        <span class="text-base leading-6 text-text">Snack</span>
+                                                    </label>
+                                                    <label for="consumption-meal" class="flex min-h-[44px] cursor-pointer items-center gap-3 rounded-lg border border-slate-300 bg-surface px-3 py-2 transition hover:border-primary focus-within:ring-2 focus-within:ring-primary/30">
+                                                        <input id="consumption-meal" type="checkbox" wire:model.live="consumption_meal" name="consumption_meal" aria-describedby="consumption-help{{ $errors->has('consumption_meal') ? ' consumption-meal-error' : '' }}" aria-invalid="{{ $errors->has('consumption_meal') ? 'true' : 'false' }}" class="h-5 w-5 shrink-0 rounded border-slate-300 text-primary focus:ring-primary focus:ring-offset-2">
+                                                        <span class="text-base leading-6 text-text">Makanan</span>
+                                                    </label>
+                                                </div>
+                                                <p id="consumption-help" class="mt-2 text-sm leading-5 text-slate-600">Centang jenis konsumsi yang dibutuhkan untuk rapat.</p>
+                                                @error('consumption_snack')<p id="consumption-snack-error" role="alert" class="mt-2 text-base text-danger">{{ $message }}</p>@enderror
+                                                @error('consumption_meal')<p id="consumption-meal-error" role="alert" class="mt-2 text-base text-danger">{{ $message }}</p>@enderror
                                             </div>
                                         </div>
                                         <p class="border-t border-slate-200 pt-4 text-sm leading-6 text-slate-600">Kebutuhan konsumsi akan ditinjau PIC, belum merupakan konfirmasi penyediaan.</p>
@@ -130,10 +149,15 @@
                         <div x-show="!changed" role="status" class="rounded-xl border border-secondaryLight bg-background p-4 text-base leading-6 text-primaryDark sm:col-span-2">Waktu dan isian lolos pemeriksaan saat ini. <strong>Ruangan belum dipesan.</strong> Klik tombol booking di bawah; ketersediaan akan diperiksa ulang saat dikirim.</div>
                     @endif
                     <p wire:offline class="text-danger sm:col-span-2">Koneksi terputus. Isian tetap di halaman ini; sambungkan kembali sebelum memeriksa rencana.</p>
-                    <div class="workspace-form-actions">
-                        <button type="button" wire:click="checkPlan" wire:loading.attr="disabled" @disabled($unavailableReason) class="workspace-button-secondary disabled:cursor-not-allowed disabled:opacity-50">Periksa Rencana</button>
-                        <button type="submit" wire:loading.attr="disabled" @disabled($unavailableReason) class="workspace-button disabled:cursor-not-allowed disabled:opacity-50">{{ $room->requires_approval ? 'Ajukan Booking' : 'Booking Sekarang' }}</button>
-                        <span wire:loading role="status" class="text-base text-primary">Memeriksa rencana...</span>
+                    <div class="booking-form-actions">
+                        <div class="grid gap-3 sm:grid-cols-2">
+                            <button type="button" wire:click="checkPlan" wire:loading.attr="disabled" @disabled($unavailableReason) class="workspace-button-secondary booking-form-button disabled:cursor-not-allowed disabled:opacity-50">Periksa Rencana</button>
+                            <button type="submit" wire:loading.attr="disabled" @disabled($unavailableReason) class="workspace-button booking-form-button border border-transparent disabled:cursor-not-allowed disabled:opacity-50">{{ ($room->requires_approval || $consumption_snack || $consumption_meal) ? 'Ajukan Booking' : 'Booking Sekarang' }}</button>
+                        </div>
+                        <div role="status" aria-live="polite" aria-atomic="true" class="mt-3 min-h-[24px] text-sm leading-6 text-primary">
+                            <span wire:loading.delay wire:target="checkPlan">Memeriksa rencana...</span>
+                            <span wire:loading.delay wire:target="submitBooking">Mengirim pengajuan booking...</span>
+                        </div>
                     </div>
                     {{-- <p id="submit-help">Ketersediaan diperiksa kembali saat booking dikirim.</p> --}}
                     <noscript><p>Aktifkan JavaScript untuk memeriksa dan mengirim booking.</p></noscript>

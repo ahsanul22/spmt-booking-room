@@ -32,11 +32,12 @@ class BookingPreparation
 
     public function validate(array $data, ?Room $room = null): array
     {
-        $data += ['meeting_preparation' => false, 'participant_count' => null, 'needs_consumption' => false];
+        $data += ['meeting_preparation' => false, 'participant_count' => null, 'consumption_snack' => false, 'consumption_meal' => false];
         $enabled = in_array($data['meeting_preparation'], [true, 1, '1'], true);
         if (! $enabled) {
             $data['participant_count'] = null;
-            $data['needs_consumption'] = false;
+            $data['consumption_snack'] = false;
+            $data['consumption_meal'] = false;
         }
         $data['agenda'] = is_string($data['agenda'] ?? null) ? trim($data['agenda']) : ($data['agenda'] ?? null);
         $validator = Validator::make($data, [
@@ -51,7 +52,8 @@ class BookingPreparation
                 }
             }],
             'participant_count' => [$enabled ? 'required' : 'nullable', 'integer', 'between:1,2147483647'],
-            'needs_consumption' => ['required', 'boolean'],
+            'consumption_snack' => ['required', 'boolean'],
+            'consumption_meal' => ['required', 'boolean'],
         ], [
             'required' => ':attribute wajib diisi.',
             'date_format' => 'Format :attribute tidak valid.',
@@ -59,7 +61,7 @@ class BookingPreparation
         ], [
             'date' => 'Tanggal', 'start_time' => 'Jam mulai', 'end_time' => 'Jam selesai',
             'agenda' => 'Agenda', 'notes' => 'Catatan',
-            'participant_count' => 'Jumlah peserta', 'meeting_preparation' => 'Persiapan rapat', 'needs_consumption' => 'Kebutuhan konsumsi',
+            'participant_count' => 'Jumlah peserta', 'meeting_preparation' => 'Persiapan rapat', 'consumption_snack' => 'Konsumsi snack', 'consumption_meal' => 'Konsumsi makan',
         ]);
         $validator->after(function ($validator) use ($data) {
             if ($validator->errors()->hasAny(['date', 'start_time', 'end_time'])) {

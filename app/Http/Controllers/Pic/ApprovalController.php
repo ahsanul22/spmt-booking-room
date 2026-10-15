@@ -53,6 +53,8 @@ class ApprovalController extends Controller
             $request->merge(['rejection_reason' => $request->input('decision_notes')]);
         }
         $data = $request->validate([
+            'approved_consumption_snack' => ['sometimes', 'boolean'],
+            'approved_consumption_meal' => ['sometimes', 'boolean'],
             'decision' => ['required', 'in:approved,rejected'],
             'decision_notes' => ['nullable', 'string', 'max:2000'],
             'return_to' => ['nullable', 'in:list,detail'],
@@ -63,7 +65,7 @@ class ApprovalController extends Controller
             'rejection_reason.max' => 'Alasan penolakan maksimal 2.000 karakter.',
         ]);
         $booking = $this->query($request)->findOrFail($approval);
-        $service->decide($request->user(), $booking, $data['decision'], $data['rejection_reason'] ?? null);
+        $service->decide($request->user(), $booking, $data['decision'], $data['rejection_reason'] ?? null, $request->only(['approved_consumption_snack', 'approved_consumption_meal']));
         $prefix = $this->routePrefix($request);
         $destination = route($prefix.'.show', $booking->id);
         if (($data['return_to'] ?? 'detail') === 'list') {

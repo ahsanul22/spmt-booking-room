@@ -61,6 +61,8 @@
     .workspace-form { @apply grid gap-5 p-5 sm:grid-cols-2 sm:p-6; }
     .workspace-form > p { @apply text-base leading-6 text-slate-600 sm:col-span-2; }
     .workspace-form-actions { @apply flex flex-wrap gap-3 border-t border-slate-100 pt-5 sm:col-span-2; }
+    .booking-form-actions { @apply border-t border-slate-100 pt-5 sm:col-span-2; }
+    .booking-form-actions .booking-form-button { @apply h-12 w-full rounded-xl px-5 py-2.5 text-base leading-6; }
     .workspace-record-actions { @apply flex flex-wrap items-center gap-2; }
     .workspace-record-actions a, .workspace-record-actions button { @apply inline-flex min-h-[44px] items-center rounded-lg border border-slate-200 px-3 py-2 text-sm font-semibold text-primary hover:bg-background; }
     .workspace-detail { @apply grid gap-5 text-base sm:grid-cols-2; }

@@ -23,6 +23,26 @@ class BookingPreparationForm extends Component
 
     public string $date = '';
 
+    public array $additionalDates = [];
+
+    public function addDate(): void
+    {
+        if (count($this->additionalDates) >= 365) {
+            $this->addError('additionalDates', 'Maksimal 365 tanggal tambahan per pengajuan.');
+
+            return;
+        }
+        $this->additionalDates[] = '';
+        $this->checked = false;
+    }
+
+    public function removeDate(int $index): void
+    {
+        unset($this->additionalDates[$index]);
+        $this->additionalDates = array_values($this->additionalDates);
+        $this->checked = false;
+    }
+
     public string $start_time = '';
 
     public string $end_time = '';
@@ -39,7 +59,9 @@ class BookingPreparationForm extends Component
 
     public $participant_count = null;
 
-    public bool $needs_consumption = false;
+    public bool $consumption_snack = false;
+
+    public bool $consumption_meal = false;
 
     #[Locked]
     public bool $checked = false;
@@ -62,7 +84,8 @@ class BookingPreparationForm extends Component
         $this->resetValidation();
         if ($property === 'meeting_preparation' && ! $this->meeting_preparation) {
             $this->participant_count = null;
-            $this->needs_consumption = false;
+            $this->consumption_snack = false;
+            $this->consumption_meal = false;
         }
         if ($property === 'end_time') {
             $this->duration = 'custom';
@@ -100,9 +123,22 @@ class BookingPreparationForm extends Component
 
             return;
         }
-        $preparation->validate($this->only(['date', 'start_time', 'end_time', 'agenda', 'notes', 'meeting_preparation', 'participant_count', 'needs_consumption']), $room);
-        app(BookingService::class)->assertPicAvailable($room);
+        $preparation->validate($this->only(['date', 'start_time', 'end_time', 'agenda', 'notes', 'meeting_preparation', 'participant_count', 'consumption_snack', 'consumption_meal']), $room);
+        $approvalRoom = clone $room;
+        $approvalRoom->requires_approval = $room->requires_approval || $this->consumption_snack || $this->consumption_meal;
+        app(BookingService::class)->assertPicAvailable($approvalRoom);
         app(BookingService::class)->assertNoConflict($room->id, $this->only(['date', 'start_time', 'end_time']));
+        $this->validate(['additionalDates' => ['array', 'max:365'], 'additionalDates.*' => ['required', 'date_format:Y-m-d', 'distinct']]);
+        if (in_array($this->date, $this->additionalDates, true)) {
+            $this->addError('additionalDates', 'Tanggal booking tidak boleh berulang.');
+
+            return;
+        }
+        foreach ($this->additionalDates as $date) {
+            $data = array_replace($this->only(['date', 'start_time', 'end_time', 'agenda', 'notes', 'meeting_preparation', 'participant_count', 'consumption_snack', 'consumption_meal']), ['date' => $date]);
+            $preparation->validate($data, $room);
+            app(BookingService::class)->assertNoConflict($room->id, $data);
+        }
         $this->checked = true;
         $this->dispatch('plan-checked');
     }
@@ -112,8 +148,10 @@ class BookingPreparationForm extends Component
         $this->checked = false;
         $this->resetValidation();
         $this->prepareTime();
-        $booking = $service->submit(auth()->user(), $this->roomId,
-            $this->only(['date', 'start_time', 'end_time', 'agenda', 'notes', 'meeting_preparation', 'participant_count', 'needs_consumption']), $this->submissionToken);
+        $this->validate(['additionalDates' => ['array', 'max:365'], 'additionalDates.*' => ['required', 'date_format:Y-m-d', 'distinct']]);
+        $booking = $service->submitMany(auth()->user(), $this->roomId,
+            $this->only(['date', 'start_time', 'end_time', 'agenda', 'notes', 'meeting_preparation', 'participant_count', 'consumption_snack', 'consumption_meal']), $this->submissionToken, $this->additionalDates);
+        session()->flash('booking_series_count', 1 + count($this->additionalDates));
         session()->flash('status', $booking->status === 'approved'
             ? 'Booking berhasil. Ruangan telah dipesan.' : 'Pengajuan berhasil dikirim. Menunggu persetujuan PIC.');
         $this->redirectRoute('my-bookings.show', ['booking' => $booking->id]);

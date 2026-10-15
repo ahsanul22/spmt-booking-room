@@ -57,7 +57,7 @@ class BookingWhatsapp
     {
         $event = match (true) {
             $booking->status === 'pending' => 'approval_request',
-            $booking->status === 'approved' && $booking->meeting_preparation && $booking->needs_consumption => 'consumption',
+            $booking->status === 'approved' && $booking->meeting_preparation && ($booking->approved_consumption_snack || $booking->approved_consumption_meal) => 'consumption',
             default => null,
         };
         if ($event === null) {
@@ -71,7 +71,7 @@ class BookingWhatsapp
         foreach ($this->recipients($booking, $event, $template)->unique('whatsapp_number') as $recipient) {
             WhatsappMessage::firstOrCreate([
                 'booking_id' => $booking->id, 'event' => $event, 'number' => $recipient->whatsapp_number,
-            ], ['recipient_user_id' => $recipient->id, 'message' => $this->render($booking, $template->body, $recipient)]);
+            ], ['recipient_user_id' => $recipient->id, 'message' => $this->render($booking, $template->body, $recipient).($event === 'consumption' ? "\nKonsumsi disetujui: ".collect([$booking->approved_consumption_snack ? 'Snack' : null, $booking->approved_consumption_meal ? 'Makanan' : null])->filter()->implode(', ') : '')]);
         }
     }
 

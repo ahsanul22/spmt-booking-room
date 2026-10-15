@@ -1,5 +1,6 @@
 <x-workspace-panel title="Detail Booking #{{ $booking->id }}">
     <div class="p-5 sm:p-6">
+        @if(session('booking_series_count', 1) > 1)<p role="status" class="mb-4 text-base text-primaryDark">{{ session('booking_series_count') }} booking berhasil diajukan. Lihat seluruh tanggal di <a class="font-semibold underline" href="{{ route('my-bookings.index') }}">My Booking</a>.</p>@endif
         <div class="mb-6"><x-booking-status :status="$booking->status" />
             <p class="mt-3 text-base leading-6 text-slate-600">{{ match($booking->status) { 'approved' => 'Booking dikonfirmasi. Gunakan ruangan sesuai jadwal.', 'pending' => 'Menunggu persetujuan PIC atau Admin. Slot waktu ditahan selama pengajuan Pending; belum berarti disetujui.', 'rejected' => 'Pengajuan ditolak. Slot waktu sudah dilepas.', default => 'Lihat status dan jadwal booking di bawah.' } }}</p>
         </div>

@@ -63,7 +63,7 @@ class WhatsappManagementTest extends PostgresTestCase
 
         return app(BookingService::class)->submit($this->account(User::ROLE_USER), $room->id, [
             'date' => $date, 'start_time' => '10:00', 'end_time' => '11:00', 'agenda' => 'Rapat <script>alert(1)</script>',
-            'meeting_preparation' => true, 'participant_count' => 8, 'needs_consumption' => true,
+            'meeting_preparation' => true, 'participant_count' => 8, 'consumption_snack' => true, 'consumption_meal' => true,
         ], (string) Str::uuid());
     }
 
@@ -144,7 +144,7 @@ class WhatsappManagementTest extends PostgresTestCase
         $this->assertSame(2, WhatsappMessage::count());
         $this->assertStringContainsString('/admin/approvals/', WhatsappMessage::where('recipient_user_id', $admin->id)->sole()->message);
         $this->assertStringContainsString('/pic/approvals/', WhatsappMessage::where('recipient_user_id', $pic->id)->sole()->message);
-        app(BookingService::class)->decide($pic, $booking, 'approved', null);
+        app(BookingService::class)->decide($pic, $booking, 'approved', null, ['approved_consumption_snack' => true, 'approved_consumption_meal' => true]);
         $consumption = WhatsappMessage::where('event', 'consumption')->sole();
         $this->assertSame($employee->id, $consumption->recipient_user_id);
         $this->assertSame($employee->whatsapp_number, $consumption->number);

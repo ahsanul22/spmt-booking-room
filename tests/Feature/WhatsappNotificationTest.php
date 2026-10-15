@@ -46,7 +46,8 @@ class WhatsappNotificationTest extends PostgresTestCase
         return app(BookingService::class)->submit(User::where('role', User::ROLE_USER)->firstOrFail(), $room->id, [
             'date' => '2026-10-14', 'start_time' => '10:00', 'end_time' => '11:00',
             'agenda' => 'Rapat', 'meeting_preparation' => true, 'participant_count' => 10,
-            'needs_consumption' => $consumption,
+            'consumption_snack' => $consumption,
+            'consumption_meal' => $consumption,
         ], $token);
     }
 
@@ -58,7 +59,7 @@ class WhatsappNotificationTest extends PostgresTestCase
         $this->submit($token);
         $this->assertSame(1, WhatsappMessage::count());
         $this->assertSame('approval_request', WhatsappMessage::sole()->event);
-        app(BookingService::class)->decide(User::where('role', User::ROLE_SUPER_ADMIN)->firstOrFail(), $booking, 'approved', null);
+        app(BookingService::class)->decide(User::where('role', User::ROLE_SUPER_ADMIN)->firstOrFail(), $booking, 'approved', null, ['approved_consumption_snack' => true, 'approved_consumption_meal' => true]);
         $this->assertSame(2, WhatsappMessage::count());
         $this->assertStringContainsString('Perkiraan peserta: 10', WhatsappMessage::where('event', 'consumption')->sole()->message);
         Http::assertNothingSent();
@@ -85,11 +86,12 @@ class WhatsappNotificationTest extends PostgresTestCase
         $this->assertSame(0, Booking::count());
     }
 
-    public function test_auto_approval_creates_consumption_message_and_no_consumption_creates_none(): void
+    public function test_auto_approval_does_not_automatically_approve_consumption(): void
     {
         Room::where('code', 'DEMO-SM')->update(['requires_approval' => false]);
         $this->submit((string) Str::uuid());
-        $this->assertSame('consumption', WhatsappMessage::sole()->event);
+        $this->assertSame('pending', Booking::sole()->status);
+        $this->assertSame('approval_request', WhatsappMessage::sole()->event);
         WhatsappMessage::query()->delete();
         Booking::query()->delete();
         $this->submit((string) Str::uuid(), false);
@@ -101,7 +103,7 @@ class WhatsappNotificationTest extends PostgresTestCase
         $booking = $this->submit((string) Str::uuid());
         $message = WhatsappMessage::sole();
         WhatsappRecipient::query()->update(['is_active' => false]);
-        app(BookingService::class)->decide(User::where('role', User::ROLE_SUPER_ADMIN)->firstOrFail(), $booking, 'approved', null);
+        app(BookingService::class)->decide(User::where('role', User::ROLE_SUPER_ADMIN)->firstOrFail(), $booking, 'approved', null, ['approved_consumption_snack' => true, 'approved_consumption_meal' => true]);
         $this->assertSame(1, WhatsappMessage::count());
         config(['whatsapp.enabled' => true, 'whatsapp.token' => 'test-token']);
         Http::fake();
