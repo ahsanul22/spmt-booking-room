@@ -8,7 +8,7 @@
     </div>
     <div class="workspace-feedback"><x-form-feedback /></div>
     <x-workspace-panel title="Pengajuan Saya">
-        @include('shared.bookings-table', ['detailRoute' => 'my-bookings.show'])
+        @include('shared.bookings-table', ['detailRoute' => 'my-bookings.show', 'showApplicant' => false])
         @if($bookings->isEmpty())<div class="pb-6 text-center"><a href="{{ route('rooms.index') }}" class="workspace-button">Pilih ruangan untuk rapat</a></div>@endif
     </x-workspace-panel>
 @endsection
