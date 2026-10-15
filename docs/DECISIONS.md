@@ -1,5 +1,29 @@
 # Decisions
 
+## DEC-050 - Dashboard Admin berfokus pada administrasi
+
+- Permintaan pengguna 2026-10-15 mengganti ringkasan dan aktivitas booking Admin dengan ringkasan master ruangan/akun/unit, kondisi operasional ruangan aktif, serta kelengkapan PIC aktif dan fasilitas ruangan. Operasional booking harian tetap menjadi fokus dashboard PIC; akses Admin ke jadwal/approval/booking existing dipertahankan.
+- Daftar pengaturan yang perlu dilengkapi hanya mencakup ruangan aktif; PIC harus ber-role room_pic dan aktif. Fasilitas belum diatur berarti relasi fasilitas kosong. Ringkasan menghitung seluruh hasil, daftar menampilkan maksimal lima ruangan dengan tautan Kelola. Kondisi ruangan bukan ukuran okupansi. Tidak mengubah data atau memberi/mencabut penugasan otomatis.
+
+
+## DEC-049 - Review konsumsi dan booking beberapa tanggal
+
+- Permintaan pengguna 2026-10-15 melanjutkan checkbox Snack/Makanan DEC-048. Permintaan disimpan terpisah dari `approved_consumption_snack/meal`; PIC yang ditugaskan atau Admin memilih subset yang disetujui, default kosong. Ruangan boleh disetujui tanpa konsumsi. Konsumsi tidak diminta tidak boleh disetujui; validasi service dan CHECK database menjaga subset. Keputusan final tetap tidak dapat diubah.
+- Permintaan konsumsi mewajibkan review walau ruangan tidak mewajibkan approval; membutuhkan PIC aktif. WhatsApp konsumsi hanya dicatat untuk jenis yang benar-benar disetujui dan menyertakan rinciannya. Booking Approved/Completed existing mempertahankan konsumsi yang sebelumnya sudah dikonfirmasi melalui backfill migration.
+- Tombol Tambah tanggal booking memakai jam/agenda/persiapan sama untuk tanggal terpisah, bukan rapat kontinu lintas tengah malam. Setiap tanggal menjadi booking dan keputusan tersendiri. Simpan seluruh tanggal dalam satu transaksi dengan lock ruangan, validasi akses/jam/bentrok tiap tanggal, dan token idempotensi deterministik; kegagalan satu tanggal membatalkan semuanya. Maksimal 365 tanggal tambahan sebagai batas ukuran request.
+
+## DEC-048 - Pilihan Konsumsi Snack dan Makan
+
+- Permintaan pengguna 2026-10-14 mengganti checkbox tunggal `needs_consumption` (boolean) dengan dua checkbox independen: `consumption_snack` dan `consumption_meal`. Pemohon dapat memilih Snack saja, Makan saja, keduanya, atau tidak sama sekali. Menggantikan model konsumsi ya/tidak pada DEC-040.
+- Kedua kolom boolean default false pada database. CHECK constraint `bookings_preparation_consistent` diperbarui: ketika `meeting_preparation` false, kedua flag konsumsi harus false. Ketika `meeting_preparation` true, kedua flag konsumsi bersifat opsional dan independen.
+- Notifikasi WhatsApp konsumsi terpicu jika salah satu jenis konsumsi dipilih (`consumption_snack OR consumption_meal`), bukan hanya berdasarkan satu boolean. Data booking existing dengan `needs_consumption=true` dimigrasi menjadi keduanya aktif.
+- Detail booking dan dialog review menampilkan jenis konsumsi spesifik (Snack, Makan) alih-alih "Diperlukan/Tidak diperlukan". Ini tetap perkiraan kebutuhan, bukan konfirmasi penyediaan.
+
+## DEC-047 - Penugasan PIC Existing untuk Seluruh Ruangan Saat Ini
+
+- Pengguna pada 2026-10-14 mengizinkan penggunaan akun PIC existing untuk setiap ruangan saat ini, menyelesaikan penundaan penugasan pada DEC-045. Akun aktif satu-satunya, `Room PIC Demo`, ditambahkan melalui RoomAssignmentService ke ruangan yang belum terhubung dengannya; penugasan existing dipertahankan.
+- Berlaku pada database proyek saat penugasan, bukan default otomatis untuk ruangan baru. Role akun dan aturan approval tetap mengikuti pengaturan existing.
+
 ## DEC-046 - Email Unik, Nomor WhatsApp Boleh Bersama
 
 - Konfirmasi pengguna 2026-10-13 membatalkan keunikan nomor pada DEC-045: beberapa akun boleh memakai nomor WhatsApp yang sama, terutama untuk uji coba. Nomor tetap nullable, dinormalisasi dan divalidasi format canonical. Tidak menghapus nomor duplikat existing atau menentukan akun pemilik tunggal.

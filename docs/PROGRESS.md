@@ -2,6 +2,106 @@
 
 ## Last Update
 
+2026-10-15 - Persiapan enam commit terpisah untuk push main.
+
+- Seluruh perubahan source yang belum di-commit dikelompokkan menjadi enam commit: booking beberapa tanggal dan konsumsi dengan persetujuan, opsi lanjutan ruangan, navigasi role, riwayat pribadi, dashboard administrasi, serta dokumentasi keputusan/progress/panduan WhatsApp. Fetch memastikan main semula sejajar origin/main; tidak memerlukan merge atau force push.
+- Verifikasi akhir aktual: npm run build berhasil, Pint --dirty --test passed, Blade cache/clear dan git diff --check berhasil. Test fitur dan audit desktop/mobile menggunakan hasil aktual yang tercatat pada entri sebelumnya; tidak mengulang full suite untuk pekerjaan commit/push. Kegagalan existing FrontendSkeletonTest pada field akses unit tetap terdokumentasi, bukan dinyatakan lulus.
+- Penambahan file dilakukan eksplisit per kelompok; .env/token, data database, public/build, node_modules dan artefak storage audit tidak disertakan. Push keenam commit dilakukan setelah commit dokumentasi dan diverifikasi terhadap origin/main.
+
+
+2026-10-15 - Dashboard administrasi ruangan dan data pengguna (DEC-050).
+
+- Dashboard Admin menghapus Booking hari ini, Menunggu approval, Rapat berlangsung dan Aktivitas Booking. Pengganti: Ruangan terdaftar (beserta jumlah aktif), Akun aktif dan Unit kerja aktif; diagram batang kondisi operasional ruangan aktif; kelengkapan PIC aktif/fasilitas beserta maksimal lima ruangan dan tautan Lengkapi langsung ke pengaturan. Data diambil service AdminDashboard, tanpa query di Blade atau dependency chart baru. Kartu akun pribadi dihapus dari konten; identitas akun tetap di header. Kedua panel administrasi sejajar pada desktop dan bertumpuk di mobile; menu akses existing dipertahankan.
+- Notifikasi WhatsApp menjadi menu terakhir sidebar Administrasi, setelah Fasilitas, pada desktop/mobile. Dashboard PIC/pegawai dan kewenangan booking/approval tidak diubah.
+- Build Vite, Blade cache/clear berhasil. Audit browser fixture dari data controller pada 1440px/390px untuk kondisi terisi dan tanpa ruangan aktif lolos: konten booking lama terhapus, panel administrasi terlihat, urutan WhatsApp terakhir, tanpa overflow, Tab/Escape mobile berfungsi. Screenshot desktop diinspeksi. Audit hanya membaca data aplikasi.
+- Run gabungan awal selesai 8 passed/2 failed, 267 assertions (279,71 detik). Satu kegagalan berasal dari fixture test baru yang belum mengisi capacity wajib; fixture diperbaiki dan test perhitungan administrasi diulang, lulus 1 test/22 assertions (26,86 detik). Test empty state, authorization dan enam kasus FrontendSkeleton lulus pada run gabungan. Satu kegagalan existing tetap pada FrontendSkeletonTest baris 117 karena section akses unit sudah dikomentari sebelum task ini; tidak mengubah bagian atau assertion itu. Pint final lulus.
+
+
+2026-10-15 - Urutan menu WhatsApp dan penyederhanaan Dashboard Admin.
+
+- Notifikasi WhatsApp dipindah tepat setelah Kelola User pada sidebar Administrasi Admin, termasuk navigasi mobile. Route, Gate dan penanda aktif dipertahankan.
+- Panel Kelola Workspace di Dashboard Admin dihapus karena mengulang tautan sidebar. Ringkasan Booking hari ini, Menunggu approval, Rapat berlangsung, serta Aktivitas Booking terbaru dan tautan laporan tetap tersedia; aktivitas kini langsung mengikuti ringkasan. Tidak menambah grafik atau statistik baru tanpa kebutuhan; backend data tetap menggunakan controller existing.
+- Verifikasi aktual: build Vite berhasil setelah hambatan EPERM sandbox ditangani dengan command build yang diizinkan; Blade cache/clear dan diff check berhasil. Audit browser pada 1440px/390px untuk data controller dan fixture kosong memastikan urutan Kelola User lalu Notifikasi WhatsApp, panel shortcut terhapus, tiga ringkasan dan aktivitas tetap tersedia, empty state benar, tanpa overflow, serta keyboard Tab/Escape menu mobile berfungsi. Screenshot desktop diinspeksi; audit hanya baca data aplikasi, tanpa menyimpan booking atau pengaturan.
+- Run AdminDashboardTest, authorization navigasi dan FrontendSkeletonTest selesai: 8 passed, 1 failed, 269 assertions (262,11 detik). Perhitungan dashboard dan authorization lulus. Kegagalan existing tetap pada FrontendSkeletonTest baris 117 yang mengharapkan organizational_unit_ids, sedangkan section akses unit di Kelola Ruangan sudah dikomentari sebelum task; tidak terkait perubahan dashboard/sidebar dan tidak mengubah bagian tersebut atau assertion-nya.
+
+
+2026-10-15 - Hilangkan kolom Pemohon/Unit pada Riwayat pribadi.
+
+- Halaman daftar riwayat pribadi mengirim parameter `showApplicant=false` pada partial tabel bersama; header dan sel Pemohon/Unit tidak dirender. Tabel pribadi berisi Ruangan/Agenda, Tanggal, Waktu, Status, Aksi. Default partial tetap menampilkan pemohon/unit pada daftar Admin dan approval PIC/Admin. Route, pembatasan booking milik sendiri, detail dan pagination dipertahankan.
+- Verifikasi aktual: render Blade fixture dan pemeriksaan DOM memastikan tabel pribadi memiliki 5 header/sel tanpa pemohon/unit, tabel Admin tetap 6 header/sel dengan unit. Blade cache/clear dan diff check berhasil. Test existing privasi booking `test_private_booking_details_cannot_be_read_by_another_employee` lulus (1 test, 8 assertions, 26,89 detik). Build aset dan audit browser tidak diulang karena tidak ada perubahan CSS/JS/layout, hanya penghilangan kolom pada tabel existing.
+
+
+2026-10-15 - Label navigasi My Booking menjadi Riwayat.
+
+- Label tautan `my-bookings.index` pada navbar pegawai, layout sidebar dan navigasi lama diganti Riwayat. Urutan menu, route, penanda aktif dan authorization dipertahankan; judul/konten halaman tidak diubah karena permintaan khusus label navigasi.
+- Verifikasi aktual: pemeriksaan referensi label navigasi dan Blade cache/clear berhasil. Test database dan build aset tidak diulang karena hanya perubahan teks Blade tanpa perubahan class, aset atau perilaku backend.
+
+
+2026-10-15 - Prioritas menu Jadwal Ruangan pada navigasi semua role.
+
+- Navbar pegawai diurutkan Dashboard, Booking Ruangan, Jadwal Ruangan, My Booking. Sidebar PIC/Admin menempatkan Jadwal Ruangan langsung setelah Dashboard. Kedua layout memakai markup yang sama pada desktop/mobile; route, Gate role, badge approval dan penanda halaman aktif dipertahankan. Partial navigasi layout lama juga diselaraskan: Jadwal Ruangan Admin langsung setelah Dashboard, sedangkan urutan pegawai/PIC sudah sesuai; verifikasi render partial ketiga role lulus.
+- Verifikasi browser fixture pada 1440px dan 390px untuk ketiga role memastikan urutan menu, tidak ada tautan duplikat/overflow, urutan fokus Tab mengikuti menu, hamburger mobile berfungsi, serta Escape menutup dan mengembalikan fokus. Screenshot mobile PIC diinspeksi. Fixture tidak menyimpan data atau menggantikan pengujian authorization server.
+- Build Vite berhasil setelah hambatan EPERM sandbox ditangani melalui command build yang diizinkan; Blade cache/clear dan diff check berhasil. Run FrontendSkeletonTest dan test authorization navigasi selesai: 7 passed, 1 failed, 260 assertions (234,91 detik). Test authorization navigasi dan enam kasus FrontendSkeleton lulus. Satu kegagalan pada `test_empty_tables_and_forms_expose_expected_structure` mengharapkan field organizational_unit_ids pada Kelola Ruangan, sedangkan section akses unit sudah dikomentari pada HEAD sebelum task ini (masalah existing yang sebelumnya tercatat). Tidak mengubah bagian akses unit atau melemahkan test.
+
+
+2026-10-15 - Perbaikan encoding jam dan ukuran Review Pengajuan.
+
+- Pemisah jam yang rusak pada partial dialog review diganti HTML entity `&ndash;` dengan spasi, sehingga rentang jam terbaca normal. Lebar maksimum dialog diperbesar dari 576px menjadi 672px; mobile tetap menyisakan margin 16px per sisi dan tinggi maksimal 90dvh dengan scroll internal. Perubahan berlaku bagi PIC dan Admin yang memakai partial sama; backend keputusan tidak berubah.
+- Verifikasi aktual: build Vite berhasil setelah esbuild EPERM di sandbox ditangani melalui command build yang diizinkan; Blade cache/clear berhasil. Test existing `test_admin_can_decide_unassigned_rooms_from_the_list_and_decision_is_audited` lulus (1 test, 22 assertions, 32,19 detik). Audit browser fixture PIC/Admin pada 1440px dan 390px memastikan teks 15:15 sampai 17:15 memakai en dash normal, lebar desktop 672px/mobile 358px, tanpa overflow horizontal dialog, Escape menutup dan mengembalikan fokus ke tombol Review. Screenshot desktop diinspeksi. Fixture tidak mengirim keputusan ke database aplikasi.
+
+
+2026-10-15 - Pengaturan Opsi Lanjutan Booking terlihat jelas untuk Admin.
+
+- Dropdown Persiapan Rapat di Akses dan Operasional diganti panel Opsi Lanjutan Booking pada shared form tambah/edit ruangan. Checkbox Tampilkan jumlah peserta dan permintaan konsumsi memakai field `allows_meeting_preparation` existing; hidden 0 memastikan melepas centang tersimpan sebagai nonaktif. Label, keterangan, old input, error dan validasi boolean dipertahankan. Pintasan Opsi Lanjutan ditambahkan pada Kelola Ruangan.
+- Pengaturan berlaku per ruangan setelah Simpan Perubahan/Simpan Ruangan. Aktif mengizinkan pegawai membuka persiapan rapat (peserta dan Snack/Makanan); nonaktif menyembunyikan bagian serta tetap ditolak server jika dipaksakan. Konsumsi tetap direview PIC/Admin. Tidak mengubah konfigurasi/data ruangan langsung atau membuat migration baru.
+- Verifikasi aktual: test pengaturan dalam MeetingPreparationTest diperluas untuk render kontrol Admin, aktivasi, penonaktifan, visibilitas pegawai dan penolakan payload persiapan saat nonaktif; test tersebut lulus (62,62 detik). Run dua test menghasilkan 1 passed/1 failed, 27 assertions. `SimplifiedWorkflowTest::test_validation_in_one_room_section_preserves_other_selections` gagal karena section akses unit sudah dikomentari pada HEAD sebelum perubahan ini, sehingga checkbox organizational_unit_ids tidak dirender; dikonfirmasi melalui git show HEAD, tidak mengubah bagian di luar task atau melemahkan assertion.
+- Build Vite, Blade cache/clear, Pint dan diff check berhasil. Browser fixture desktop 1440px/mobile 390px lolos overflow, navigasi anchor, toggle Space dan payload FormData: tidak dicentang mengirim 0, dicentang mengirim nilai akhir 1. Screenshot mobile diinspeksi; fixture tidak menyimpan data aplikasi dan bukan browser end-to-end login/submit.
+
+
+2026-10-15 - Jadwal di atas form booking, label Tambah booking, audit fasilitas.
+
+- Pada `/rooms/{room}/book`, panel Jadwal Ruangan Ini dipindah ke atas penuh sebelum informasi ruangan dan detail pertemuan pada desktop maupun mobile. Pilihan tanggal dan slot jadwal mendahului area tambah booking. Tombol menjadi Tambah booking; field berikutnya Tanggal booking 2/3/dst dan tombol hapus memiliki label Hapus booking sesuai nomor. Nama properti Livewire, route dan validasi dipertahankan.
+- Audit read-only database lokal: master 7 fasilitas tersedia; empat ruangan demo ID 1-4 memiliki Projector, HDMI, Whiteboard. Sepuluh ruangan ID 5-14 (2A, 3A/3B, 4A/4B, 6A/6B, Selat Malaka I/II/III) tidak mempunyai relasi fasilitas. Empty state sesuai data; tidak mengisi assignment berdasarkan asumsi. Penjelasan diberikan bahwa master fasilitas berbeda dari fasilitas yang dipilih dan disimpan per ruangan.
+- Verifikasi aktual: test existing katalog/fasilitas (termasuk simpan melalui endpoint Admin lalu refresh Livewire) lulus 1 test/30 assertions; alur tambah/hapus tanggal dan submit lulus 1 test/20 assertions. Build Vite, Blade cache/clear berhasil. Audit fixture Blade pada browser desktop 1440px/mobile 390px memastikan jadwal di atas informasi ruangan/form, label baru, navigasi keyboard dan tidak ada overflow; screenshot mobile diinspeksi. Audit browser memakai fixture tanpa menulis data aplikasi, bukan end-to-end login/submit.
+
+
+2026-10-15 - Konsistensi tombol dan indikator proses form booking.
+
+- Pada `/rooms/{room}/book`, Periksa Rencana dan Ajukan Booking/Booking Sekarang kini berada pada grid dengan lebar sama, tinggi 48px, teks 16px dan padding sama. Desktop memakai dua kolom sejajar; mobile satu kolom penuh. CSS dibatasi pada footer aksi booking agar halaman lain tidak berubah.
+- Indikator proses berada pada baris khusus di bawah tombol dengan ruang tetap. `wire:loading.delay` ditargetkan ke `checkPlan` dan `submitBooking`, sehingga polling jadwal dan toggle persiapan tidak menampilkan Memeriksa rencana. Pengiriman menampilkan Mengirim pengajuan booking. Disabled, submit, CSRF, error dan alur backend dipertahankan.
+- Verifikasi aktual: build Vite berhasil (esbuild sempat diblokir EPERM di sandbox, berhasil pada command build yang diizinkan), Blade cache/clear dan diff check berhasil. Test existing `test_conditional_fields_validate_persist_and_are_visible_to_reviewer` lulus (1 test, 27 assertions, 34,57 detik).
+- Audit browser pada fixture Blade desktop 1440px/mobile 390px mengonfirmasi tinggi kedua tombol 48px, lebar sama, desktop sejajar/mobile bertumpuk, font 16px, urutan fokus Tab benar, serta tidak ada overflow. Simulasi tampilan loading tidak menggeser tombol; menutup bagian persiapan mempertahankan ukuran tombol. Screenshot diinspeksi; audit fixture bukan pengiriman booking lewat browser nyata.
+
+
+2026-10-15 - Investigasi notifikasi WhatsApp yang tidak terkirim.
+
+- Audit read-only database lokal: `whatsapp:status` menunjukkan pengiriman server aktif dan token tersedia, tetapi kedua template nonaktif, PIC otomatis nonaktif, tabel penerima kosong, serta tidak ada akun aktif bernomor WhatsApp. Tidak ada record antrean/riwayat pesan. Kedua template terakhir diperbarui 14 Oktober 2026 pukul 11:08 WIB; booking terakhir 14 Oktober pukul 14:00 WIB. Kondisi ini mencegah pencatatan pesan, sebelum pengiriman ke Fonnte.
+- Konfigurasi tidak tercache; `schedule:list` menunjukkan `whatsapp:send` terdaftar tiap menit, tetapi daftar jadwal tidak membuktikan worker/cron berjalan. Log terakhir yang diperiksa tidak memuat error baru tanggal 14/15 Oktober. Validitas token dan koneksi Device Fonnte belum diverifikasi.
+- Verifikasi aktual: `php artisan whatsapp:status`, `php artisan schedule:list` dan audit metadata/angka database berhasil. Tidak mengubah pengaturan, nomor, penerima atau booking; tidak mengirim pesan nyata. Test aplikasi tidak diulang karena investigasi read-only dan perubahan hanya dokumentasi. Pengguna diminta mengonfirmasi tes dilakukan di lokal atau hosting; hasil lokal tidak dianggap bukti kondisi hosting.
+
+
+2026-10-15 - Review konsumsi PIC/Admin dan booking beberapa tanggal (DEC-049).
+
+- Melanjutkan implementasi Snack/Makanan yang sudah ada. Form pegawai memakai checkbox independen; permintaan dan hasil persetujuan tersimpan terpisah. Dialog review dan halaman detail PIC/Admin dapat menyetujui kedua jenis, salah satu, atau tanpa konsumsi. Server menolak persetujuan jenis yang tidak diminta. Detail pemohon menampilkan permintaan serta hasil review.
+- Permintaan konsumsi tetap Pending untuk review meskipun ruangan biasanya auto-approve. Notifikasi WhatsApp konsumsi hanya dibuat setelah jenis konsumsi disetujui dan menyertakan jenisnya. Migration kolom approval sudah diterapkan lokal; booking Approved/Completed lama mempertahankan konsumsi yang sebelumnya dikonfirmasi.
+- Tombol Tambah tanggal booking berada di bagian atas form. Semua tanggal memakai jam/agenda/persiapan sama dan menjadi booking terpisah yang ditinjau per tanggal. Pemeriksaan bentrok, tanggal lampau/duplikat, authorization, lock ruangan, transaksi seluruh tanggal dan token retry aktif. Kegagalan satu tanggal membatalkan seluruh pengajuan; tautan My Booking memperlihatkan seluruh hasil.
+- URL review: `/rooms/{room}/book`, `/pic/approvals`, `/admin/approvals`, dan detail approval serta My Booking. Snapshot browser desktop 1440px/mobile 390px untuk form dan detail kedua reviewer lolos overflow, label input dan toggle keyboard Space; inspeksi visual dilakukan. Snapshot memakai fixture terisolasi tanpa tulis database, bukan uji browser end-to-end login/submit. Alur dinamis tambah/hapus tanggal serta submit diverifikasi melalui test Livewire (1 test, 20 assertions, lulus).
+- Verifikasi: migration lokal berhasil; build Vite, Pint, Blade cache/clear dan diff check berhasil. Build ulang sempat diblokir sandbox EPERM lalu berhasil dengan command build yang sudah diizinkan. Seluruh 17 kasus BookingWorkflowTest lulus (termasuk concurrency, CSRF, otorisasi dan konflik). Rangkaian luas dihentikan setelah kelas tersebut selesai untuk mempersempit sisa pemeriksaan; bukan hasil full suite. Run terfokus 6 tests/56 assertions lulus (177,14 detik): transaksi/idempotensi beberapa tanggal, subset persetujuan PIC/Admin, larangan menyetujui konsumsi tidak diminta, penerima/pesan WhatsApp setelah approval dan tidak ada auto-approval konsumsi. Bersama 17 kasus BookingWorkflowTest dan 1 test Livewire (20 assertions), total 24 kasus terverifikasi lulus; bukan full suite. Tidak mengirim WhatsApp nyata. Schema sementara yang ditinggalkan run terinterupsi sudah dihapus secara spesifik; database aplikasi dipertahankan.
+
+
+2026-10-14 - Pilihan konsumsi Snack dan Makan menggantikan checkbox tunggal (DEC-048).
+
+- Sesuai permintaan pengguna, checkbox tunggal "Perlu konsumsi" diganti dua checkbox independen: Snack dan Makan. Pemohon dapat memilih salah satu, keduanya, atau tidak sama sekali. Perubahan mencakup migration database, model, validasi, Livewire component, form booking, detail view, dan trigger notifikasi WhatsApp.
+- Migration `2026_10_14_000001_split_consumption_to_snack_and_meal` mengganti kolom boolean `needs_consumption` dengan `consumption_snack` dan `consumption_meal`. Data existing dengan `needs_consumption=true` dimigrasi ke kedua flag aktif. CHECK constraint `bookings_preparation_consistent` diperbarui.
+- Detail booking menampilkan jenis konsumsi spesifik (Snack, Makan, atau Snack, Makan) alih-alih "Diperlukan/Tidak diperlukan". Notifikasi WhatsApp konsumsi tetap terpicu jika salah satu jenis dipilih. Test MeetingPreparationTest, WhatsappNotificationTest, dan WhatsappManagementTest disesuaikan.
+- Verifikasi aktual: migration berhasil diterapkan pada database lokal. View cache dibersihkan. Test belum dijalankan ulang karena memerlukan schema PostgreSQL terisolasi. Audit visual browser tidak dilakukan karena Playwright tidak tersedia.
+
+2026-10-14 - PIC existing ditetapkan untuk seluruh ruangan saat ini (DEC-047).
+
+- Sesuai instruksi pengguna, akun aktif `Room PIC Demo` ditetapkan melalui RoomAssignmentService dalam transaksi ke 2A, 3A, 3B, 4A, 4B, 6A dan 6B. Audit database saat ini berjumlah 14 ruangan; tujuh ruangan lainnya sudah terhubung ke akun tersebut.
+- Verifikasi langsung memastikan seluruh 14 ruangan terhubung ke PIC tersebut dan lolos `BookingService::assertPicAvailable`. Tidak membuat booking untuk verifikasi.
+- Test `test_multiple_pics_save_and_render_without_duplicates_or_role_changes` lulus (1 test, 27 assertions, 28.60s) pada schema PostgreSQL terisolasi. `git diff --check` berhasil. Tidak ada perubahan tampilan/kode aplikasi.
+
 2026-10-14 - Investigasi error pengajuan booking, menunggu teks error/ruangan.
 
 - Koneksi database berhasil dan seluruh 18 migration berstatus Ran. Log Laravel terakhir bertanggal 13 Oktober; belum ada exception baru yang dapat dikaitkan dengan laporan pengguna.

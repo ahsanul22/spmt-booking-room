@@ -11,9 +11,9 @@ Email akun tetap unik. Beberapa akun boleh memakai nomor WhatsApp yang sama; jik
 | Jenis pesan | Pemicu | Penerima |
 | --- | --- | --- |
 | Pengajuan approval | Booking baru Pending | PIC aktif yang ditugaskan pada ruangan jika opsi otomatis dipilih, serta Admin tambahan yang dipilih |
-| Konsumsi | Booking Approved dan meminta konsumsi | Akun aktif yang dipilih Admin sebagai penerima konsumsi |
+| Konsumsi | Booking Approved dan PIC/Admin menyetujui Snack/Makanan | Akun aktif yang dipilih Admin sebagai penerima konsumsi |
 
-Booking ditolak/tanpa konsumsi tidak membuat pesan konsumsi. Approved langsung tanpa approval tetap memicu konsumsi jika diminta. Booking gagal tidak meninggalkan pesan; retry pengajuan tidak mencatat pesan ganda. Booking lama tidak otomatis dibuatkan pesan.
+Booking ditolak atau tanpa konsumsi yang disetujui tidak membuat pesan konsumsi. Permintaan konsumsi tetap memerlukan review PIC/Admin meskipun ruangan biasanya langsung Approved (DEC-049). Booking gagal tidak meninggalkan pesan; retry pengajuan tidak mencatat pesan ganda. Booking lama tidak otomatis dibuatkan pesan.
 
 ## Yang dilakukan Admin di website
 
@@ -24,7 +24,7 @@ Booking ditolak/tanpa konsumsi tidak membuat pesan konsumsi. Approved langsung t
    - Pilih akun petugas konsumsi dan aktifkan kebutuhan konsumsi. Memilih akun tidak mengubah role/hak aksesnya.
    - Edit teks pesan dan centang **Data yang disertakan** (ruangan, tanggal, jam, dll.). Baris data otomatis ditambahkan; melepas centang menghapus datanya. Tidak perlu mengetik variabel sendiri. Klik **Simpan**; **Pratinjau** memakai booking terbaru tanpa menyimpan atau mengirim.
    - Periksa kesiapan nomor PIC, filter riwayat, lihat isi pesan, dan antrekan ulang pesan gagal.
-3. Buat booking uji coba sebagai Pegawai aktif dengan akses ruangan. Centang persiapan rapat, jumlah peserta, dan konsumsi jika ingin menguji dua pesan. Setujui melalui PIC/Admin setelah pesan pengajuan diproses.
+3. Buat booking uji coba sebagai Pegawai aktif dengan akses ruangan. Centang persiapan rapat, jumlah peserta, dan konsumsi jika ingin menguji dua pesan. Setujui melalui PIC/Admin setelah pesan pengajuan diproses, lalu centang jenis konsumsi yang disetujui untuk menguji pesan konsumsi.
 
 Hanya Admin mengelola nomor/penerima/template/riwayat. PIC tetap melakukan approval sesuai penugasan. Dua jenis notifikasi awalnya nonaktif setelah migrasi agar Admin meninjau penerima terlebih dahulu. Nomor uji coba lama yang tidak cocok dengan satu akun yang memenuhi syarat ditandai untuk dipilih ulang, tanpa membuat akun atau mengubah role otomatis.
 

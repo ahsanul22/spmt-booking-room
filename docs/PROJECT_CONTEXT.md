@@ -20,7 +20,7 @@ Sistem digunakan untuk kebutuhan internal perusahaan. Beranda sebelum login memp
 
 ## Scope yang Tidak Dikerjakan Saat Ini
 
-Pencatatan kebutuhan konsumsi ya/tidak diizinkan sebagai persiapan booking (DEC-040), tanpa pengelolaan catering/snack. Notifikasi WhatsApp booking ke PIC/Admin dan konsumsi memakai Fonnte, penerima dari akun user/PIC serta pengaturan Admin (DEC-043); pengiriman mengikuti konfigurasi perangkat/token dan scheduler server. Jangan mengembangkan pemesanan atau penyediaan konsumsi, rapat eksternal, pengelolaan tamu eksternal, SMS, payment, atau fitur di luar kebutuhan booking ruang rapat. Email juga tidak diperlukan pada tahap awal.
+Permintaan Snack/Makanan dan persetujuan subset oleh PIC/Admin diizinkan sebagai persiapan booking (DEC-048/049), tanpa pengelolaan catering/snack. Notifikasi WhatsApp booking ke PIC/Admin dan konsumsi memakai Fonnte, penerima dari akun user/PIC serta pengaturan Admin (DEC-043); pengiriman mengikuti konfigurasi perangkat/token dan scheduler server. Jangan mengembangkan pemesanan atau penyediaan konsumsi, rapat eksternal, pengelolaan tamu eksternal, SMS, payment, atau fitur di luar kebutuhan booking ruang rapat. Email juga tidak diperlukan pada tahap awal.
 
 ## Struktur Organisasi
 
@@ -87,6 +87,8 @@ Data asli ruangan harus dapat dimasukkan melalui aplikasi. Jangan hardcode dafta
 
 ## Akses Ruangan
 
+Seluruh ruangan pada database proyek saat penugasan 2026-10-14 sudah terhubung ke akun aktif `Room PIC Demo` atas instruksi pengguna (DEC-047). Ruangan baru tetap memerlukan penugasan PIC melalui pengaturan Admin.
+
 - `all`: semua pegawai dapat mengajukan penggunaan ruang.
 - `restricted`: hanya organizational unit tertentu yang diperbolehkan menggunakan ruang.
 
@@ -96,7 +98,7 @@ Default konsep sistem adalah ruang dapat digunakan seluruh pegawai, kecuali terd
 
 Setiap ruang memiliki pengaturan `requires_approval = true/false`.
 
-- Jika `false`: User → Booking → Validasi → Approved.
+- Jika `false`: booking tanpa konsumsi langsung Approved; permintaan konsumsi tetap Pending untuk review PIC/Admin (DEC-049).
 - Jika `true`: User → Booking → Pending → Room PIC → Approved / Rejected.
 
 Validasi booking tetap berlaku untuk kedua alur.
@@ -111,7 +113,7 @@ Kalender menampilkan booking tersimpan dengan ringkasan per tanggal dan daftar r
 
 ## Booking
 
-Pengajuan tidak lagi mempunyai batas minimal dua jam sebelum rapat (DEC-044). Booking boleh diajukan mendekati waktu mulai; waktu mulai yang sudah lewat tetap ditolak. Pemeriksaan rencana dan submit menggunakan waktu server WIB (`Asia/Jakarta`) dengan presisi menit, dihitung ulang pada setiap pemeriksaan/submit. Form mendukung satu tanggal; akhir harus setelah awal, lintas hari belum tersedia. Ruangan yang membutuhkan approval tetap harus disetujui sebelum waktu mulai.
+Pengajuan tidak lagi mempunyai batas minimal dua jam sebelum rapat (DEC-044). Booking boleh diajukan mendekati waktu mulai; waktu mulai yang sudah lewat tetap ditolak. Pemeriksaan rencana dan submit menggunakan waktu server WIB (`Asia/Jakarta`) dengan presisi menit, dihitung ulang pada setiap pemeriksaan/submit. Form mendukung beberapa tanggal dengan jam yang sama melalui tombol Tambah tanggal booking (DEC-049). Setiap tanggal merupakan booking terpisah; akhir harus setelah awal pada tanggal yang sama, rapat kontinu lintas tengah malam belum tersedia. Ruangan yang membutuhkan approval tetap harus disetujui sebelum waktu mulai.
 
 Data booking yang disimpan:
 
