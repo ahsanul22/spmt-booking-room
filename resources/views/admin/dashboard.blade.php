@@ -8,7 +8,7 @@
         <div>
             <p class="mb-2 text-sm font-bold uppercase tracking-[0.2em] text-primary">Administrasi Workspace</p>
             <h1 class="text-3xl font-bold tracking-tight text-primaryDark sm:text-4xl">{{ $title }}</h1>
-            <p class="mt-3 text-base leading-6 text-slate-600">Kelola ruang dan dukung kolaborasi dari satu tempat.</p>
+            <p class="mt-3 text-base leading-6 text-slate-600">Pantau kondisi ruangan, kelengkapan pengaturan, dan data pengguna.</p>
         </div>
         <a href="{{ route('admin.rooms.create') }}" class="inline-flex items-center gap-2 rounded-xl bg-primary px-5 py-3 text-base font-semibold text-white shadow-sm transition hover:bg-primaryDark"><x-schedule-icon name="plus" />Tambah Ruangan</a>
     </div>
@@ -17,58 +17,49 @@
         <div role="status" class="mb-6 rounded-xl border border-secondaryLight bg-surface p-4 text-base text-primaryDark">{{ session('status') }}</div>
     @endif
 
-<section aria-label="Ringkasan booking" class="mb-6 grid gap-4 sm:grid-cols-3">
+<section aria-label="Ringkasan administrasi" class="mb-6 grid gap-4 sm:grid-cols-3">
         @foreach($stats as $stat)
             <div class="rounded-2xl border border-slate-200/80 bg-surface p-5 shadow-sm">
                 <div class="flex items-center justify-between gap-3"><h2 class="text-base font-medium text-slate-600">{{ $stat['label'] }}</h2><span class="rounded-lg bg-secondaryLight/20 p-2 text-primary"><x-schedule-icon :name="$stat['icon']" /></span></div>
                 <p class="mt-4 text-3xl font-semibold text-primaryDark">{{ $stat['value'] }}</p>
-                <p class="mt-2 text-sm text-slate-500">Berdasarkan data booking saat ini</p>
+                <p class="mt-2 text-sm text-slate-500">{{ $stat['description'] }}</p>
             </div>
         @endforeach
     </section>
 
-    <div class="grid items-start gap-6 xl:grid-cols-[minmax(0,1fr)_300px]">
-        <div class="min-w-0 space-y-6">
-            <section aria-labelledby="management-title" class="rounded-2xl border border-slate-200/80 bg-surface p-5 shadow-sm sm:p-6">
-                <h2 id="management-title" class="text-lg font-bold text-primaryDark">Kelola Workspace</h2>
-                <p class="mt-1 text-sm leading-5 text-slate-600">Akses cepat ke data dan pengaturan ruang rapat.</p>
-                <div class="mt-5 grid gap-3 sm:grid-cols-2">
-                    <x-dashboard-shortcut :href="route('admin.rooms.index')" title="Kelola Ruangan" icon="room">Status, PIC, dan akses ruangan.</x-dashboard-shortcut>
-                    <x-dashboard-shortcut :href="route('admin.users.index')" title="Kelola User">Akun pegawai, role, dan status akses.</x-dashboard-shortcut>
-                    <x-dashboard-shortcut :href="route('admin.organizational-units.index')" title="Unit Organisasi">Susunan direktorat, divisi, dan departemen.</x-dashboard-shortcut>
-                    <x-dashboard-shortcut :href="route('admin.facilities.index')" title="Kelola Fasilitas">Perlengkapan pendukung ruang rapat.</x-dashboard-shortcut>
-                    <x-dashboard-shortcut :href="route('admin.schedule.index')" title="Jadwal Ruangan" icon="calendar">Lihat jadwal penggunaan ruang rapat.</x-dashboard-shortcut>
+    <div class="grid items-start gap-6 xl:grid-cols-2">
+            <x-workspace-panel title="Kondisi Ruangan" description="Kondisi operasional ruangan aktif, terpisah dari ketersediaan jadwal.">
+                <div class="space-y-5 p-5 sm:p-6">
+                    @if($activeRoomCount)
+                        @foreach($roomConditions as $condition)
+                            <div>
+                                <div class="mb-2 flex items-center justify-between gap-3 text-base"><span class="text-slate-600">{{ $condition['label'] }}</span><span class="font-semibold text-primaryDark">{{ $condition['count'] }} ruangan</span></div>
+                                <div class="h-3 overflow-hidden rounded-full bg-background" aria-hidden="true"><div class="h-full rounded-full bg-primary" style="width: {{ $condition['percentage'] }}%"></div></div>
+                            </div>
+                        @endforeach
+                    @else
+                        <p class="text-base text-slate-600">Belum ada ruangan aktif. Tambahkan atau aktifkan ruangan melalui Daftar Ruangan.</p>
+                    @endif
+                    <a href="{{ route('admin.rooms.index') }}" class="workspace-button-secondary">Kelola kondisi ruangan</a>
                 </div>
-            </section>
-
-            <section aria-labelledby="activity-title" class="overflow-hidden rounded-2xl border border-slate-200/80 bg-surface shadow-sm">
-                <div class="flex flex-wrap items-center justify-between gap-3 border-b border-slate-100 p-5 sm:px-6">
-                    <h2 id="activity-title" class="text-lg font-bold text-primaryDark">Aktivitas Booking</h2>
-                    <a href="{{ route('admin.reports.index') }}" class="font-semibold text-primary hover:underline">Laporan Bulanan</a>
+            </x-workspace-panel>
+            <x-workspace-panel title="Kelengkapan Pengaturan Ruangan" description="Lengkapi penanggung jawab dan fasilitas agar informasi ruangan siap digunakan.">
+                <div class="grid gap-4 border-b border-slate-100 p-5 sm:grid-cols-2 sm:p-6">
+                    <div class="rounded-xl bg-background p-4"><p class="text-sm text-slate-600">Belum memiliki PIC aktif</p><p class="mt-2 text-2xl font-bold text-primaryDark">{{ $missingPicCount }} <span class="text-base font-normal">ruangan</span></p></div>
+                    <div class="rounded-xl bg-background p-4"><p class="text-sm text-slate-600">Fasilitas belum diatur</p><p class="mt-2 text-2xl font-bold text-primaryDark">{{ $missingFacilitiesCount }} <span class="text-base font-normal">ruangan</span></p></div>
                 </div>
                 <ul class="divide-y divide-slate-100">
-                    @forelse($recentBookings as $booking)
-                        <li class="flex flex-wrap items-center justify-between gap-3 p-5">
-                            <div class="min-w-0"><a class="break-words font-semibold text-primary hover:underline" href="{{ route('admin.bookings.show', $booking) }}">{{ $booking->agenda }}</a><p class="mt-1 break-words text-sm text-slate-600">{{ $booking->room->name }} · {{ $booking->date }} · {{ $booking->applicant->name }}</p></div>
-                            <x-booking-status :status="$booking->status" />
+                    @forelse($attentionRooms as $room)
+                        <li class="flex flex-wrap items-center justify-between gap-3 p-5 sm:px-6">
+                            <div class="min-w-0"><p class="break-words text-base font-semibold text-primaryDark">{{ $room->name }}</p><p class="mt-1 text-sm text-slate-600">{{ collect([(int) $room->active_pics_count === 0 ? 'PIC aktif belum ditetapkan' : null, (int) $room->facilities_count === 0 ? 'Fasilitas belum diatur' : null])->filter()->implode(' / ') }}</p></div>
+                            <a href="{{ route('admin.rooms.show', $room) }}" class="workspace-button-secondary" aria-label="Lengkapi pengaturan {{ $room->name }}">Lengkapi</a>
                         </li>
                     @empty
-                        <li><x-workspace-empty title="Belum ada booking." description="Pengajuan yang masuk akan muncul di sini." /></li>
+                        <li class="p-5 text-base text-slate-600 sm:px-6">Tidak ada ruangan aktif yang perlu dilengkapi PIC atau fasilitasnya.</li>
                     @endforelse
                 </ul>
-                <div class="border-t border-slate-100 p-5"><a class="workspace-button-secondary" href="{{ route('admin.bookings.index') }}">Lihat Semua Booking</a></div>
-            </section>
-        </div>
+                @if($attentionRooms->isNotEmpty())<p class="border-t border-slate-100 p-5 text-sm text-slate-600">Menampilkan maksimal 5 ruangan aktif. <a href="{{ route('admin.rooms.index') }}" class="font-semibold text-primary underline">Lihat seluruh ruangan</a></p>@endif
+            </x-workspace-panel>
 
-        <aside class="min-w-0 space-y-5">
-            <section class="rounded-2xl border border-slate-200/80 bg-surface p-6 shadow-sm" aria-labelledby="account-title">
-                <h2 id="account-title" class="font-bold text-primaryDark">Akun Anda</h2>
-                <dl class="mt-5 space-y-4 text-base">
-                    <div><dt class="text-sm text-slate-500">Login sebagai</dt><dd class="mt-1 break-words font-semibold">{{ $user->name }}</dd></div>
-                    <div><dt class="text-sm text-slate-500">Role</dt><dd class="mt-1">{{ $user->roleLabel() }}</dd></div>
-                    <div><dt class="text-sm text-slate-500">Unit Kerja</dt><dd class="mt-1 break-words">{{ $user->organizationalUnit?->name ?? 'Belum ditentukan' }}</dd></div>
-                </dl>
-            </section>
-        </aside>
     </div>
 @endsection
