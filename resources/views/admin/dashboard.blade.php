@@ -17,7 +17,7 @@
         <div role="status" class="mb-6 rounded-xl border border-secondaryLight bg-surface p-4 text-base text-primaryDark">{{ session('status') }}</div>
     @endif
 
-<section aria-label="Ringkasan administrasi" class="mb-6 grid gap-4 sm:grid-cols-3">
+    <section aria-label="Ringkasan administrasi" class="mb-6 grid gap-4 sm:grid-cols-3">
         @foreach($stats as $stat)
             <div class="rounded-2xl border border-slate-200/80 bg-surface p-5 shadow-sm">
                 <div class="flex items-center justify-between gap-3"><h2 class="text-base font-medium text-slate-600">{{ $stat['label'] }}</h2><span class="rounded-lg bg-secondaryLight/20 p-2 text-primary"><x-schedule-icon :name="$stat['icon']" /></span></div>
@@ -27,20 +27,25 @@
         @endforeach
     </section>
 
-    <div class="grid items-start gap-6 xl:grid-cols-2">
+    <div class="space-y-6">
             <x-workspace-panel title="Kondisi Ruangan" description="Kondisi operasional ruangan aktif, terpisah dari ketersediaan jadwal.">
-                <div class="space-y-5 p-5 sm:p-6">
+                <x-slot:headingActions>
+                    <a href="{{ route('admin.rooms.index') }}" class="workspace-button-secondary">Kelola kondisi ruangan</a>
+                </x-slot:headingActions>
+                <div class="p-5 sm:p-6">
                     @if($activeRoomCount)
+                        <div class="grid gap-5 lg:grid-cols-3">
                         @foreach($roomConditions as $condition)
-                            <div>
-                                <div class="mb-2 flex items-center justify-between gap-3 text-base"><span class="text-slate-600">{{ $condition['label'] }}</span><span class="font-semibold text-primaryDark">{{ $condition['count'] }} ruangan</span></div>
-                                <div class="h-3 overflow-hidden rounded-full bg-background" aria-hidden="true"><div class="h-full rounded-full bg-primary" style="width: {{ $condition['percentage'] }}%"></div></div>
+                            <div class="min-w-0 rounded-xl bg-background p-4">
+                                <p class="text-base text-slate-600">{{ $condition['label'] }}</p>
+                                <p class="mb-4 mt-2 text-2xl font-bold text-primaryDark">{{ $condition['count'] }} <span class="text-base font-normal">ruangan</span></p>
+                                <div class="h-3 overflow-hidden rounded-full bg-surface" aria-hidden="true"><div class="h-full rounded-full bg-primary" style="width: {{ $condition['percentage'] }}%"></div></div>
                             </div>
                         @endforeach
+                        </div>
                     @else
                         <p class="text-base text-slate-600">Belum ada ruangan aktif. Tambahkan atau aktifkan ruangan melalui Daftar Ruangan.</p>
                     @endif
-                    <a href="{{ route('admin.rooms.index') }}" class="workspace-button-secondary">Kelola kondisi ruangan</a>
                 </div>
             </x-workspace-panel>
             <x-workspace-panel title="Kelengkapan Pengaturan Ruangan" description="Lengkapi penanggung jawab dan fasilitas agar informasi ruangan siap digunakan.">
@@ -48,14 +53,14 @@
                     <div class="rounded-xl bg-background p-4"><p class="text-sm text-slate-600">Belum memiliki PIC aktif</p><p class="mt-2 text-2xl font-bold text-primaryDark">{{ $missingPicCount }} <span class="text-base font-normal">ruangan</span></p></div>
                     <div class="rounded-xl bg-background p-4"><p class="text-sm text-slate-600">Fasilitas belum diatur</p><p class="mt-2 text-2xl font-bold text-primaryDark">{{ $missingFacilitiesCount }} <span class="text-base font-normal">ruangan</span></p></div>
                 </div>
-                <ul class="divide-y divide-slate-100">
+                <ul class="grid gap-4 p-5 sm:p-6 lg:grid-cols-2">
                     @forelse($attentionRooms as $room)
-                        <li class="flex flex-wrap items-center justify-between gap-3 p-5 sm:px-6">
+                        <li class="flex flex-wrap items-center justify-between gap-4 rounded-xl border border-slate-200/80 p-4">
                             <div class="min-w-0"><p class="break-words text-base font-semibold text-primaryDark">{{ $room->name }}</p><p class="mt-1 text-sm text-slate-600">{{ collect([(int) $room->active_pics_count === 0 ? 'PIC aktif belum ditetapkan' : null, (int) $room->facilities_count === 0 ? 'Fasilitas belum diatur' : null])->filter()->implode(' / ') }}</p></div>
                             <a href="{{ route('admin.rooms.show', $room) }}" class="workspace-button-secondary" aria-label="Lengkapi pengaturan {{ $room->name }}">Lengkapi</a>
                         </li>
                     @empty
-                        <li class="p-5 text-base text-slate-600 sm:px-6">Tidak ada ruangan aktif yang perlu dilengkapi PIC atau fasilitasnya.</li>
+                        <li class="text-base text-slate-600 lg:col-span-2">Tidak ada ruangan aktif yang perlu dilengkapi PIC atau fasilitasnya.</li>
                     @endforelse
                 </ul>
                 @if($attentionRooms->isNotEmpty())<p class="border-t border-slate-100 p-5 text-sm text-slate-600">Menampilkan maksimal 5 ruangan aktif. <a href="{{ route('admin.rooms.index') }}" class="font-semibold text-primary underline">Lihat seluruh ruangan</a></p>@endif
