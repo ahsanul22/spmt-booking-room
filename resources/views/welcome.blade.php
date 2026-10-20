@@ -8,9 +8,9 @@
         <h1 id="welcome-title" class="mt-6 text-4xl font-bold leading-[1.12] tracking-tight sm:text-5xl">Pertemuan yang baik.<br><span class="text-primary">Dimulai di sini.</span></h1>
         <p class="mt-6 max-w-lg text-base leading-7 text-slate-600 sm:text-lg sm:leading-8">Selamat datang di Booking Room PT Pelindo Multi Terminal. Ruang untuk bertukar ide, menyatukan rencana, dan membawa kolaborasi lebih jauh.</p>
         <div class="mt-8 flex flex-wrap gap-4">
-            <a href="{{ route('public.schedule') }}" class="inline-flex min-h-[48px] items-center justify-center gap-3 rounded-xl border border-secondaryLight/60 px-5 py-3 text-base font-semibold text-primaryDark transition hover:bg-background"><x-schedule-icon name="calendar" class="h-4 w-4" />Lihat Jadwal Ruangan</a>
+            <a href="{{ route('guests.register') }}" class="workspace-button-secondary">Pendataan Tamu</a>
         </div>
-        <p class="mt-5 max-w-md text-base leading-7 text-slate-600">Jadwal dapat dilihat di halaman terpisah. Login untuk melakukan booking.</p>
+        <p class="mt-5 max-w-md text-base leading-7 text-slate-600">Login dengan akun pegawai untuk melihat jadwal dan melakukan booking.</p>
     </div>
     <figure class="relative w-full min-w-0 overflow-hidden rounded-2xl border border-secondaryLight/40 bg-background lg:order-1">
         <img src="{{ asset('images/Beranda.jpeg') }}" alt="Ilustrasi area diskusi dengan meja bundar dan kursi biru menghadap pelabuhan." width="1254" height="1254" fetchpriority="high" class="h-[240px] w-full object-cover sm:h-[320px] lg:h-[400px]">
