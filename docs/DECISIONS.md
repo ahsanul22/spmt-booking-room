@@ -1,5 +1,67 @@
 # Decisions
 
+## DEC-058 - Izin resepsionis melalui satu checkbox Kelola User
+
+- Arahan pengguna 2026-10-20 kembali ke alur pendataan/jadwal tamu lalu booking dibantu pegawai yang ditunjuk, tanpa antrean permintaan baru. Admin cukup mencentang Petugas resepsionis pada tambah/Kelola User existing; daftar user menandai petugasnya. Tidak ada role/menu administrasi/lokasi khusus tambahan.
+- users.is_receptionist default false, tidak mass assignable. Berlaku untuk user/PIC aktif; Admin tidak otomatis mendapatkan hak booking. Role menjadi Admin mengosongkan flag. Simpan melalui form dengan checkbox dilepas mencabut izin; request lama tanpa field ini mempertahankan izin selama role masih eligible. Izin lokasi tetap mengikuti branch_user.
+- Hanya petugas mendapat dropdown Booking untuk (Diri sendiri atau nama/instansi tamu aktif di kantor ruangan). Tamu cukup menyebut nama/instansi; kode tidak perlu tampil pada jadwal tamu atau diketik manual. Referensi internal dan snapshot laporan existing dipertahankan.
+- Livewire memuat ulang status izin untuk daftar tamu dan checkPlan. BookingService memeriksa user terkunci sebelum memproses referensi tamu, termasuk replay token; pencabutan izin langsung memblokir pengajuan tamu berikutnya. Pengajuan existing tetap tercatat dan dapat diputuskan mengikuti kewenangan PIC/Admin existing. Pegawai biasa tetap dapat booking pribadi.
+
+
+## DEC-057 - Isian dan tampilan pendataan tamu
+
+- Arahan pengguna 2026-10-20: form di tengah, lebih besar, dengan latar pelabuhan lembut sesuai palet. Isian: nama, instansi, NIP, kontak dan tujuan; kantor/cabang dihapus dari form. NIP opsional karena tamu eksternal belum tentu memilikinya, disimpan sebagai string agar nol awal utuh. Tujuan kunjungan wajib untuk registrasi baru; record lama tetap kompatibel.
+- Lokasi tetap diperlukan untuk scope jadwal/booking DEC-056, ditentukan di server melalui GUEST_BRANCH_ID. Jika belum diatur, memakai kantor ID pertama pada master data. Field branch_id yang disisipkan dalam POST diabaikan. Konfigurasi lokasi tidak mengubah registrasi existing.
+- NIP dan tujuan disimpan hanya pada registrasi sementara, ikut terhapus saat expiry; snapshot booking/laporan tetap nama, instansi dan kode tamu. Tidak memperluas scope akses jadwal atau mengubah approval.
+
+
+## DEC-056 - Pendataan tamu sementara, jadwal terbatas, dan snapshot peminta
+
+- Permintaan pengguna 2026-10-20 mengizinkan pendataan tamu eksternal melalui QR/form, memperluas scope DEC-008 dan pengecualian DEC-053. Session registrasi aktif membaca jadwal khusus tamu tanpa akun pegawai; kalender internal tetap terlindungi.
+- Jadwal hanya ruangan aktif akses all di kantor tujuan serta jam Pending/Approved, tanpa nama pemohon, unit, agenda, kontak atau catatan.
+- Pegawai/resepsionis memakai kode registrasi aktif pada kantor yang sama dalam form booking existing. Izin access-employee tetap, tanpa role baru atau hak booking Admin. Pengajuan tamu wajib PIC aktif dan persetujuan; izin lokasi/unit/ruangan/operasional dan konflik tetap diperiksa.
+- Snapshot nama, instansi dan kode tamu pada booking terpisah dari user_id pegawai pengaju. Detail, laporan layar/CSV/cetak menampilkan kedua pihak. Kontak tidak disalin; penghapusan registrasi tidak mengubah riwayat booking.
+- Default sementara tiga hari, configurable days/end_of_day pukul 17.00 WIB. Registrasi mulai pukul 17.00 berakhir esok pukul 17.00. Kebijakan akhir masih menunggu konfirmasi pemilik proses. Expiry diperiksa setiap akses/submit; scheduler menghapus registrasi kedaluwarsa setiap menit. Panduan: docs/GUESTS.md.
+
+
+## DEC-055 - Kelola user tunggal dan tombol Tampilkan pada filter
+
+- Daftar user hanya memiliki aksi Kelola menuju form edit. Halaman detail terpisah dihapus; route GET detail lama mengalihkan ke edit. Status aktif/nonaktif, identitas, izin lokasi, dan penggantian/reset password dikelola pada halaman Kelola. Endpoint status/reset-password tetap tersedia dengan authorization dan validasi existing; redirect setelah perubahan menuju Kelola, termasuk penanganan aman ketika admin menonaktifkan akun sendiri atau mengganti role sendiri.
+- Dropdown Kantor / Cabang pada daftar user menyaring akses efektif: pegawai/PIC berdasarkan pivot branch_user, Admin ikut semua filter karena memiliki akses global. Pagination mempertahankan lokasi. Tidak menambah kolom bisnis user, migration, maupun perubahan seed untuk task ini; DEC-054 tetap berlaku.
+- Dropdown filter memiliki tombol Tampilkan. Pilihan pada kalender/katalog disimpan sebagai draft dan diterapkan oleh aksi Livewire setelah tombol ditekan. Filter daftar admin, approval/riwayat, laporan, dan WhatsApp memakai komponen ListingFilters dengan navigasi Livewire: hasil dimuat tanpa reload browser, URL GET diperbarui, halaman pagination kembali ke awal, dan tautan CSV/cetak mengikuti filter yang diterapkan. Mengganti lokasi laporan mengosongkan pilihan ruangan, dengan daftar ruangan tetap dibatasi izin server.
+- Tujuan navigasi menggunakan whitelist route dan properti Locked; role/akun aktif diperiksa kembali pada render/aksi. Filter lokasi hanya boleh dijalankan Admin. Laporan PIC memvalidasi ruangan dalam izin lokasi dan penugasannya. Route GET existing tetap melakukan validasi/authorization. Tidak menerima URL redirect bebas.
+- Dropdown isian form (role, status akun, lantai, durasi/jam booking) tetap menggunakan aksi simpan/pengajuan masing-masing. Tombol Tampilkan hanya untuk filter data, bukan perubahan data akun/booking. Script menu mobile, dialog approval, editor WhatsApp, navbar, dan indikator loading menyesuaikan siklus navigasi Livewire.
+
+## DEC-054 - Izin lokasi pada akun, bukan filter pegawai/PIC
+
+- Koreksi pengguna 2026-10-19 menggantikan asumsi akses seluruh lokasi pegawai/PIC pada DEC-051. Admin tetap meliputi semua lokasi; hanya Admin melihat dropdown lokasi. Pegawai/PIC otomatis menerima gabungan data dari lokasi yang diizinkan, tanpa dropdown untuk berpindah lokasi.
+- Izin menggunakan pivot `branch_user` (user_id, branch_id, primary key gabungan), bukan boolean kantor pusat atau satu kolom lokasi. Satu akun dapat diberi satu/beberapa lokasi secara eksplisit melalui checkbox Kelola User. Tanpa izin berarti tidak dapat mengakses data lokasi; akun baru tanpa pilihan tidak otomatis mendapat lokasi. Izin tetap terpisah dari role dan unit organisasi.
+- Migration additive memberi izin Kantor Pusat kepada akun existing yang sebelumnya digunakan untuk pusat. FoundationSeeder memberi HQ hanya untuk akun demo yang baru dibuat; menjalankan seeder ulang tidak mengembalikan izin yang sudah dicabut dan tidak mengubah password/role existing. Tidak memerlukan migrate:fresh atau reset data.
+- Scope Room::visibleTo dan User::canAccessBranch menjadi aturan bersama untuk katalog/dashboard, jadwal dan refresh Livewire, detail/URL lama, booking termasuk retry token, riwayat/detail pribadi, approval, rekap/badge PIC, laporan layar/CSV/cetak, assignment PIC, serta penerima/kelayakan notifikasi. Akun nonaktif/role tidak dikenal ditolak. Akses diperiksa di server, termasuk setelah izin dicabut; menyembunyikan dropdown bukan pengamanan utama.
+- PIC membutuhkan kedua syarat: izin lokasi dan assignment room. Assignment lama di lokasi yang tidak lagi diizinkan tidak memberi akses. Admin tidak otomatis memberi izin lokasi ketika memilih PIC; perbaiki izin akun dahulu. Hak pemohon, operational/restricted unit, waktu, bentrok dan idempotensi booking tetap berlaku di dalam lokasi yang diizinkan.
+- Penyimpanan user dan izin bersifat atomik, dengan lock row user agar sinkron dengan booking/keputusan yang membaca ulang akun. Request edit lama tanpa branch_ids mempertahankan izin; marker form dan semua checkbox kosong secara eksplisit mencabut seluruh izin. Riwayat booking tetap tersimpan dan tersedia pada laporan Admin walaupun izin akun dicabut.
+
+## DEC-053 - Jadwal hanya untuk akun pegawai
+
+- Arahan pengguna 2026-10-19 menggantikan akses jadwal publik DEC-031. Beranda tetap publik sebagai pengantar, tanpa tombol atau data jadwal. URL lama `/jadwal-ruangan` memerlukan auth + access-general lalu redirect ke jadwal internal.
+- Komponen legacy PublicRoomSchedule juga mewajibkan access-general pada boot setiap request, termasuk refresh Livewire; menghapus tautan saja tidak cukup menutup akses.
+
+## DEC-052 - Kebutuhan teknisi IT dan kelengkapan laporan
+
+- Booking memiliki `it_support` dan `approved_it_support`, default false. Permintaan IT berdiri sendiri, tidak bergantung pada pengaturan persiapan/konsumsi ruangan. Permintaan memerlukan review dan PIC aktif walau ruangan biasanya langsung Approved.
+- PIC yang ditugaskan atau Admin dapat menyetujui ruangan dengan/tanpa IT melalui checkbox, default tidak dicentang. IT yang tidak diminta tidak boleh disetujui; service dan CHECK database menjaga subset. Penolakan booking mengosongkan persetujuan IT. Keputusan final tetap tidak dapat diubah.
+- Field IT termasuk fingerprint idempotensi dan diterapkan ke semua tanggal dalam submitMany. Form lama dengan IT tidak dikirim mempertahankan kompatibilitas fingerprint.
+- Laporan bulanan layar/CSV/cetak memuat seluruh status sesuai cakupan dan filter, lokasi, perkiraan peserta, konsumsi diminta/disetujui, IT diminta/disetujui, serta catatan pemohon/keputusan. Pending diberi label menunggu review. Data kebutuhan bukan bukti layanan telah diberikan; peserta hanya tersedia bila diisi saat pengajuan, tanpa backfill perkiraan palsu.
+
+## DEC-051 - Lokasi kantor pusat dan cabang
+
+- Arahan pengguna 2026-10-19 menambahkan master `branches` (lokasi), terpisah dari unit organisasi dan role. Setiap room terhubung satu lokasi melalui FK; migration menempatkan seluruh room existing di Kantor Pusat. Booking tetap mengikuti room, sehingga konflik antarroom/lokasi tidak saling memblokir.
+- Asumsi implementasi yang disampaikan ke pengguna: Admin tetap terpusat dengan kewenangan seluruh lokasi. PIC tetap berbasis assignment ruangan, sehingga PIC pusat/cabang dapat berbeda, atau satu PIC ditugaskan di beberapa lokasi. Pegawai dapat memilih semua lokasi, tetap tunduk pada akses restricted/operasional existing. Filter lokasi bukan pembatasan tenant atau role Admin cabang. Kebijakan Admin khusus cabang belum ditetapkan; tidak menebak pembatasan akun.
+- Admin dapat menambah/mengganti nama lokasi dari `/admin/branches`, memilih lokasi pada pengelolaan room, dan menetapkan PIC melalui form existing. Tidak membuat akun atau ruangan cabang fiktif. Fasilitas, lantai, dan unit organisasi masih master bersama; nomor lantai dan kode room tetap mengikuti constraint global existing.
+- Dropdown lokasi tersedia pada katalog/dashboard pegawai, jadwal, daftar ruangan Admin/PIC, booking pribadi/Admin, approval/riwayat dan laporan bulanan. Pergantian lokasi kalender mengosongkan filter room; katalog mereset pagination. Cakupan PIC tetap diberlakukan di server pada approval dan laporan.
+- Lokasi room dengan booking tidak dapat dipindahkan untuk menjaga riwayat laporan; nonaktifkan room lama dan buat room baru pada lokasi tujuan. Nama lokasi mengikuti nama master terkini. Tidak menyediakan hapus lokasi; FK restrict menjaga referensi.
+
+
 ## DEC-050 - Dashboard Admin berfokus pada administrasi
 
 - Permintaan pengguna 2026-10-15 mengganti ringkasan dan aktivitas booking Admin dengan ringkasan master ruangan/akun/unit, kondisi operasional ruangan aktif, serta kelengkapan PIC aktif dan fasilitas ruangan. Operasional booking harian tetap menjadi fokus dashboard PIC; akses Admin ke jadwal/approval/booking existing dipertahankan.

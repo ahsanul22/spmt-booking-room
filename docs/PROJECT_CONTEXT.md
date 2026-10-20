@@ -16,11 +16,15 @@ Website internal perusahaan untuk membantu pegawai:
 - Mengelola approval untuk ruang tertentu.
 - Melihat status dan riwayat booking.
 
-Sistem digunakan untuk kebutuhan internal perusahaan. Beranda sebelum login memperkenalkan sistem dan menampilkan jadwal ruangan publik aktif (DEC-031); booking, jadwal internal lengkap, dan pengajuan tetap memerlukan akun pegawai.
+Sistem digunakan untuk kebutuhan internal perusahaan. Beranda sebelum login hanya memperkenalkan sistem. Jadwal internal dan pengajuan booking memerlukan akun pegawai aktif. Pengecualian DEC-056: tamu dengan registrasi sementara aktif dapat melihat jadwal khusus tamu; pengajuan tetap dibantu pegawai/resepsionis.
 
 ## Scope yang Tidak Dikerjakan Saat Ini
 
-Permintaan Snack/Makanan dan persetujuan subset oleh PIC/Admin diizinkan sebagai persiapan booking (DEC-048/049), tanpa pengelolaan catering/snack. Notifikasi WhatsApp booking ke PIC/Admin dan konsumsi memakai Fonnte, penerima dari akun user/PIC serta pengaturan Admin (DEC-043); pengiriman mengikuti konfigurasi perangkat/token dan scheduler server. Jangan mengembangkan pemesanan atau penyediaan konsumsi, rapat eksternal, pengelolaan tamu eksternal, SMS, payment, atau fitur di luar kebutuhan booking ruang rapat. Email juga tidak diperlukan pada tahap awal.
+Permintaan Snack/Makanan dan persetujuan subset oleh PIC/Admin diizinkan sebagai persiapan booking (DEC-048/049), tanpa pengelolaan catering/snack. Notifikasi WhatsApp booking ke PIC/Admin dan konsumsi memakai Fonnte, penerima dari akun user/PIC serta pengaturan Admin (DEC-043); pengiriman mengikuti konfigurasi perangkat/token dan scheduler server. Jangan mengembangkan pemesanan atau penyediaan konsumsi, rapat eksternal, SMS, payment, atau fitur di luar kebutuhan booking ruang rapat. Email juga tidak diperlukan pada tahap awal.
+
+## Kantor Pusat dan Cabang
+
+Ruangan dikelompokkan menurut lokasi kantor/cabang dari master branches (DEC-051). Ruangan existing dimigrasi ke Kantor Pusat; lokasi cabang beserta ruangan dan PIC diatur Admin. Admin terpusat meliputi seluruh lokasi dan menjadi satu-satunya role dengan dropdown lokasi. Pegawai/PIC hanya dapat melihat dan menggunakan lokasi yang secara eksplisit diberikan melalui Kelola User (pivot branch_user, DEC-054). Satu akun boleh satu/beberapa lokasi; tanpa izin berarti tidak dapat mengakses data lokasi. PIC tetap memerlukan assignment room selain izin lokasi. Unit organisasi tetap terpisah dari lokasi.
 
 ## Struktur Organisasi
 
@@ -98,7 +102,7 @@ Default konsep sistem adalah ruang dapat digunakan seluruh pegawai, kecuali terd
 
 Setiap ruang memiliki pengaturan `requires_approval = true/false`.
 
-- Jika `false`: booking tanpa konsumsi langsung Approved; permintaan konsumsi tetap Pending untuk review PIC/Admin (DEC-049).
+- Jika `false`: booking tanpa konsumsi/IT langsung Approved; permintaan konsumsi atau teknisi IT tetap Pending untuk review PIC/Admin (DEC-049).
 - Jika `true`: User → Booking → Pending → Room PIC → Approved / Rejected.
 
 Validasi booking tetap berlaku untuk kedua alur.
@@ -109,7 +113,7 @@ Menu Booking Ruangan berisi katalog kartu ruangan. User memilih satu kartu, lalu
 
 ## Jadwal Ruangan
 
-Kalender menampilkan booking tersimpan dengan ringkasan per tanggal dan daftar room/jam WIB. Pending berwarna kuning, Approved terjadwal biru, Approved yang waktunya sedang berjalan merah, dan waktu lewat abu-abu. Rejected/Cancelled tidak mengisi jadwal. Jadwal internal menampilkan snapshot unit kerja pemohon (DEC-040); jadwal publik tidak menampilkan unit. Nama pemohon/agenda/catatan tidak ditampilkan di jadwal bersama. Panel yang sama tersedia di atas form booking untuk room dan tanggal terpilih. Pembaruan otomatis tetap disertai validasi konflik ulang saat submit.
+Kalender menampilkan booking tersimpan dengan ringkasan per tanggal dan daftar room/jam WIB. Pending berwarna kuning, Approved terjadwal biru, Approved yang waktunya sedang berjalan merah, dan waktu lewat abu-abu. Rejected/Cancelled tidak mengisi jadwal. Jadwal internal menampilkan snapshot unit kerja pemohon (DEC-040); seluruh akses jadwal kini memerlukan login (DEC-053). Nama pemohon/agenda/catatan tidak ditampilkan di jadwal bersama. Panel yang sama tersedia di atas form booking untuk room dan tanggal terpilih. Pembaruan otomatis tetap disertai validasi konflik ulang saat submit.
 
 ## Booking
 
@@ -126,6 +130,7 @@ Data booking yang disimpan:
 - Jam selesai.
 - Catatan opsional.
 - Persiapan rapat opsional, perkiraan jumlah peserta dan kebutuhan konsumsi.
+- Permintaan teknisi IT serta persetujuan IT terpisah oleh PIC/Admin (DEC-052).
 - Status.
 
 ## Bentrok Jadwal
@@ -146,6 +151,8 @@ Booking yang dibatalkan tidak boleh dihapus dari database karena diperlukan seba
 ## Laporan Bulanan
 
 Admin dan PIC dapat membuat laporan berdasarkan bulan tanggal rapat dan filter ruangan, melihat rekap status serta durasi terjadwal, mengunduh CSV, dan mencetak/menyimpan PDF melalui browser. Admin mencakup semua ruangan; PIC hanya penugasan saat ini termasuk riwayat ruangan nonaktif. Jam terjadwal menghitung Approved + Completed, bukan bukti penggunaan aktual. Status mengikuti data saat laporan dibuka; tidak mengubah lifecycle booking (DEC-036).
+
+Laporan juga mencatat lokasi, perkiraan peserta, konsumsi diminta/disetujui, teknisi IT diminta/disetujui, dan catatan pemohon/keputusan. Filter lokasi dipertahankan pada ekspor/cetak (DEC-052).
 
 ## Notification Internal
 
@@ -178,3 +185,11 @@ Hal berikut belum diputuskan dan bukan aturan implementasi:
 - Satu keputusan PIC yang ditugaskan atau Admin aktif menyelesaikan pengajuan Pending; alasan rejection wajib. Admin dapat memutuskan seluruh ruangan, tetapi tidak mengubah keputusan final (DEC-037).
 - Bagaimana booking yang sudah ada ditangani ketika ruangan menjadi maintenance/nonaktif atau aturan aksesnya berubah?
 - Nama unit pemohon disimpan sebagai snapshot saat pengajuan (DEC-029).
+
+## Pendataan Tamu (DEC-056)
+
+Tamu scan QR ke /tamu, mencatat nama, instansi, NIP opsional, kontak dan tujuan kunjungan, lalu melihat jam penggunaan ruangan umum di kantor itu selama masa aktif. Petugas resepsionis yang ditunjuk Admin memilih nama tamu pada form booking; PIC menyetujui. Registrasi kedaluwarsa dihapus, snapshot nama/instansi/kode peminta pada booking tetap tersedia bersama pegawai pengaju dalam laporan bulanan layar/CSV/cetak. Default sementara tiga hari, opsi pukul 17.00 melalui config; lihat docs/GUESTS.md.
+
+Penyesuaian DEC-057: kantor/cabang tidak lagi dipilih tamu; lokasi mengikuti konfigurasi server GUEST_BRANCH_ID atau kantor ID pertama dari master data. NIP dan tujuan ikut expiry registrasi, tidak menambah snapshot laporan.
+
+DEC-058: penunjukan resepsionis cukup satu checkbox pada Kelola User, tanpa role baru. Hanya user/PIC aktif yang ditunjuk dapat memilih tamu aktif di lokasi ruangan; pegawai biasa hanya booking pribadi. Tamu menyebut nama/instansi, tanpa kode manual atau antrean permintaan.

@@ -47,3 +47,19 @@ Setelah login: pegawai menuju `/dashboard`, PIC menuju `/pic/dashboard`, admin m
 - `tests/Feature/AuthorizationTest.php`: akses langsung URL, navigasi, dashboard, akun nonaktif, dan role tidak dikenal. Test memakai schema PostgreSQL sementara existing.
 
 Jalankan `php artisan serve`, buka `/login`, lalu gunakan akun development dari `docs/DATABASE.md`. Tidak perlu `npm run dev`. Jalankan `php artisan test` untuk verifikasi otomatis. Tahap 3 belum dikerjakan.
+
+## Pembaruan lokasi dan privasi 2026-10-19
+
+DEC-051 mempertahankan Admin terpusat dan PIC per assignment room. Lokasi adalah filter data; tidak memberikan izin tambahan atau membuat role Admin cabang. Admin mengelola lokasi melalui GET/POST `/admin/branches` dan PUT/PATCH `/admin/branches/{branch}` di grup auth + access-admin. PIC tetap hanya memutuskan dan melaporkan room penugasannya. Pegawai melihat jadwal seluruh lokasi setelah login, dengan data privat booking tetap dibatasi seperti sebelumnya.
+
+DEC-053 menutup akses jadwal sebelum login: `/jadwal-ruangan` kini memakai auth + access-general lalu redirect `/schedule`. PublicRoomSchedule legacy juga memeriksa Gate pada setiap request/refresh Livewire. Beranda hanya menampilkan informasi umum.
+
+## Aturan lokasi aktif — DEC-054
+
+Koreksi 2026-10-19 menggantikan asumsi filter-only DEC-051 di atas. Admin mengelola semua lokasi dan memiliki dropdown; pegawai/PIC tidak memiliki dropdown dan hanya mengakses gabungan lokasi yang dicentang Admin pada Kelola User. Pivot branch_user memisahkan izin lokasi dari role/unit organisasi. Nol izin menolak seluruh data lokasi.
+
+Batas berlaku di query dan service, bukan hanya Blade: katalog, jadwal/polling, detail dan URL booking, submit/retry, riwayat pribadi, badge/dashboard PIC, approval, laporan/CSV/print dan penerima notifikasi. PIC membutuhkan izin lokasi sekaligus assignment room. Penambahan assignment tidak otomatis memberi izin. Pencabutan izin langsung efektif pada request/refresh berikutnya; data booking tidak dihapus.
+
+## Izin resepsionis (DEC-058)
+
+users.is_receptionist merupakan izin tambahan, bukan role. Admin mengaturnya melalui SaveUserRequest/kelola akun. User/PIC aktif yang ditunjuk dapat memilih tamu aktif di kantor ruangan saat booking, tetap dibatasi izin lokasi/unit/ruangan. Akun Admin tidak mendapat hak booking dari flag ini. Flag tidak mass assignable. BookingService memeriksa user yang dikunci ulang sebelum pemrosesan referensi/idempotensi tamu; Livewire tidak memberikan daftar tamu kepada akun biasa atau setelah izin dicabut. Persetujuan booking tetap kewenangan PIC/Admin existing.

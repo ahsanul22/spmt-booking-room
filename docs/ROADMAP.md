@@ -19,3 +19,7 @@ Urutan backend tetap mengikuti tabel berikut. Setelah 4E, pengembangan frontend 
 | 7 | Calendar, Notification, Dashboard | Kalender, dashboard dan laporan aktif (DEC-036); WhatsApp dengan nomor user, penerima PIC/Admin/konsumsi, template dan riwayat/retry Admin aktif (DEC-043); pengiriman membutuhkan konfigurasi Fonnte dan scheduler server |
 | 8 | Backend Refinement | Belum dikerjakan |
 | 9 | Testing dan Finalisasi | Belum dikerjakan |
+
+## Perluasan scope 2026-10-20
+
+Pendataan tamu sementara melalui QR/form, jadwal terbatas setelah registrasi, pengajuan oleh pegawai/resepsionis dengan approval PIC, serta snapshot identitas peminta dalam laporan bulanan aktif (DEC-056). Tidak membuat role/akun login tamu.

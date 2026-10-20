@@ -75,3 +75,17 @@ php artisan test
 Test fondasi menggunakan schema PostgreSQL sementara bernama `foundation_test_*`, lalu menghapusnya setelah test. Tabel development tidak di-reset. User database untuk test perlu izin membuat schema. Jangan menggunakan database produksi untuk test.
 
 Di pgAdmin: **Databases → spmt_booking_room → Schemas → public → Tables**. Klik kanan **Tables → Refresh** jika tabel belum terlihat, lalu klik kanan tabel → **View/Edit Data → All Rows**.
+
+## Pembaruan lokasi dan teknisi IT 2026-10-19
+
+Migration `2026_10_19_000001_add_branches_and_it_support` menambah master `branches` (nama unik) dan FK wajib `rooms.branch_id` dengan default Kantor Pusat untuk kompatibilitas data existing. FK restrict mencegah penghapusan lokasi yang masih direferensikan. Lokasi room dengan riwayat booking tidak dapat diubah melalui RoomService; nama master lokasi mengikuti data terkini.
+
+Booking menambah boolean `it_support` dan `approved_it_support` default false, independen dari meeting_preparation. Migration `2026_10_19_000002_constrain_it_support_approval` menambah CHECK subset: approved_it_support hanya boleh true jika it_support true. Riwayat existing tidak ditebak memiliki kebutuhan IT.
+
+## Izin lokasi user — DEC-054
+
+Migration 2026_10_19_000003_add_user_branch_permissions menambah pivot branch_user dengan FK user/lokasi dan primary key gabungan, tanpa reset tabel. Akun existing diberi izin Kantor Pusat untuk mempertahankan penggunaan sebelumnya. Kelola User mengatur satu/beberapa lokasi melalui checkbox; Admin tetap global. Akun baru tanpa pilihan tidak memiliki akses lokasi. FoundationSeeder memberi izin HQ pada akun demo baru saja dan tidak mengembalikan izin akun existing yang sudah dicabut. Cukup php artisan migrate pada database lain; jangan migrate:fresh untuk pembaruan ini.
+
+## Penunjukan resepsionis (2026-10-20)
+
+Migration additive 2026_10_20_000003_add_receptionist_permission menambah users.is_receptionist boolean default false. Tidak ada role baru atau backfill akun petugas. Snapshot identitas tamu pada bookings tetap terpisah dari user_id pegawai pengaju.

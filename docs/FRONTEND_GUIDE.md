@@ -70,3 +70,7 @@ Booking/pengajuan dan approve/reject PIC sudah aktif sesuai DEC-029; pertahankan
 > Kerjakan frontend halaman [nama halaman] untuk role [role], pada file [path]. Baca AGENTS.md dan docs/FRONTEND_GUIDE.md. Ikuti desain Jadwal Ruangan dan palet tailwind.config.js. Pertahankan route, kontrak form, data Laravel, dan authorization existing. Gunakan komponen bersama bila sesuai; jangan mengimplementasikan backend tahap berikutnya. Uji halaman yang terdampak dan catat hasil di docs/PROGRESS.md.
 
 Catatan tahap lama di `FRONTEND.md` dan `DECISIONS.md` merupakan riwayat. Untuk pekerjaan UI baru, aturan aktif pada panduan ini dan DEC-020 menggantikan batasan HTML sederhana untuk testing.
+
+> Pembaruan 2026-10-19 (DEC-051/052/053): dropdown Kantor / Cabang tersedia pada katalog, jadwal, daftar/approval dan laporan. Kelola lokasi melalui Admin Kantor & Cabang; PIC tetap per room. Checkbox teknisi IT berdiri sendiri pada booking/review. Beranda dan URL jadwal publik tidak lagi memberi akses jadwal sebelum login. Laporan mencatat permintaan dan keputusan kebutuhan rapat secara terpisah.
+
+> Koreksi DEC-054 (2026-10-19): dropdown Kantor / Cabang hanya untuk Admin. Pegawai/PIC otomatis melihat lokasi yang diizinkan dari Kelola User; tidak menampilkan form filter lokasi atau daftar pilihan cabang di komponen mereka. Form User memiliki checkbox izin lokasi dengan empty selection/old input/error. Seluruh pembatasan tetap diperiksa di server pada URL, Livewire dan proses, bukan hanya @can di Blade.
