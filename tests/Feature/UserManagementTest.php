@@ -75,7 +75,7 @@ class UserManagementTest extends PostgresTestCase
             $this->assertDatabaseHas('users', ['id' => $record->id, 'role' => $role, 'organizational_unit_id' => $unit->id, 'is_active' => true]);
             $this->assertTrue(Hash::check($data['password'], $record->password));
             $this->assertNotSame($data['password'], $record->password);
-            $this->get($this->url('show', $record))->assertOk()->assertSee($data['email'])->assertSee($record->fresh()->roleLabel())->assertSee($unit->name)
+            $this->get($this->url('edit', $record))->assertOk()->assertSee($data['email'])->assertSee($record->fresh()->roleLabel())->assertSee($unit->name)
                 ->assertDontSee($record->password, false)->assertDontSee($data['password']);
             $this->get($this->url('index'))->assertOk()->assertSee($data['email'])->assertSee($unit->name);
         }
@@ -119,10 +119,10 @@ class UserManagementTest extends PostgresTestCase
             ->assertSee('value="'.$record->organizational_unit_id.'" selected', false)->assertDontSee($oldHash, false);
         foreach (['room_pic', 'super_admin', 'user'] as $role) {
             $data = $this->data(['role' => $role, 'organizational_unit_id' => $unit->id, 'password' => '', 'password_confirmation' => '']);
-            $this->put($this->url('update', $record), $data)->assertRedirect($this->url('show', $record))->assertSessionHasNoErrors();
+            $this->put($this->url('update', $record), $data)->assertRedirect($this->url('edit', $record))->assertSessionHasNoErrors();
             $this->assertDatabaseHas('users', ['id' => $record->id, 'name' => $data['name'], 'email' => $data['email'], 'role' => $role, 'organizational_unit_id' => $unit->id]);
             $this->assertSame($oldHash, $record->fresh()->password);
-            $this->get($this->url('show', $record))->assertSee($data['name'])->assertSee($data['email'])->assertSee($record->fresh()->roleLabel())->assertSee($unit->name)->assertSee('User berhasil diperbarui.');
+            $this->get($this->url('edit', $record))->assertSee($data['name'])->assertSee($data['email'])->assertSee($record->fresh()->roleLabel())->assertSee($unit->name)->assertSee('User berhasil diperbarui.');
             $this->get($this->url('index'))->assertSee($data['email'])->assertSee($unit->name);
         }
         $data = $this->data(['organizational_unit_id' => null]);
@@ -156,10 +156,10 @@ class UserManagementTest extends PostgresTestCase
         foreach ([false, true] as $active) {
             $this->admin();
             $this->patch($this->url('status', $record), ['is_active' => (int) $active, 'role' => 'super_admin'])
-                ->assertRedirect($this->url('show', $record))->assertSessionHas('status');
+                ->assertRedirect($this->url('edit', $record))->assertSessionHas('status');
             $this->assertDatabaseHas('users', ['id' => $record->id, 'is_active' => $active, 'role' => 'user', 'organizational_unit_id' => $originalUnit]);
-            $this->get($this->url('show', $record))->assertSee('Status Aktif: '.($active ? 'Aktif' : 'Nonaktif'));
-            $this->get($this->url('index'))->assertSee($record->email)->assertSee($active ? 'Nonaktifkan' : 'Aktifkan');
+            $this->get($this->url('edit', $record))->assertSee('Status Aktif: '.($active ? 'Aktif' : 'Nonaktif'));
+            $this->get($this->url('index'))->assertSee($record->email)->assertDontSee('Nonaktifkan')->assertDontSee('>Aktifkan<', false);
             $this->guest();
             $response = $this->post('/login', ['email' => $record->email, 'password' => 'password']);
             if ($active) {
@@ -190,13 +190,13 @@ class UserManagementTest extends PostgresTestCase
         }
         $this->patch($this->url('reset-password', $record), [
             'password' => 'Reset-password-123', 'password_confirmation' => 'Reset-password-123', 'role' => 'super_admin',
-        ])->assertRedirect($this->url('show', $record))->assertSessionHasNoErrors()->assertSessionHas('status');
+        ])->assertRedirect($this->url('edit', $record))->assertSessionHasNoErrors()->assertSessionHas('status');
         $record->refresh();
         $this->assertTrue(Hash::check('Reset-password-123', $record->password));
         $this->assertFalse(Hash::check('password', $record->password));
         $this->assertNotSame('old-remember-token', $record->getRememberToken());
         $this->assertSame('user', $record->role);
-        $this->get($this->url('show', $record))->assertSee('Password berhasil direset.')
+        $this->get($this->url('edit', $record))->assertSee('Password berhasil direset.')
             ->assertDontSee($record->password, false)->assertDontSee('Reset-password-123');
         $this->guest();
         $this->post('/login', ['email' => $record->email, 'password' => 'password'])->assertSessionHasErrors('email');
@@ -229,7 +229,7 @@ class UserManagementTest extends PostgresTestCase
         $this->patch('/admin/users/999999999/status', ['is_active' => 0])->assertNotFound();
         $this->get('/admin/users/preview')->assertNotFound();
         $record = User::factory()->create(['name' => '<script>alert(1)</script>', 'role' => 'user', 'is_active' => true]);
-        $this->get($this->url('show', $record))->assertSee($record->name)->assertDontSee($record->name, false);
+        $this->get($this->url('edit', $record))->assertSee($record->name)->assertDontSee($record->name, false);
         $this->get($this->url('index'))->assertSee($record->name)->assertDontSee($record->name, false);
         $this->app->bind(VerifyCsrfToken::class, fn ($app) => new class($app, $app['encrypter']) extends VerifyCsrfToken
         {

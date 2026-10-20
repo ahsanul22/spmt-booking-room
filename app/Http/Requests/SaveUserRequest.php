@@ -12,6 +12,12 @@ class SaveUserRequest extends FormRequest
 {
     protected function prepareForValidation(): void
     {
+        if ($this->has('receptionist_selection_present') && ! $this->exists('is_receptionist')) {
+            $this->merge(['is_receptionist' => false]);
+        }
+        if ($this->has('branch_selection_present') && ! $this->exists('branch_ids')) {
+            $this->merge(['branch_ids' => []]);
+        }
         if (is_string($this->input('email'))) {
             $this->merge(['email' => mb_strtolower(trim($this->input('email')))]);
         }
@@ -40,6 +46,9 @@ class SaveUserRequest extends FormRequest
             'role' => ['required', Rule::in([User::ROLE_USER, User::ROLE_ROOM_PIC, User::ROLE_SUPER_ADMIN])],
             'organizational_unit_id' => ['nullable', 'integer', 'exists:organizational_units,id'],
             'is_active' => ['required', 'boolean'],
+            'is_receptionist' => ['sometimes', 'boolean'],
+            'branch_ids' => ['sometimes', 'array'],
+            'branch_ids.*' => ['required', 'integer', 'distinct', 'exists:branches,id'],
             'password' => [$record ? 'nullable' : 'required', 'string', 'confirmed', Password::min(8)],
         ];
     }
