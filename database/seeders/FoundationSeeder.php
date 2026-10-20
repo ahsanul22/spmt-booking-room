@@ -2,6 +2,7 @@
 
 namespace Database\Seeders;
 
+use App\Models\Branch;
 use App\Models\Facility;
 use App\Models\Floor;
 use App\Models\OrganizationalUnit;
@@ -53,9 +54,9 @@ class FoundationSeeder extends Seeder
                 ]);
             }
 
-            $this->user('admin@example.test', 'Admin Demo', User::ROLE_SUPER_ADMIN, $directorate);
-            $pic = $this->user('pic@example.test', 'Room PIC Demo', User::ROLE_ROOM_PIC, $division);
-            $this->user('pegawai@example.test', 'Pegawai Demo', User::ROLE_USER, $department);
+            $this->user('admin@example.test', 'Admin', User::ROLE_SUPER_ADMIN, $directorate);
+            $pic = $this->user('pic@example.test', 'PIC Ruangan', User::ROLE_ROOM_PIC, $division);
+            $this->user('pegawai@example.test', 'Pegawai', User::ROLE_USER, $department);
 
             $floors = collect(range(1, 8))->mapWithKeys(fn (int $number) => [
                 $number => Floor::firstOrCreate(['floor_number' => $number], ['name' => "Lantai {$number}"]),
@@ -69,9 +70,9 @@ class FoundationSeeder extends Seeder
             }
             $examples = [
                 ['DEMO-SM', 'Selat Malaka', 7, 20, 'all', true, 'available'],
-                ['DEMO-01', 'Ruang Demo Terbatas', 2, 10, 'restricted', true, 'available'],
-                ['DEMO-02', 'Ruang Demo Bersama', 3, 15, 'all', true, 'maintenance'],
-                ['DEMO-03', 'Ruang Demo Unit', 7, 8, 'restricted', true, 'unavailable'],
+                ['DEMO-01', 'Ruang Rapat Terbatas', 2, 10, 'restricted', true, 'available'],
+                ['DEMO-02', 'Ruang Rapat Bersama', 3, 15, 'all', true, 'maintenance'],
+                ['DEMO-03', 'Ruang Rapat Unit', 7, 8, 'restricted', true, 'unavailable'],
             ];
 
             foreach ($examples as [$code, $name, $floor, $capacity, $access, $approval, $status]) {
@@ -103,6 +104,8 @@ class FoundationSeeder extends Seeder
                 'name' => $name, 'role' => $role, 'organizational_unit_id' => $unit->id,
                 'password' => Hash::make('password'), 'is_active' => true,
             ])->save();
+            $headOffice = Branch::orderBy('id')->value('id');
+            $user->branches()->syncWithoutDetaching([$headOffice]);
         }
 
         return $user;

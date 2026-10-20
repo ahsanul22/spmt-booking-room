@@ -1,6 +1,7 @@
 <?php
 
 use App\Http\Controllers\Admin\BookingController;
+use App\Http\Controllers\Admin\BranchController;
 use App\Http\Controllers\Admin\DashboardController as AdminDashboardController;
 use App\Http\Controllers\Admin\FacilityController;
 use App\Http\Controllers\Admin\FloorController;
@@ -13,6 +14,7 @@ use App\Http\Controllers\Admin\UserController;
 use App\Http\Controllers\Admin\WhatsappController;
 use App\Http\Controllers\BookingPreparationController;
 use App\Http\Controllers\DashboardController;
+use App\Http\Controllers\GuestRegistrationController;
 use App\Http\Controllers\HomeController;
 use App\Http\Controllers\MonthlyReportController;
 use App\Http\Controllers\Pic\ApprovalController;
@@ -26,8 +28,11 @@ Route::pattern('floor', '[1-9][0-9]*(?:-[a-z0-9]+(?:-[a-z0-9]+)*)?');
 Route::pattern('facility', '[1-9][0-9]*(?:-[a-z0-9]+(?:-[a-z0-9]+)*)?');
 Route::pattern('unit', '[1-9][0-9]*(?:-[a-z0-9]+(?:-[a-z0-9]+)*)?');
 
+Route::get('/tamu', [GuestRegistrationController::class, 'create'])->name('guests.register');
+Route::post('/tamu', [GuestRegistrationController::class, 'store'])->middleware('throttle:10,1')->name('guests.store');
+Route::get('/tamu/jadwal', [GuestRegistrationController::class, 'schedule'])->name('guests.schedule');
 Route::get('/', HomeController::class)->name('home');
-Route::view('/jadwal-ruangan', 'public.schedule')->name('public.schedule');
+Route::get('/jadwal-ruangan', fn () => redirect()->route('schedule.index'))->middleware(['auth', 'can:access-general'])->name('public.schedule');
 
 Route::middleware(['auth', 'can:access-employee'])->group(function () {
     Route::get('/my-bookings', [UserBookingController::class, 'index'])->name('my-bookings.index');
@@ -56,6 +61,7 @@ Route::prefix('pic')->name('pic.')->middleware(['auth', 'can:access-pic'])->grou
 });
 
 Route::prefix('admin')->name('admin.')->middleware(['auth', 'can:access-admin'])->group(function () {
+    Route::resource('branches', BranchController::class)->only(['index', 'store', 'update'])->whereNumber('branch');
     Route::get('/whatsapp', [WhatsappController::class, 'index'])->name('whatsapp.index');
     Route::put('/whatsapp/{template}', [WhatsappController::class, 'update'])->whereNumber('template')->name('whatsapp.update');
     Route::post('/whatsapp/{template}/preview', [WhatsappController::class, 'preview'])->whereNumber('template')->name('whatsapp.preview');

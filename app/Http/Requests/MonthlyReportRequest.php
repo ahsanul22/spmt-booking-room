@@ -3,6 +3,7 @@
 namespace App\Http\Requests;
 
 use Illuminate\Foundation\Http\FormRequest;
+use Illuminate\Validation\Rule;
 
 class MonthlyReportRequest extends FormRequest
 {
@@ -15,6 +16,7 @@ class MonthlyReportRequest extends FormRequest
     {
         return [
             'month' => ['sometimes', 'required', 'date_format:Y-m', 'after_or_equal:1000-01', 'before_or_equal:9998-12'],
+            'branch_id' => [Rule::prohibitedIf(! $this->user()->can('access-admin')), 'nullable', 'integer', 'exists:branches,id'],
             'room_id' => ['nullable', 'integer', 'min:1'],
         ];
     }

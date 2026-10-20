@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use App\Models\Booking;
+use App\Models\Room;
 use Carbon\CarbonImmutable;
 use Illuminate\Http\Request;
 use Illuminate\View\View;
@@ -31,13 +32,13 @@ class DashboardController extends Controller
                 [
                     'label' => 'Ruangan tanggung jawab',
                     'icon' => 'room',
-                    'value' => $user->managedRooms()->count(),
+                    'value' => $user->managedRooms()->visibleTo($user)->count(),
                     'description' => 'Ruangan ditugaskan',
                 ],
                 [
                     'label' => 'Jadwal hari ini',
                     'icon' => 'calendar',
-                    'value' => Booking::query()
+                    'value' => Booking::query()->whereIn('room_id', Room::query()->visibleTo($user)->select('rooms.id'))
                         ->where('date', $today)
                         ->whereIn('status', ['pending', 'approved', 'completed'])
                         ->when(! $isAdmin, fn ($query) => $query

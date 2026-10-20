@@ -9,7 +9,12 @@ class Booking extends Model
 {
     protected $guarded = ['id'];
 
-    protected $casts = ['requires_approval' => 'boolean', 'meeting_preparation' => 'boolean', 'participant_count' => 'integer', 'consumption_snack' => 'boolean', 'consumption_meal' => 'boolean', 'approved_consumption_snack' => 'boolean', 'approved_consumption_meal' => 'boolean', 'decided_at' => 'immutable_datetime'];
+    protected $casts = ['it_support' => 'boolean', 'approved_it_support' => 'boolean', 'requires_approval' => 'boolean', 'meeting_preparation' => 'boolean', 'participant_count' => 'integer', 'consumption_snack' => 'boolean', 'consumption_meal' => 'boolean', 'approved_consumption_snack' => 'boolean', 'approved_consumption_meal' => 'boolean', 'decided_at' => 'immutable_datetime'];
+
+    public function itSupportDecisionLabel(): string
+    {
+        return ! $this->it_support ? 'Tidak diminta' : ($this->status === 'pending' ? 'Menunggu review' : ($this->approved_it_support ? 'Ya' : 'Tidak'));
+    }
 
     public function applicant(): BelongsTo
     {

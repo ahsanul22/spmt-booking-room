@@ -2,8 +2,8 @@
 
 namespace App\Services;
 
-use App\Models\Room;
 use App\Models\Booking;
+use App\Models\Room;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Validation\ValidationException;
 
@@ -31,6 +31,9 @@ class RoomService
             unset($data['facility_ids']);
             if (! $record->exists && ! array_key_exists('capacity', $data)) {
                 $data['capacity'] = 0;
+            }
+            if ($record->exists && isset($data['branch_id']) && (int) $data['branch_id'] !== (int) $record->branch_id && $record->bookings()->exists()) {
+                throw ValidationException::withMessages(['branch_id' => 'Ruangan dengan riwayat booking tidak dapat dipindahkan lokasi. Buat ruangan baru pada lokasi tujuan.']);
             }
             $record->fill($data);
             $record->save();

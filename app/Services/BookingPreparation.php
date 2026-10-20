@@ -11,6 +11,9 @@ class BookingPreparation
 {
     public function unavailableReason(Room $room, User $user): ?string
     {
+        if (! $user->canAccessBranch($room->branch_id)) {
+            return 'Anda tidak memiliki izin akses ke lokasi ruangan ini.';
+        }
         if (! $room->is_active) {
             return 'Ruangan sudah tidak aktif. Silakan pilih ruangan lain.';
         }
@@ -32,7 +35,7 @@ class BookingPreparation
 
     public function validate(array $data, ?Room $room = null): array
     {
-        $data += ['meeting_preparation' => false, 'participant_count' => null, 'consumption_snack' => false, 'consumption_meal' => false];
+        $data += ['it_support' => false, 'meeting_preparation' => false, 'participant_count' => null, 'consumption_snack' => false, 'consumption_meal' => false];
         $enabled = in_array($data['meeting_preparation'], [true, 1, '1'], true);
         if (! $enabled) {
             $data['participant_count'] = null;
@@ -54,6 +57,7 @@ class BookingPreparation
             'participant_count' => [$enabled ? 'required' : 'nullable', 'integer', 'between:1,2147483647'],
             'consumption_snack' => ['required', 'boolean'],
             'consumption_meal' => ['required', 'boolean'],
+            'it_support' => ['required', 'boolean'],
         ], [
             'required' => ':attribute wajib diisi.',
             'date_format' => 'Format :attribute tidak valid.',

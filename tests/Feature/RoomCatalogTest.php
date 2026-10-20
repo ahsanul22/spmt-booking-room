@@ -33,7 +33,7 @@ class RoomCatalogTest extends PostgresTestCase
             ->assertViewHas('rooms', fn ($rooms) => $rooms->total() === 4)
             ->call('selectFilter', 'featured')
             ->assertViewHas('rooms', fn ($rooms) => $rooms->count() === 1 && $rooms->first()->name === 'Selat Malaka')
-            ->assertDontSee('Ruang Demo Terbatas')
+            ->assertDontSee('Ruang Rapat Terbatas')
             ->call('selectFilter', 'other')
             ->assertViewHas('rooms', fn ($rooms) => $rooms->total() === 3 && ! $rooms->contains('name', 'Selat Malaka'))
             ->call('selectFilter', 'all')->assertViewHas('rooms', fn ($rooms) => $rooms->total() === 4);

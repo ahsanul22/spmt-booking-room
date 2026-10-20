@@ -12,6 +12,7 @@ class Kernel extends ConsoleKernel
      */
     protected function schedule(Schedule $schedule): void
     {
+        $schedule->command('guests:prune')->everyMinute()->withoutOverlapping();
         $schedule->command('whatsapp:send')->everyMinute()->withoutOverlapping()
             ->when(fn () => config('whatsapp.enabled') && config('whatsapp.token'));
     }

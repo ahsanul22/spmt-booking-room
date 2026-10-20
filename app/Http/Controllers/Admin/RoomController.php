@@ -4,6 +4,7 @@ namespace App\Http\Controllers\Admin;
 
 use App\Http\Controllers\Controller;
 use App\Http\Requests\SaveRoomRequest;
+use App\Models\Branch;
 use App\Models\Facility;
 use App\Models\Floor;
 use App\Models\OrganizationalUnit;
@@ -16,10 +17,13 @@ use Illuminate\View\View;
 
 class RoomController extends Controller
 {
-    public function index(): View
+    public function index(Request $request): View
     {
+        $request->validate(['branch_id' => ['nullable', 'integer', 'exists:branches,id']]);
+
         return view('admin.rooms.index', [
-            'rooms' => Room::with(['floor', 'facilities'])->orderBy('name')->orderBy('id')->paginate(20),
+            'branches' => Branch::orderBy('name')->get(),
+            'rooms' => Room::with(['branch', 'floor', 'facilities'])->when($request->filled('branch_id'), fn ($query) => $query->where('branch_id', $request->integer('branch_id')))->orderBy('name')->orderBy('id')->paginate(20)->withQueryString(),
         ]);
     }
 
@@ -44,7 +48,7 @@ class RoomController extends Controller
     {
         return view('admin.rooms.edit', $this->formOptions() + [
             'room' => $room->load(['floor', 'facilities', 'pics', 'allowedOrganizationalUnits']),
-            'eligiblePics' => User::where('role', User::ROLE_ROOM_PIC)->orderBy('name')->get(),
+            'eligiblePics' => User::where('role', User::ROLE_ROOM_PIC)->whereHas('branches', fn ($query) => $query->where('branches.id', $room->branch_id))->orderBy('name')->get(),
             'units' => OrganizationalUnit::orderBy('name')->get(),
             'selectedPicIds' => $room->pics->pluck('id')->all(),
             'selectedUnitIds' => $room->allowedOrganizationalUnits->pluck('id')->all(),
@@ -79,6 +83,7 @@ class RoomController extends Controller
     private function formOptions(): array
     {
         return [
+            'branches' => Branch::orderBy('name')->get(),
             'floors' => Floor::orderBy('floor_number')->get(),
             'facilities' => Facility::orderBy('name')->get(),
         ];

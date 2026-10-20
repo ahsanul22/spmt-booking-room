@@ -8,6 +8,7 @@
     <x-workspace-panel :title="$room->name">
         <div class="space-y-6 p-5 sm:p-6">
             <dl class="workspace-detail">
+                <div><dt>Kantor / Cabang</dt><dd>{{ $room->branch?->name }}</dd></div>
                 <div><dt>Kode</dt><dd>{{ $room->code ?? 'Belum ditentukan' }}</dd></div>
                 <div><dt>Lantai</dt><dd>{{ $room->floor?->name ?? 'Belum ditentukan' }}</dd></div>
                 <div><dt>Status Operasional</dt><dd>{{ ['available' => 'Operasional', 'maintenance' => 'Dalam perawatan', 'unavailable' => 'Tidak dapat digunakan'][$room->status] }}</dd></div>

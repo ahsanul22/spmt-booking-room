@@ -22,6 +22,12 @@ class User extends Authenticatable
 
     public const ROLE_SUPER_ADMIN = 'super_admin';
 
+    public function canHandleGuests(): bool
+    {
+        return $this->is_active && $this->is_receptionist
+            && in_array($this->role, [self::ROLE_USER, self::ROLE_ROOM_PIC], true);
+    }
+
     public function roleLabel(): string
     {
         return $this->role === self::ROLE_SUPER_ADMIN ? 'Admin' : str_replace('_', ' ', $this->role);
@@ -47,24 +53,30 @@ class User extends Authenticatable
         return $this->belongsToMany(Room::class, 'room_pics');
     }
 
+    public function branches(): BelongsToMany
+    {
+        return $this->belongsToMany(Branch::class);
+    }
+
+    public function canAccessBranch(int $branchId): bool
+    {
+        return $this->is_active && ($this->role === self::ROLE_SUPER_ADMIN
+            || (in_array($this->role, [self::ROLE_USER, self::ROLE_ROOM_PIC], true)
+                && $this->branches()->whereKey($branchId)->exists()));
+    }
+
     public function notificationRecipients(): HasMany
     {
         return $this->hasMany(WhatsappRecipient::class);
     }
 
-    protected ?int $pendingApprovalsCountCache = null;
-
     public function pendingApprovalsCount(): int
     {
-        if ($this->pendingApprovalsCountCache !== null) {
-            return $this->pendingApprovalsCountCache;
-        }
-
         if (! $this->can('access-pic')) {
-            return $this->pendingApprovalsCountCache = 0;
+            return 0;
         }
 
-        return $this->pendingApprovalsCountCache = Booking::query()
+        return Booking::query()->whereIn('room_id', Room::query()->visibleTo($this)->select('rooms.id'))
             ->where('requires_approval', true)
             ->where('status', 'pending')
             ->when(! $this->can('access-admin'), fn ($query) => $query
@@ -100,6 +112,7 @@ class User extends Authenticatable
      * @var array<string, string>
      */
     protected $casts = [
+        'is_receptionist' => 'boolean',
         'email_verified_at' => 'datetime',
         'is_active' => 'boolean',
     ];

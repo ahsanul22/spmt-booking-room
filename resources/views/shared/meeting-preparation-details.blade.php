@@ -7,3 +7,6 @@
 @if($booking->meeting_preparation)
     <div><dt>Konsumsi disetujui</dt><dd>{{ $booking->status === 'pending' ? 'Menunggu review PIC / Admin' : (collect([$booking->approved_consumption_snack ? 'Snack' : null, $booking->approved_consumption_meal ? 'Makanan' : null])->filter()->implode(', ') ?: 'Tidak ada konsumsi yang disetujui') }}</dd></div>
 @endif
+
+<div><dt>Teknisi IT diminta</dt><dd>{{ $booking->it_support ? 'Ya' : 'Tidak' }}</dd></div>
+<div><dt>Teknisi IT disetujui</dt><dd>{{ $booking->itSupportDecisionLabel() }}</dd></div>

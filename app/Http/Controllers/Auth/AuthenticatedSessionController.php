@@ -27,8 +27,8 @@ class AuthenticatedSessionController extends Controller
                 $request->session()->forget('booking.login_room');
             }
         }
-        $selectedRoom = Room::where('is_active', true)->where('access_type', 'all')
-            ->find($request->session()->get('booking.login_room'));
+        // Location permissions cannot be checked before authentication.
+        $selectedRoom = null;
 
         return view('auth.login', compact('selectedRoom'));
     }
@@ -44,7 +44,7 @@ class AuthenticatedSessionController extends Controller
 
         $roomId = $request->session()->pull('booking.login_room');
         if ($roomId && $request->user()->can('access-employee')) {
-            $room = Room::where('is_active', true)->where('status', 'available')->find($roomId);
+            $room = Room::query()->visibleTo($request->user())->where('is_active', true)->where('status', 'available')->find($roomId);
 
             return $room ? redirect()->route('rooms.book', $room)
                 : redirect()->route('rooms.index');

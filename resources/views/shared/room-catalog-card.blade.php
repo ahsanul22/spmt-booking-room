@@ -6,7 +6,7 @@
                     </span>
                 </div>
                 <div @class(['flex flex-1 flex-col', 'p-5' => $compact ?? false, 'p-6' => ! ($compact ?? false)])>
-                    <p class="break-words text-sm font-medium text-slate-500">{{ $room->floor?->name ?? 'Lantai belum ditentukan' }}</p>
+                    <p class="break-words text-sm font-medium text-slate-500">{{ $room->branch?->name }} · {{ $room->floor?->name ?? 'Lantai belum ditentukan' }}</p>
                     <h3 @class(['mt-2 break-words font-bold text-primaryDark', 'text-lg leading-6' => $compact ?? false, 'text-xl' => ! ($compact ?? false)])>@if($public){{ $room->name }}@else<a class="hover:underline" href="{{ route('rooms.show', $room) }}">{{ $room->name }}</a>@endif</h3>
                     @if(! $public && ! ($compact ?? false))
                     <p class="mt-4 break-words text-base leading-6 text-slate-600">{{ $room->description ?: 'Deskripsi ruangan belum ditambahkan.' }}</p>

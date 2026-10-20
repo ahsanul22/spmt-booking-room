@@ -18,7 +18,7 @@
             @endif
             <div class="space-y-3">
                 <button type="button" wire:click="addDate" wire:loading.attr="disabled" class="workspace-button-secondary">+ Tambah booking</button>
-                <p class="text-sm text-slate-600">Tambah booking untuk hari lain dengan jam, agenda, peserta, dan permintaan konsumsi yang sama. Setiap booking ditinjau terpisah. Jika satu jadwal bermasalah, seluruh pengajuan belum disimpan.</p>
+                <p class="text-sm text-slate-600">Tambah booking untuk hari lain dengan jam, agenda, peserta, konsumsi, dan kebutuhan teknisi IT yang sama. Setiap booking ditinjau terpisah. Jika satu jadwal bermasalah, seluruh pengajuan belum disimpan.</p>
                 @foreach($additionalDates as $index => $extraDate)
                     <div wire:key="extra-date-{{ $index }}" class="flex flex-wrap items-end gap-3">
                         <x-workspace-field wire:model.live="additionalDates.{{ $index }}" name="additionalDates.{{ $index }}" label="Tanggal booking {{ $index + 2 }}" type="date" :min="$earliestStart->format('Y-m-d')" required />
@@ -35,8 +35,8 @@
         <div class="min-w-0 lg:order-2">
             <x-workspace-panel title="Ruangan pilihan">
                 <div class="space-y-4 p-5 sm:p-6">
-                    <div><h2 class="break-words text-xl font-bold text-primaryDark">{{ $room->name }}</h2><p class="mt-2 text-base text-slate-600">{{ $room->floor?->name ?? 'Lantai belum ditentukan' }}</p></div>
-                    <p class="text-base leading-6 text-slate-600">{{ $room->requires_approval ? 'Pengajuan memerlukan persetujuan PIC.' : 'Ruangan dapat langsung dibooking. Permintaan konsumsi tetap memerlukan review PIC / Admin.' }}</p>
+                    <div><h2 class="break-words text-xl font-bold text-primaryDark">{{ $room->name }}</h2><p class="mt-2 text-base text-slate-600">{{ $room->branch?->name }} · {{ $room->floor?->name ?? 'Lantai belum ditentukan' }}</p></div>
+                    <p class="text-base leading-6 text-slate-600">{{ ($guest_reference !== '' || $room->requires_approval) ? 'Pengajuan memerlukan persetujuan PIC.' : 'Ruangan dapat langsung dibooking. Permintaan konsumsi atau teknisi IT tetap memerlukan review PIC / Admin.' }}</p>
                     <div class="border-t border-slate-100 pt-4 text-base">
                         <h3 class="font-semibold text-primaryDark">Fasilitas ruangan</h3>
                         @if($room->facilities->isNotEmpty())
@@ -63,6 +63,17 @@
                 <div class="px-5 pt-5 sm:px-6"><h2 class="text-lg font-bold text-primaryDark">Detail Pertemuan</h2></div>
                 <form wire:submit="submitBooking" method="POST" action="{{ route('rooms.book', $room) }}" class="workspace-form">
                     @csrf
+                    @if($canHandleGuests)
+                    <div class="sm:col-span-2">
+                        <x-workspace-field wire:model.live="guest_reference" type="select" name="guest_reference" label="Booking untuk" hint="Pilih tamu yang sudah mendaftar. Identitas tamu otomatis dicatat; Anda tetap tercatat sebagai pegawai pengaju.">
+                            <option value="">Diri sendiri</option>
+                            @foreach($guestOptions as $guest)
+                                <option value="{{ $guest->reference }}">{{ $guest->name }} - {{ $guest->organization }} ({{ $guest->created_at->setTimezone(config('booking.timezone'))->format('d/m H:i') }})</option>
+                            @endforeach
+                        </x-workspace-field>
+                        @if($guestOptions->isEmpty())<p class="mt-2 text-sm text-slate-600">Belum ada tamu aktif untuk lokasi ruangan ini.</p>@endif
+                    </div>
+                    @endif
                     <input type="hidden" name="room_id" value="{{ $room->id }}">
                     <p class="text-sm leading-6 text-slate-600 sm:col-span-2">Tidak ada batas minimal waktu pengajuan. Jam mulai belum boleh lewat dan rapat selesai pada tanggal yang sama.</p>
                     <label class="flex min-h-[44px] items-center gap-3 text-base text-primaryDark sm:col-span-2">
@@ -100,6 +111,14 @@
                     </div>
                     <div class="sm:col-span-2"><x-workspace-field wire:model="agenda" name="agenda" label="Judul / Agenda Rapat" maxlength="255" required /></div>
                     <div class="sm:col-span-2"><x-workspace-field wire:model="notes" name="notes" label="Catatan (opsional)" type="textarea" rows="2" maxlength="2000" /></div>
+                    <div class="mb-5 rounded-xl border border-slate-200 p-4">
+                        <label class="flex min-h-[44px] items-center gap-3 text-base" for="it-support">
+                            <input id="it-support" type="checkbox" name="it_support" wire:model.live="it_support" class="h-5 w-5 rounded border-slate-300 text-primary focus:ring-primary">
+                            Membutuhkan teknisi IT
+                        </label>
+                        <p class="mt-2 text-sm text-slate-600">Permintaan teknisi IT memerlukan persetujuan PIC / Admin.</p>
+                        @error('it_support')<p role="alert" class="text-danger">{{ $message }}</p>@enderror
+                    </div>
                     @if($room->allows_meeting_preparation)
                         <fieldset class="min-w-0 overflow-hidden rounded-xl border border-slate-200 bg-surface sm:col-span-2" aria-describedby="meeting-preparation-help">
                             <legend class="sr-only">Persiapan rapat (opsional)</legend>
@@ -152,7 +171,7 @@
                     <div class="booking-form-actions">
                         <div class="grid gap-3 sm:grid-cols-2">
                             <button type="button" wire:click="checkPlan" wire:loading.attr="disabled" @disabled($unavailableReason) class="workspace-button-secondary booking-form-button disabled:cursor-not-allowed disabled:opacity-50">Periksa Rencana</button>
-                            <button type="submit" wire:loading.attr="disabled" @disabled($unavailableReason) class="workspace-button booking-form-button border border-transparent disabled:cursor-not-allowed disabled:opacity-50">{{ ($room->requires_approval || $consumption_snack || $consumption_meal) ? 'Ajukan Booking' : 'Booking Sekarang' }}</button>
+                            <button type="submit" wire:loading.attr="disabled" @disabled($unavailableReason) class="workspace-button booking-form-button border border-transparent disabled:cursor-not-allowed disabled:opacity-50">{{ ($guest_reference !== '' || $room->requires_approval || $consumption_snack || $consumption_meal || $it_support) ? 'Ajukan Booking' : 'Booking Sekarang' }}</button>
                         </div>
                         <div role="status" aria-live="polite" aria-atomic="true" class="mt-3 min-h-[24px] text-sm leading-6 text-primary">
                             <span wire:loading.delay wire:target="checkPlan">Memeriksa rencana...</span>

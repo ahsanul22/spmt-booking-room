@@ -25,6 +25,7 @@ class SaveRoomRequest extends FormRequest
         return [
             'name' => ['required', 'string', 'max:255'],
             'code' => ['nullable', 'string', 'max:255', Rule::unique('rooms')->ignore($this->route('room'))],
+            'branch_id' => ['sometimes', 'required', 'integer', 'exists:branches,id'],
             'floor_id' => ['required', 'integer', 'exists:floors,id'],
             'capacity' => ['sometimes', 'integer', 'between:0,2147483647'],
             'description' => ['nullable', 'string', 'max:5000'],

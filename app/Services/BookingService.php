@@ -3,6 +3,7 @@
 namespace App\Services;
 
 use App\Models\Booking;
+use App\Models\GuestRegistration;
 use App\Models\Room;
 use App\Models\User;
 use Carbon\CarbonImmutable;
@@ -20,14 +21,22 @@ class BookingService
     {
         Validator::make(['token' => $token], ['token' => ['required', 'uuid']])->validate();
         // Only the expected form fields contribute to the idempotency fingerprint.
-        $input = array_intersect_key($input, array_flip(['date', 'start_time', 'end_time', 'agenda', 'notes', 'meeting_preparation', 'participant_count', 'consumption_snack', 'consumption_meal', 'series_hash']));
+        $input = array_intersect_key($input, array_flip(['date', 'start_time', 'end_time', 'agenda', 'notes', 'meeting_preparation', 'participant_count', 'consumption_snack', 'consumption_meal', 'it_support', 'series_hash', 'guest_reference']));
         $input['agenda'] = is_string($input['agenda'] ?? null) ? trim($input['agenda']) : ($input['agenda'] ?? null);
         $input['notes'] = is_string($input['notes'] ?? null) ? trim($input['notes']) : ($input['notes'] ?? '');
-        $input += ['meeting_preparation' => false, 'participant_count' => null, 'consumption_snack' => false, 'consumption_meal' => false];
+        $input += ['it_support' => false, 'meeting_preparation' => false, 'participant_count' => null, 'consumption_snack' => false, 'consumption_meal' => false];
+        Validator::make($input, ['guest_reference' => ['nullable', 'string', 'max:20']])->validate();
+        $input['guest_reference'] = strtoupper(trim((string) ($input['guest_reference'] ?? '')));
         $fingerprint = $input;
+        if ($input['guest_reference'] === '') {
+            unset($fingerprint['guest_reference']);
+        }
         // Keep retries of submissions made before preparation fields were introduced valid.
         if ($input['meeting_preparation'] === false && $input['participant_count'] === null && $input['consumption_snack'] === false && $input['consumption_meal'] === false) {
             unset($fingerprint['meeting_preparation'], $fingerprint['participant_count'], $fingerprint['consumption_snack'], $fingerprint['consumption_meal']);
+        }
+        if ($input['it_support'] === false) {
+            unset($fingerprint['it_support']);
         }
         ksort($fingerprint);
         $hash = hash('sha256', json_encode([$roomId, $fingerprint], JSON_THROW_ON_ERROR));
@@ -38,6 +47,12 @@ class BookingService
             $room = Room::lockForUpdate()->findOrFail($roomId);
             $user = User::lockForUpdate()->findOrFail($actor->id);
             Gate::forUser($user)->authorize('access-employee');
+            if ($input['guest_reference'] !== '') {
+                abort_unless($user->canHandleGuests(), 403);
+            }
+            if (! $user->canAccessBranch($room->branch_id)) {
+                throw ValidationException::withMessages(['room' => 'Anda tidak memiliki izin akses ke lokasi ruangan ini.']);
+            }
             $existing = Booking::where('user_id', $user->id)->where('submission_token', $token)->first();
             if ($existing) {
                 if (! hash_equals($existing->request_hash, $hash)) {
@@ -46,9 +61,17 @@ class BookingService
 
                 return $existing;
             }
+            $guest = null;
+            if ($input['guest_reference'] !== '') {
+                $guest = GuestRegistration::where('reference', $input['guest_reference'])
+                    ->where('branch_id', $room->branch_id)->where('expires_at', '>', now())->sharedLock()->first();
+                if (! $guest) {
+                    throw ValidationException::withMessages(['guest_reference' => 'Kode tamu tidak ditemukan, kedaluwarsa, atau berbeda kantor tujuan.']);
+                }
+            }
             $data = $this->preparation->validate($input, $room);
             $this->assertRoomAllowed($room, $user);
-            $requiresApproval = $room->requires_approval || $data['consumption_snack'] || $data['consumption_meal'];
+            $requiresApproval = $guest !== null || $room->requires_approval || $data['consumption_snack'] || $data['consumption_meal'] || $data['it_support'];
             $approvalRoom = clone $room;
             $approvalRoom->requires_approval = $requiresApproval;
             $this->assertPicAvailable($approvalRoom);
@@ -56,11 +79,15 @@ class BookingService
 
             $booking = Booking::create([
                 'user_id' => $user->id, 'room_id' => $room->id,
+                'guest_name' => $guest?->name,
+                'guest_organization' => $guest?->organization,
+                'guest_reference' => $guest?->reference,
                 'organizational_unit_id' => $user->organizational_unit_id,
                 'unit_name' => $user->organizationalUnit?->name,
                 'agenda' => $data['agenda'], 'date' => $data['date'],
                 'start_time' => $data['start_time'], 'end_time' => $data['end_time'],
                 'notes' => $data['notes'] ?: null,
+                'it_support' => $data['it_support'],
                 'meeting_preparation' => $data['meeting_preparation'],
                 'participant_count' => $data['participant_count'],
                 'consumption_snack' => $data['consumption_snack'],
@@ -110,7 +137,7 @@ class BookingService
 
     public function assertPicAvailable(Room $room): void
     {
-        if ($room->requires_approval && ! $room->pics()->where('role', User::ROLE_ROOM_PIC)->where('is_active', true)->exists()) {
+        if ($room->requires_approval && ! $room->pics()->where('role', User::ROLE_ROOM_PIC)->where('is_active', true)->whereHas('branches', fn ($query) => $query->where('branches.id', $room->branch_id))->exists()) {
             throw ValidationException::withMessages(['room' => 'PIC aktif belum ditetapkan. Hubungi administrator sebelum mengajukan ruangan ini.']);
         }
     }
@@ -146,6 +173,7 @@ class BookingService
             $room = Room::lockForUpdate()->findOrFail($record->room_id);
             $booking = Booking::lockForUpdate()->findOrFail($record->id);
             $reviewer = User::sharedLock()->findOrFail($actor->id);
+            abort_unless($reviewer->canAccessBranch($room->branch_id), 403);
             abort_unless($reviewer->is_active && ($reviewer->role === User::ROLE_SUPER_ADMIN
                 || ($reviewer->role === User::ROLE_ROOM_PIC && $room->pics()->whereKey($reviewer->id)->exists())), 403);
             abort_unless($booking->requires_approval, 403);
@@ -172,6 +200,12 @@ class BookingService
                 }
                 $approved[$field] = $decision === 'approved' && (bool) $value;
             }
+            $it = $consumption['approved_it_support'] ?? false;
+            Validator::make(['approved_it_support' => $it], ['approved_it_support' => ['required', 'boolean']])->validate();
+            if ($decision === 'approved' && $it && ! $booking->it_support) {
+                throw ValidationException::withMessages(['approved_it_support' => 'Teknisi IT hanya dapat disetujui jika diminta pegawai.']);
+            }
+            $approved['approved_it_support'] = $decision === 'approved' && (bool) $it;
             $booking->update($approved + [
                 'decision_notes' => $reason !== '' ? $reason : null,
                 'status' => $decision, 'rejection_reason' => $decision === 'rejected' ? $reason : null,

@@ -3,6 +3,8 @@
 namespace App\Services;
 
 use App\Models\Booking;
+use App\Models\Room;
+use App\Models\User;
 use Carbon\CarbonImmutable;
 use Illuminate\Support\Collection;
 use Illuminate\Support\Facades\Validator;
@@ -16,17 +18,19 @@ class BookingSchedule
         ])->passes();
     }
 
-    public function slots(string $from, string $to, ?int $roomId = null, bool $publicOnly = false): Collection
+    public function slots(string $from, string $to, ?int $roomId = null, bool $publicOnly = false, ?int $branchId = null): Collection
     {
         // The authenticated schedule may show unit snapshots; public responses
         // exclude them, as well as agendas, people, notes and submission tokens.
         $now = CarbonImmutable::now(config('booking.timezone'));
 
         return Booking::query()->select(['id', 'room_id', 'date', 'start_time', 'end_time', 'status'])
+            ->whereIn('room_id', Room::query()->visibleTo(auth()->user() ?? new User)->select('rooms.id'))
             ->when(! $publicOnly, fn ($query) => $query->addSelect('unit_name'))
-            ->with('room:id,name,is_active,status')->whereBetween('date', [$from, $to])
+            ->with(['room:id,name,is_active,status,branch_id', 'room.branch:id,name'])->whereBetween('date', [$from, $to])
             ->whereIn('status', ['pending', 'approved', 'completed'])
             ->when($publicOnly, fn ($query) => $query->whereHas('room', fn ($rooms) => $rooms->where('is_active', true)->where('access_type', 'all')))
+            ->when($branchId, fn ($query) => $query->whereHas('room', fn ($rooms) => $rooms->where('branch_id', $branchId)))
             ->when($roomId, fn ($query) => $query->where('room_id', $roomId))
             ->orderBy('date')->orderBy('start_time')->orderBy('room_id')->get()
             ->map(function ($booking) use ($now, $publicOnly) {
@@ -42,7 +46,7 @@ class BookingSchedule
                 return [
                     ...($publicOnly ? [] : ['unit_name' => $booking->unit_name]),
                     'id' => $booking->id, 'room_id' => $booking->room_id,
-                    'room_name' => $booking->room->name, 'room_operational' => $booking->room->is_active && $booking->room->status === 'available',
+                    'room_name' => $booking->room->name, 'branch_name' => $booking->room->branch?->name, 'room_operational' => $booking->room->is_active && $booking->room->status === 'available',
                     'date' => $booking->date, 'start' => substr($booking->start_time, 0, 5), 'end' => substr($booking->end_time, 0, 5),
                     'state' => $state, 'label' => match ($state) {
                         'ongoing' => 'Sedang berlangsung', 'pending' => 'Menunggu PIC', 'scheduled' => 'Terjadwal',

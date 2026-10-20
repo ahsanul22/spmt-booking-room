@@ -5,7 +5,7 @@
         <x-table :headers="['Ruangan / Agenda', ...(($showApplicant ?? true) ? ['Pemohon / Unit'] : []), 'Tanggal', 'Waktu (WIB)', 'Status', 'Aksi']">
             @foreach($bookings as $item)
                 <tr>
-                    <td><p class="font-semibold text-primaryDark">{{ $item->room->name }}</p><p class="mt-1">{{ $item->agenda }}</p></td>
+                    <td><p class="font-semibold text-primaryDark">{{ $item->room->name }}</p><p class="mt-1 text-sm text-slate-600">{{ $item->room->branch?->name }}</p><p class="mt-1">{{ $item->agenda }}</p>@if($item->guest_name)<p class="mt-2 font-semibold text-primaryDark">Tamu: {{ $item->guest_name }} &middot; {{ $item->guest_organization }}</p>@endif</td>
                     @if($showApplicant ?? true)
                     <td>{{ $item->applicant->name }}<p class="mt-1 text-sm text-slate-600">{{ $item->unit_name ?? 'Unit belum ditentukan' }}</p></td>
                     @endif

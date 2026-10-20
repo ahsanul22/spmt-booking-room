@@ -24,6 +24,11 @@
     <option value="restricted" @selected(old('access_type', data_get($room ?? null, 'access_type', 'all')) === 'restricted')>Unit tertentu (Restricted)</option>
 </x-workspace-field>
 
+<x-workspace-field type="select" name="branch_id" label="Kantor / Cabang" required>
+    @foreach($branches as $branch)
+        <option value="{{ $branch->id }}" @selected((string) old('branch_id', $room->branch_id ?? $branches->sortBy('id')->first()?->id) === (string) $branch->id)>{{ $branch->name }}</option>
+    @endforeach
+</x-workspace-field>
 <x-workspace-field type="select" name="requires_approval" label="Perlu Approval" required>
     <option value="">Pilih Kebutuhan Approval</option>
     <option value="1" @selected((string) old('requires_approval', isset($room) ? (int) $room->requires_approval : 0) === '1')>Ya</option>

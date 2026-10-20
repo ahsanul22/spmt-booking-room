@@ -15,14 +15,15 @@ class MonthlyBookingReport
 
     public function rooms(User $user): Builder
     {
-        return Room::query()->when(! $user->can('access-admin'), fn ($query) => $query
+        return Room::query()->visibleTo($user)->when(! $user->can('access-admin'), fn ($query) => $query
             ->whereHas('pics', fn ($pics) => $pics->where('users.id', $user->id)));
     }
 
-    public function bookings(User $user, CarbonImmutable $month, ?int $roomId): Builder
+    public function bookings(User $user, CarbonImmutable $month, ?int $roomId, ?int $branchId = null): Builder
     {
         return Booking::query()->whereIn('room_id', $this->rooms($user)->select('rooms.id'))
             ->whereBetween('date', [$month->startOfMonth()->toDateString(), $month->endOfMonth()->toDateString()])
+            ->when($branchId, fn ($query) => $query->whereHas('room', fn ($rooms) => $rooms->where('branch_id', $branchId)))
             ->when($roomId, fn ($query) => $query->where('room_id', $roomId));
     }
 
@@ -33,6 +34,7 @@ class MonthlyBookingReport
             ->groupBy('room_id', 'status')->get();
         $byRoom = $rooms->map(function ($room) use ($counts) {
             $rows = $counts->where('room_id', $room->id);
+
             return [
                 'room' => $room,
                 'counts' => collect(self::STATUSES)->map(fn ($label, $status) => (int) $rows->where('status', $status)->sum('total'))->all(),
@@ -52,6 +54,7 @@ class MonthlyBookingReport
     public static function csvCell(mixed $value): string
     {
         $value = (string) $value;
+
         // Prevent spreadsheet formulas from user-supplied names, units, or agendas.
         return preg_match('/^[\s\x{FEFF}]*[=+@-]/u', $value) || preg_match('/^[\t\r\n]/', $value) ? "'".$value : $value;
     }

@@ -13,3 +13,14 @@
         @endforeach
     </fieldset>
 @endif
+
+@if($booking->it_support)
+    <div class="mb-5 rounded-xl border border-slate-200 p-4">
+        <label class="flex min-h-[44px] items-center gap-3 text-base">
+            <input type="checkbox" name="approved_it_support" value="1" @checked((string) old('approval_id', $booking->id) === (string) $booking->id && old('approved_it_support', false)) class="h-5 w-5 rounded border-slate-300 text-primary focus:ring-primary">
+            Setujui kebutuhan teknisi IT
+        </label>
+        <p class="mt-2 text-sm text-slate-600">Jika tidak dicentang, booking dapat disetujui tanpa teknisi IT.</p>
+        @error('approved_it_support')<p role="alert" class="text-danger">{{ $message }}</p>@enderror
+    </div>
+@endif

@@ -2,11 +2,13 @@
 
 namespace App\Livewire;
 
+use Illuminate\Support\Facades\Gate;
+
 class PublicRoomSchedule extends RoomSchedule
 {
     public function boot(): void
     {
-        // Public occupancy is scoped on every query, including Livewire refreshes.
+        Gate::authorize('access-general');
     }
 
     protected function publicOnly(): bool

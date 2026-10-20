@@ -3,17 +3,39 @@
 namespace App\Models;
 
 use App\Models\Concerns\HasReadableRouteKey;
+use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\BelongsToMany;
+use Illuminate\Database\Eloquent\Relations\HasMany;
 
 class Room extends Model
 {
     use HasReadableRouteKey;
 
-    protected $fillable = ['name', 'code', 'floor_id', 'capacity', 'description', 'access_type', 'requires_approval', 'allows_meeting_preparation', 'status', 'is_active'];
+    protected $fillable = ['branch_id', 'name', 'code', 'floor_id', 'capacity', 'description', 'access_type', 'requires_approval', 'allows_meeting_preparation', 'status', 'is_active'];
 
     protected $casts = ['capacity' => 'integer', 'requires_approval' => 'boolean', 'allows_meeting_preparation' => 'boolean', 'is_active' => 'boolean'];
+
+    public function scopeVisibleTo(Builder $query, User $user): Builder
+    {
+        if (! $user->is_active || ! in_array($user->role, [User::ROLE_SUPER_ADMIN, User::ROLE_ROOM_PIC, User::ROLE_USER], true)) {
+            return $query->whereRaw('1 = 0');
+        }
+
+        return $query->when($user->role !== User::ROLE_SUPER_ADMIN, fn ($rooms) => $rooms
+            ->whereIn('rooms.branch_id', $user->branches()->select('branches.id')));
+    }
+
+    public function bookings(): HasMany
+    {
+        return $this->hasMany(Booking::class);
+    }
+
+    public function branch(): BelongsTo
+    {
+        return $this->belongsTo(Branch::class);
+    }
 
     public function floor(): BelongsTo
     {

@@ -12,6 +12,7 @@
             <a href="{{ route('admin.rooms.show', $item) }}" class="hover:underline">{{ $item->name }}</a>
         </h3>
         <dl class="relative mt-5 grid grid-cols-1 gap-4 border-t border-secondaryLight/40 pt-4">
+            <div><dt class="text-sm text-slate-500">Kantor / Cabang</dt><dd class="mt-2 text-base font-semibold text-primaryDark">{{ $item->branch?->name }}</dd></div>
             <div><dt class="text-sm text-slate-500">Lantai</dt><dd class="mt-2 break-words text-base font-semibold text-primaryDark">{{ $item->floor?->name ?? 'Belum ditentukan' }}</dd></div>
         </dl>
     </div>

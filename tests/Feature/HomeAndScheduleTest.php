@@ -49,51 +49,33 @@ class HomeAndScheduleTest extends PostgresTestCase
         ], $changes));
     }
 
-    public function test_public_schedule_page_and_home_link_do_not_expose_private_meeting_fields(): void
+    public function test_guest_cannot_open_any_schedule_or_the_legacy_livewire_component(): void
     {
         $booking = $this->booking();
-        $this->room()->update(['description' => 'DESKRIPSI-INTERNAL']);
-        $this->get('/')->assertOk()->assertSee(route('public.schedule'), false);
-        $this->get(route('public.schedule'))->assertOk()->assertSeeLivewire(PublicRoomSchedule::class)->assertSee($this->room()->name)
-            ->assertSee('12:00')->assertSee('13:00')->assertSee(route('login'), false)
-            ->assertDontSee('Kenali pilihan ruangan')
-            ->assertDontSee('RAHASIA-AGENDA')->assertDontSee('RAHASIA-CATATAN')->assertDontSee('RAHASIA-UNIT')
-            ->assertDontSee($booking->submission_token)->assertDontSee('DESKRIPSI-INTERNAL')
-            ->assertDontSee('Ruang Demo Terbatas')->assertDontSee($this->employee()->email)
-            ->assertDontSee('wire:submit', false);
-        $this->get('/schedule')->assertRedirect('/login');
-        $this->get('/admin/schedule')->assertRedirect('/login');
+        $this->get('/')->assertOk()->assertDontSee(route('public.schedule'), false)
+            ->assertDontSee('Lihat Jadwal Ruangan')->assertDontSee($this->room()->name)
+            ->assertDontSee('RAHASIA-AGENDA')->assertDontSee($booking->submission_token);
+        foreach (['public.schedule', 'schedule.index', 'admin.schedule.index'] as $name) {
+            $this->get(route($name))->assertRedirect(route('login'));
+        }
         Livewire::test(RoomSchedule::class)->assertForbidden();
+        Livewire::test(PublicRoomSchedule::class)->assertForbidden();
     }
 
-    public function test_public_schedule_handles_empty_schedule_and_escapes_names(): void
+    public function test_legacy_schedule_redirects_employees_and_escapes_room_names(): void
     {
         $this->room()->update(['name' => '<script>room-name</script>']);
-        $this->get(route('public.schedule'))->assertSee('<script>room-name</script>')->assertDontSee('<script>room-name</script>', false);
-        Room::query()->update(['is_active' => false]);
-        $this->get(route('public.schedule'))->assertOk()->assertSee('Belum ada jadwal ruangan.')->assertSee('Login')->assertDontSee('Login Pegawai');
+        $this->actingAs($this->employee())->get(route('public.schedule'))->assertRedirect(route('schedule.index'));
+        $this->get(route('schedule.index'))->assertOk()->assertSee('<script>room-name</script>')->assertDontSee('<script>room-name</script>', false);
     }
 
-    public function test_public_schedule_scopes_filters_and_refresh_to_public_active_rooms(): void
+    public function test_legacy_livewire_component_rechecks_authorization_after_deactivation(): void
     {
-        $this->booking();
-        $restricted = Room::where('access_type', 'restricted')->firstOrFail();
-        $this->booking(['room_id' => $restricted->id]);
-        $component = Livewire::test(PublicRoomSchedule::class)
-            ->assertDontSee($restricted->name)
-            ->assertViewHas('daySlots', fn ($slots) => $slots->count() === 1)
-            ->call('selectRoom', (string) $this->room()->id)
-            ->call('selectDate', '2026-09-28')->assertSee('Belum ada jadwal ruangan.')
-            ->call('today')->assertSee('12:00')
-            ->call('changeMonth', 1)->assertSet('month', '2026-10-01')
-            ->call('today');
-        $this->room()->update(['access_type' => 'restricted']);
-        $component->call('$refresh')->assertViewHas('daySlots', fn ($slots) => $slots->isEmpty())
-            ->assertDontSee($this->room()->name);
-        Livewire::test(PublicRoomSchedule::class)->call('selectRoom', (string) $restricted->id)->assertStatus(422);
-        $this->get('/?room_id='.$restricted->id)->assertOk()->assertDontSee($restricted->name);
-        $this->room()->update(['access_type' => 'all', 'is_active' => false]);
-        Livewire::test(PublicRoomSchedule::class)->assertViewHas('daySlots', fn ($slots) => $slots->isEmpty());
+        $user = $this->employee();
+        $component = Livewire::actingAs($user)->test(PublicRoomSchedule::class);
+        $user->is_active = false;
+        $user->save();
+        $component->call('$refresh')->assertForbidden();
     }
 
     public function test_selected_public_room_is_preserved_through_failed_then_successful_login(): void
@@ -145,6 +127,7 @@ class HomeAndScheduleTest extends PostgresTestCase
 
     public function test_occupancy_states_follow_wib_and_do_not_mark_pending_as_in_use(): void
     {
+        $this->actingAs($this->employee());
         $this->booking(['start_time' => '09:00', 'end_time' => '10:00']);
         $this->booking(['start_time' => '10:00', 'end_time' => '11:00']);
         $this->booking(['start_time' => '09:00', 'end_time' => '11:00', 'status' => 'pending']);

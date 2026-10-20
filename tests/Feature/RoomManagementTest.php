@@ -186,6 +186,8 @@ class RoomManagementTest extends PostgresTestCase
             $this->get($this->url('show', $room))->assertSee($status);
             $this->get($this->url('index'))->assertSee($status);
         }
+        // Updates above also rename the room; redirect assertions need its current readable key.
+        $room->refresh();
         foreach ([false, true] as $active) {
             $this->patch($this->url('status', $room), ['is_active' => (int) $active, 'status' => 'unavailable', 'facility_ids' => []])
                 ->assertRedirect($this->url('show', $room))->assertSessionHasNoErrors();

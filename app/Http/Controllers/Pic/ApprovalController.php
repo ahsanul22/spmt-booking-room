@@ -4,6 +4,8 @@ namespace App\Http\Controllers\Pic;
 
 use App\Http\Controllers\Controller;
 use App\Models\Booking;
+use App\Models\Branch;
+use App\Models\Room;
 use App\Services\BookingService;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Http\RedirectResponse;
@@ -16,26 +18,31 @@ class ApprovalController extends Controller
 
     private function query(Request $request): Builder
     {
-        return Booking::with(['room', 'applicant', 'organizationalUnit'])
+        abort_if(! $request->user()->can('access-admin') && $request->filled('branch_id'), 403);
+        $request->validate(['branch_id' => ['nullable', 'integer', 'exists:branches,id']]);
+
+        return Booking::with(['room.branch', 'applicant', 'organizationalUnit'])
+            ->whereIn('room_id', Room::query()->visibleTo($request->user())->select('rooms.id'))
             ->where('requires_approval', true)
+            ->when($request->filled('branch_id'), fn ($query) => $query->whereHas('room', fn ($rooms) => $rooms->where('branch_id', $request->integer('branch_id'))))
             ->when(! $request->user()->can('access-admin'), fn ($query) => $query
                 ->whereHas('room.pics', fn ($pics) => $pics->where('users.id', $request->user()->id)));
     }
 
     public function index(Request $request): View
     {
-        $approvals = $this->query($request)->where('status', 'pending')->orderBy('date')->orderBy('start_time')->paginate(self::PAGE_SIZE);
+        $approvals = $this->query($request)->where('status', 'pending')->orderBy('date')->orderBy('start_time')->paginate(self::PAGE_SIZE)->withQueryString();
         $history = false;
 
-        return view('pic.approvals.index', compact('approvals', 'history') + ['approvalRoutePrefix' => $this->routePrefix($request)]);
+        return view('pic.approvals.index', compact('approvals', 'history') + ['branches' => ($request->user()->can('access-admin') ? Branch::orderBy('name')->get() : collect()), 'approvalRoutePrefix' => $this->routePrefix($request)]);
     }
 
     public function history(Request $request): View
     {
-        $approvals = $this->query($request)->whereIn('status', ['approved', 'rejected'])->latest('decided_at')->paginate(self::PAGE_SIZE);
+        $approvals = $this->query($request)->whereIn('status', ['approved', 'rejected'])->latest('decided_at')->paginate(self::PAGE_SIZE)->withQueryString();
         $history = true;
 
-        return view('pic.approvals.index', compact('approvals', 'history') + ['approvalRoutePrefix' => $this->routePrefix($request)]);
+        return view('pic.approvals.index', compact('approvals', 'history') + ['branches' => ($request->user()->can('access-admin') ? Branch::orderBy('name')->get() : collect()), 'approvalRoutePrefix' => $this->routePrefix($request)]);
     }
 
     public function show(Request $request, int $approval): View
@@ -43,7 +50,7 @@ class ApprovalController extends Controller
         $booking = $this->query($request)->findOrFail($approval);
         $canDecide = $booking->status === 'pending';
 
-        return view('pic.approvals.show', compact('booking', 'canDecide') + ['approvalRoutePrefix' => $this->routePrefix($request)]);
+        return view('pic.approvals.show', compact('booking', 'canDecide') + ['branches' => ($request->user()->can('access-admin') ? Branch::orderBy('name')->get() : collect()), 'approvalRoutePrefix' => $this->routePrefix($request)]);
     }
 
     public function decide(Request $request, int $approval, BookingService $service): RedirectResponse
@@ -53,6 +60,7 @@ class ApprovalController extends Controller
             $request->merge(['rejection_reason' => $request->input('decision_notes')]);
         }
         $data = $request->validate([
+            'approved_it_support' => ['sometimes', 'boolean'],
             'approved_consumption_snack' => ['sometimes', 'boolean'],
             'approved_consumption_meal' => ['sometimes', 'boolean'],
             'decision' => ['required', 'in:approved,rejected'],
@@ -65,13 +73,13 @@ class ApprovalController extends Controller
             'rejection_reason.max' => 'Alasan penolakan maksimal 2.000 karakter.',
         ]);
         $booking = $this->query($request)->findOrFail($approval);
-        $service->decide($request->user(), $booking, $data['decision'], $data['rejection_reason'] ?? null, $request->only(['approved_consumption_snack', 'approved_consumption_meal']));
+        $service->decide($request->user(), $booking, $data['decision'], $data['rejection_reason'] ?? null, $request->only(['approved_consumption_snack', 'approved_consumption_meal', 'approved_it_support']));
         $prefix = $this->routePrefix($request);
         $destination = route($prefix.'.show', $booking->id);
         if (($data['return_to'] ?? 'detail') === 'list') {
             $remaining = $this->query($request)->where('status', 'pending')->count();
             $lastPage = max(1, (int) ceil($remaining / self::PAGE_SIZE));
-            $destination = route($prefix.'.index', ['page' => min($data['page'] ?? 1, $lastPage)]);
+            $destination = route($prefix.'.index', array_filter(['page' => min($data['page'] ?? 1, $lastPage), 'branch_id' => $request->input('branch_id')], fn ($value) => $value !== null && $value !== ''));
         }
 
         return redirect()->to($destination)->with('status', 'Keputusan pengajuan berhasil disimpan.');

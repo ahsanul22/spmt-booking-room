@@ -18,6 +18,9 @@ class RoomAssignmentService
             if ($users->count() !== count($ids) || $users->contains(fn ($user) => $user->role !== User::ROLE_ROOM_PIC)) {
                 throw ValidationException::withMessages(['pic_ids' => 'Semua PIC harus merupakan user dengan role room_pic.']);
             }
+            if ($users->contains(fn ($user) => ! $user->canAccessBranch($record->branch_id))) {
+                throw ValidationException::withMessages(['pic_ids' => 'PIC harus memiliki izin lokasi ruangan ini. Atur izin melalui Kelola User.']);
+            }
             $record->pics()->sync($ids);
         });
     }

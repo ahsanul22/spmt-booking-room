@@ -11,6 +11,8 @@ class BookingPreparationController extends Controller
 {
     public function __invoke(Room $room): View
     {
+        abort_unless(auth()->user()->canAccessBranch($room->branch_id), 404);
+
         return view('user.bookings.create', compact('room'));
     }
 
@@ -21,7 +23,7 @@ class BookingPreparationController extends Controller
         }
         $id = $request->query('room_id');
         abort_unless(is_string($id) && filter_var($id, FILTER_VALIDATE_INT, ['options' => ['min_range' => 1]]) !== false, 404);
-        $room = Room::findOrFail($id);
+        $room = Room::query()->visibleTo($request->user())->findOrFail($id);
 
         return redirect()->route('rooms.book', $room);
     }

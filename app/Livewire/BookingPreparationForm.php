@@ -2,6 +2,7 @@
 
 namespace App\Livewire;
 
+use App\Models\GuestRegistration;
 use App\Models\Room;
 use App\Services\BookingPreparation;
 use App\Services\BookingSchedule;
@@ -51,6 +52,8 @@ class BookingPreparationForm extends Component
 
     public string $notes = '';
 
+    public string $guest_reference = '';
+
     public string $duration = '60';
 
     public bool $outsideWorkHours = false;
@@ -63,6 +66,8 @@ class BookingPreparationForm extends Component
 
     public bool $consumption_meal = false;
 
+    public bool $it_support = false;
+
     #[Locked]
     public bool $checked = false;
 
@@ -73,6 +78,7 @@ class BookingPreparationForm extends Component
 
     public function mount(int $roomId): void
     {
+        abort_unless(Room::query()->visibleTo(auth()->user())->whereKey($roomId)->exists(), 404);
         $this->roomId = $roomId;
         $this->submissionToken = (string) Str::uuid();
         $this->date = app(BookingPreparation::class)->earliestStart()->toDateString();
@@ -116,16 +122,19 @@ class BookingPreparationForm extends Component
         $this->checked = false;
         $this->resetValidation();
         $this->prepareTime();
-        $room = Room::with(['floor', 'facilities', 'allowedOrganizationalUnits'])->findOrFail($this->roomId);
+        $room = $this->resolveRoom();
+        if (trim($this->guest_reference) !== '') {
+            abort_unless(auth()->user()->fresh()->canHandleGuests(), 403);
+        }
         $reason = $preparation->unavailableReason($room, auth()->user()->fresh());
         if ($reason) {
             $this->addError('room', $reason);
 
             return;
         }
-        $preparation->validate($this->only(['date', 'start_time', 'end_time', 'agenda', 'notes', 'meeting_preparation', 'participant_count', 'consumption_snack', 'consumption_meal']), $room);
+        $preparation->validate($this->only(['date', 'start_time', 'end_time', 'agenda', 'notes', 'meeting_preparation', 'participant_count', 'consumption_snack', 'consumption_meal', 'it_support', 'guest_reference']), $room);
         $approvalRoom = clone $room;
-        $approvalRoom->requires_approval = $room->requires_approval || $this->consumption_snack || $this->consumption_meal;
+        $approvalRoom->requires_approval = trim($this->guest_reference) !== '' || $room->requires_approval || $this->consumption_snack || $this->consumption_meal || $this->it_support;
         app(BookingService::class)->assertPicAvailable($approvalRoom);
         app(BookingService::class)->assertNoConflict($room->id, $this->only(['date', 'start_time', 'end_time']));
         $this->validate(['additionalDates' => ['array', 'max:365'], 'additionalDates.*' => ['required', 'date_format:Y-m-d', 'distinct']]);
@@ -135,7 +144,7 @@ class BookingPreparationForm extends Component
             return;
         }
         foreach ($this->additionalDates as $date) {
-            $data = array_replace($this->only(['date', 'start_time', 'end_time', 'agenda', 'notes', 'meeting_preparation', 'participant_count', 'consumption_snack', 'consumption_meal']), ['date' => $date]);
+            $data = array_replace($this->only(['date', 'start_time', 'end_time', 'agenda', 'notes', 'meeting_preparation', 'participant_count', 'consumption_snack', 'consumption_meal', 'it_support', 'guest_reference']), ['date' => $date]);
             $preparation->validate($data, $room);
             app(BookingService::class)->assertNoConflict($room->id, $data);
         }
@@ -150,11 +159,19 @@ class BookingPreparationForm extends Component
         $this->prepareTime();
         $this->validate(['additionalDates' => ['array', 'max:365'], 'additionalDates.*' => ['required', 'date_format:Y-m-d', 'distinct']]);
         $booking = $service->submitMany(auth()->user(), $this->roomId,
-            $this->only(['date', 'start_time', 'end_time', 'agenda', 'notes', 'meeting_preparation', 'participant_count', 'consumption_snack', 'consumption_meal']), $this->submissionToken, $this->additionalDates);
+            $this->only(['date', 'start_time', 'end_time', 'agenda', 'notes', 'meeting_preparation', 'participant_count', 'consumption_snack', 'consumption_meal', 'it_support', 'guest_reference']), $this->submissionToken, $this->additionalDates);
         session()->flash('booking_series_count', 1 + count($this->additionalDates));
         session()->flash('status', $booking->status === 'approved'
             ? 'Booking berhasil. Ruangan telah dipesan.' : 'Pengajuan berhasil dikirim. Menunggu persetujuan PIC.');
         $this->redirectRoute('my-bookings.show', ['booking' => $booking->id]);
+    }
+
+    private function resolveRoom(): Room
+    {
+        $room = Room::query()->visibleTo(auth()->user())->with(['branch', 'floor', 'facilities', 'allowedOrganizationalUnits'])->find($this->roomId);
+        abort_unless($room, 404);
+
+        return $room;
     }
 
     private function prepareTime(): void
@@ -167,7 +184,7 @@ class BookingPreparationForm extends Component
 
     public function render(): View
     {
-        $room = Room::with(['floor', 'facilities', 'allowedOrganizationalUnits'])->findOrFail($this->roomId);
+        $room = $this->resolveRoom();
         $preparation = app(BookingPreparation::class);
         $startOptions = [];
         for ($minute = 0; $minute < 1440; $minute += config('booking.time_step_minutes')) {
@@ -182,7 +199,13 @@ class BookingPreparationForm extends Component
             sort($startOptions);
         }
 
+        $canHandleGuests = auth()->user()->fresh()->canHandleGuests();
+
         return view('livewire.booking-preparation-form', [
+            'canHandleGuests' => $canHandleGuests,
+            'guestOptions' => $canHandleGuests
+                ? GuestRegistration::where('branch_id', $room->branch_id)->where('expires_at', '>', now())->orderBy('name')->orderBy('id')->get(['reference', 'name', 'organization', 'created_at'])
+                : collect(),
             'startOptions' => $startOptions,
             'outsideWorkday' => $this->start_time !== '' && ($this->start_time < config('booking.workday_start') || $this->start_time >= config('booking.workday_end') || $this->end_time > config('booking.workday_end')),
             'room' => $room,

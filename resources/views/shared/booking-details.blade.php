@@ -5,8 +5,13 @@
             <p class="mt-3 text-base leading-6 text-slate-600">{{ match($booking->status) { 'approved' => 'Booking dikonfirmasi. Gunakan ruangan sesuai jadwal.', 'pending' => 'Menunggu persetujuan PIC atau Admin. Slot waktu ditahan selama pengajuan Pending; belum berarti disetujui.', 'rejected' => 'Pengajuan ditolak. Slot waktu sudah dilepas.', default => 'Lihat status dan jadwal booking di bawah.' } }}</p>
         </div>
         <dl class="workspace-detail">
+            <div><dt>Kantor / Cabang</dt><dd>{{ $booking->room->branch?->name }}</dd></div>
             <div><dt>Ruangan</dt><dd>{{ $booking->room->name }}</dd></div>
-            <div><dt>Pemohon</dt><dd>{{ $booking->applicant->name }}</dd></div>
+            @if($booking->guest_name)
+                <div><dt>Peminta (Tamu)</dt><dd>{{ $booking->guest_name }} &middot; {{ $booking->guest_organization }}</dd></div>
+                <div><dt>Kode Registrasi Tamu</dt><dd>{{ $booking->guest_reference }}</dd></div>
+            @endif
+            <div><dt>{{ $booking->guest_name ? 'Diajukan oleh (Pegawai)' : 'Pemohon' }}</dt><dd>{{ $booking->applicant->name }}</dd></div>
             <div><dt>Unit Kerja saat Pengajuan</dt><dd>{{ $booking->unit_name ?? 'Belum ditentukan' }}</dd></div>
             <div><dt>Agenda</dt><dd>{{ $booking->agenda }}</dd></div>
             <div><dt>Tanggal</dt><dd>{{ $booking->date }}</dd></div>

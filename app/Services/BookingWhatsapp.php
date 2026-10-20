@@ -34,7 +34,7 @@ class BookingWhatsapp
             $selected = $selected->merge($booking->room->pics()->where('role', User::ROLE_ROOM_PIC)->where('is_active', true)->get());
         }
 
-        return $selected->unique('id')->filter(fn ($user) => WhatsappNumber::valid($user->whatsapp_number));
+        return $selected->unique('id')->filter(fn ($user) => $user->canAccessBranch($booking->room->branch_id) && WhatsappNumber::valid($user->whatsapp_number));
     }
 
     public function render(Booking $booking, string $body, ?User $recipient = null): string
