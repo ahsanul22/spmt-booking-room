@@ -2,6 +2,11 @@
 
 ## Last Update
 
+2026-10-20 - Penyelarasan nama halaman dengan sidebar Pengguna dan Notifikasi.
+
+- Daftar akun memakai judul tab/heading/breadcrumb Pengguna; form Tambah Pengguna dan Kelola Pengguna, tombol kembali, panel daftar, empty state, pesan berhasil serta rujukan menu PIC/navigasi lama mengikuti istilah Pengguna. Role User tetap nama role sesuai keputusan sebelumnya. Halaman notifikasi memakai judul tab, heading dan breadcrumb Notifikasi; deskripsi/riwayat masih menjelaskan kanal WhatsApp yang aktif, tanpa menyiratkan email telah tersedia. Route, field dan authorization tetap.
+- Verifikasi: tes pembuatan semua role UserManagementTest dan akses/CSRF pengaturan WhatsappManagementTest lulus 2 tes / 76 assertions pada schema PostgreSQL sementara. Build Vite, Pint, kompilasi/clear Blade dan diff check berhasil. Tidak mengulang full suite atau audit browser untuk perubahan teks. Perubahan source dan dokumentasi di-commit terpisah untuk push main.
+
 2026-10-20 - Konsistensi penamaan sidebar Administrasi.
 
 - Label sidebar Admin Kelola User menjadi Pengguna dan Notifikasi WhatsApp menjadi Notifikasi, konsisten dengan menu berbentuk kata benda lainnya. Nama Notifikasi dapat mencakup kanal email ketika ditugaskan nanti; implementasi saat ini tetap WhatsApp. Route, menu aktif, Gate, urutan menu dan perilaku desktop/mobile tetap. Assertion visibilitas menu user/PIC memakai URL tujuan agar tidak bergantung pada label lama.
