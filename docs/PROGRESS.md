@@ -2,6 +2,11 @@
 
 ## Last Update
 
+2026-10-20 - Penyeragaman label role dan keterangan akses lokasi.
+
+- Pilihan role tambah/kelola user dan roleLabel bersama menampilkan User, Room PIC, Admin; identifier database/authorization tetap kompatibel. FoundationSeeder menggunakan nama akun contoh User dan Room PIC, tanpa menimpa akun existing atau menjalankan ulang seeder pada database aplikasi. Keterangan akses lokasi dipersingkat dengan mempertahankan informasi tanpa pilihan berarti tanpa akses, Admin global, dan PIC memerlukan assignment ruangan.
+- Verifikasi: kasus UserManagementTest create_each_role_hashes_password_and_displays_saved_database_data lulus (1 tes / 57 assertions) pada schema PostgreSQL sementara; Pint, Blade cache/clear, diff check dan build Vite lulus. Build diulang di luar sandbox setelah esbuild EPERM. Tidak mengulang full suite atau audit browser untuk perubahan label/teks. Source dan dokumentasi dibuat dalam commit terpisah untuk push main.
+
 2026-10-20 - Persiapan enam commit terpisah untuk push main.
 
 - Perubahan dikelompokkan menjadi backend lokasi/booking/IT/tamu, filter dan navigasi Livewire, halaman tamu beserta aset/panduan QR, pengelolaan user dan izin resepsionis, perapian dashboard Admin, serta dokumentasi. File integrasi backend yang saling terkait disertakan bersama; keterangan WhatsApp memakai revisi terakhir pengguna.
