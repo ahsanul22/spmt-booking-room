@@ -2,6 +2,11 @@
 
 ## Last Update
 
+2026-10-20 - Konsistensi penamaan sidebar Administrasi.
+
+- Label sidebar Admin Kelola User menjadi Pengguna dan Notifikasi WhatsApp menjadi Notifikasi, konsisten dengan menu berbentuk kata benda lainnya. Nama Notifikasi dapat mencakup kanal email ketika ditugaskan nanti; implementasi saat ini tetap WhatsApp. Route, menu aktif, Gate, urutan menu dan perilaku desktop/mobile tetap. Assertion visibilitas menu user/PIC memakai URL tujuan agar tidak bergantung pada label lama.
+- Verifikasi: AuthorizationTest navigation_links_are_authorized_and_dashboard_link_matches_role lulus 1 tes / 46 assertions; build Vite (retry di luar sandbox setelah EPERM), Pint, kompilasi/clear Blade dan diff check berhasil. Tidak mengulang full suite/FrontendSkeletonTest atau audit browser karena perubahan terbatas pada label menu, tanpa perubahan struktur/interaksi.
+
 2026-10-20 - Penyeragaman label role dan keterangan akses lokasi.
 
 - Pilihan role tambah/kelola user dan roleLabel bersama menampilkan User, Room PIC, Admin; identifier database/authorization tetap kompatibel. FoundationSeeder menggunakan nama akun contoh User dan Room PIC, tanpa menimpa akun existing atau menjalankan ulang seeder pada database aplikasi. Keterangan akses lokasi dipersingkat dengan mempertahankan informasi tanpa pilihan berarti tanpa akses, Admin global, dan PIC memerlukan assignment ruangan.
