@@ -81,7 +81,7 @@ class WhatsappManagementTest extends PostgresTestCase
             $this->post(route('admin.whatsapp.retry', $message))->assertForbidden();
         }
         $this->actingAs($this->account(User::ROLE_SUPER_ADMIN));
-        $this->get(route('admin.whatsapp.index'))->assertOk()->assertSee('Notifikasi WhatsApp')->assertSee('Pengujian');
+        $this->get(route('admin.whatsapp.index'))->assertOk()->assertSee('<title>Notifikasi</title>', false)->assertSee('Pengujian');
         $this->app->bind(VerifyCsrfToken::class, fn ($app) => new class($app, $app['encrypter']) extends VerifyCsrfToken
         {
             protected function runningUnitTests(): bool

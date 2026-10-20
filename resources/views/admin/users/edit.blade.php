@@ -1,9 +1,9 @@
 @extends('layouts.schedule')
-@section('breadcrumb', 'Kelola User')
-@section('title', 'Kelola User')
+@section('breadcrumb', 'Pengguna')
+@section('title', 'Kelola Pengguna')
 @section('content')
-    <x-workspace-heading title="Kelola User" description="Atur identitas, status aktif, dan izin akses kantor atau cabang pengguna.">
-        <a class="workspace-button-secondary" href="{{ route('admin.users.index') }}">Kembali ke Kelola User</a>
+    <x-workspace-heading title="Kelola Pengguna" description="Atur identitas, status aktif, dan izin akses kantor atau cabang pengguna.">
+        <a class="workspace-button-secondary" href="{{ route('admin.users.index') }}">Kembali ke Pengguna</a>
     </x-workspace-heading>
     <div class="workspace-feedback">@include('admin.users._feedback')</div>
     <p class="mb-5 text-base text-slate-600">{{ $userRecord->name }} · {{ $userRecord->roleLabel() }} · Status Aktif: {{ $userRecord->is_active ? 'Aktif' : 'Nonaktif' }}</p>

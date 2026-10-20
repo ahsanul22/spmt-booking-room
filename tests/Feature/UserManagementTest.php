@@ -122,7 +122,7 @@ class UserManagementTest extends PostgresTestCase
             $this->put($this->url('update', $record), $data)->assertRedirect($this->url('edit', $record))->assertSessionHasNoErrors();
             $this->assertDatabaseHas('users', ['id' => $record->id, 'name' => $data['name'], 'email' => $data['email'], 'role' => $role, 'organizational_unit_id' => $unit->id]);
             $this->assertSame($oldHash, $record->fresh()->password);
-            $this->get($this->url('edit', $record))->assertSee($data['name'])->assertSee($data['email'])->assertSee($record->fresh()->roleLabel())->assertSee($unit->name)->assertSee('User berhasil diperbarui.');
+            $this->get($this->url('edit', $record))->assertSee($data['name'])->assertSee($data['email'])->assertSee($record->fresh()->roleLabel())->assertSee($unit->name)->assertSee('Pengguna berhasil diperbarui.');
             $this->get($this->url('index'))->assertSee($data['email'])->assertSee($unit->name);
         }
         $data = $this->data(['organizational_unit_id' => null]);
@@ -210,7 +210,7 @@ class UserManagementTest extends PostgresTestCase
         $admin = $this->admin();
         $this->put($this->url('update', $admin), $this->data(['email' => $admin->email, 'role' => 'room_pic']))
             ->assertRedirect(route('pic.dashboard'));
-        $this->actingAs($admin->fresh())->get(route('pic.dashboard'))->assertOk()->assertSee('User berhasil diperbarui.');
+        $this->actingAs($admin->fresh())->get(route('pic.dashboard'))->assertOk()->assertSee('Pengguna berhasil diperbarui.');
         $this->actingAs($admin->fresh())->get($this->url('index'))->assertForbidden();
         $this->assertSame('room_pic', $admin->fresh()->role);
         $another = User::factory()->create(['role' => 'super_admin', 'is_active' => true]);

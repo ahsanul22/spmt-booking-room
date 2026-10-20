@@ -1,9 +1,9 @@
 @extends('layouts.schedule')
-@section('breadcrumb', 'Kelola User')
-@section('title', 'Tambah User')
+@section('breadcrumb', 'Pengguna')
+@section('title', 'Tambah Pengguna')
 @section('content')
-    <x-workspace-heading title="Tambah User" description="Lengkapi identitas dan pengaturan akses pengguna.">
-        <a class="workspace-button-secondary" href="{{ route('admin.users.index') }}">Kembali ke Kelola User</a>
+    <x-workspace-heading title="Tambah Pengguna" description="Lengkapi identitas dan pengaturan akses pengguna.">
+        <a class="workspace-button-secondary" href="{{ route('admin.users.index') }}">Kembali ke Pengguna</a>
     </x-workspace-heading>
     <div class="workspace-feedback">@include('admin.users._feedback')</div>
     <x-workspace-panel title="Informasi Akun" description="Kolom bertanda * wajib diisi.">

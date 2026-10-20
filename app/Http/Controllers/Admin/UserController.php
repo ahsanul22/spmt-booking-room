@@ -43,7 +43,7 @@ class UserController extends Controller
         $user = new User;
         $this->save($user, $request->validated());
 
-        return redirect()->route('admin.users.edit', $user)->with('status', 'User berhasil ditambahkan.');
+        return redirect()->route('admin.users.edit', $user)->with('status', 'Pengguna berhasil ditambahkan.');
     }
 
     public function show(User $user): RedirectResponse
@@ -64,7 +64,7 @@ class UserController extends Controller
     {
         $this->save($user, $request->validated());
 
-        return $this->redirectAfterChange($request, $user, 'User berhasil diperbarui.');
+        return $this->redirectAfterChange($request, $user, 'Pengguna berhasil diperbarui.');
     }
 
     public function status(Request $request, User $user): RedirectResponse
@@ -73,7 +73,7 @@ class UserController extends Controller
         $user->is_active = $data['is_active'];
         $user->save();
 
-        return $this->redirectAfterChange($request, $user, $user->is_active ? 'User berhasil diaktifkan.' : 'User berhasil dinonaktifkan.');
+        return $this->redirectAfterChange($request, $user, $user->is_active ? 'Pengguna berhasil diaktifkan.' : 'Pengguna berhasil dinonaktifkan.');
     }
 
     public function resetPassword(Request $request, User $user): RedirectResponse

@@ -1,9 +1,9 @@
 @extends('layouts.schedule')
-@section('title', 'Notifikasi WhatsApp')
-@section('breadcrumb', 'Notifikasi WhatsApp')
+@section('title', 'Notifikasi')
+@section('breadcrumb', 'Notifikasi')
 @section('content')
-    <x-workspace-heading title="Notifikasi WhatsApp" description="Aktifkan pesan, pilih penerima, lalu simpan pengaturan.">
-        <a class="workspace-button-secondary" href="{{ route('admin.users.index') }}">Kelola nomor user</a>
+    <x-workspace-heading title="Notifikasi" description="Atur notifikasi WhatsApp, pilih penerima, lalu simpan pengaturan.">
+        <a class="workspace-button-secondary" href="{{ route('admin.users.index') }}">Kelola nomor pengguna</a>
     </x-workspace-heading>
     <div class="workspace-feedback"><x-form-feedback /></div>
     @if(! $enabled || ! $hasToken)

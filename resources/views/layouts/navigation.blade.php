@@ -5,7 +5,7 @@
 @endcan
 @can('access-admin')
 <li><a href="{{ route('admin.schedule.index') }}">Jadwal Ruangan</a></li>
-<li><a href="{{ route('admin.users.index') }}">Kelola User</a></li>
+<li><a href="{{ route('admin.users.index') }}">Pengguna</a></li>
 <li><a href="{{ route('admin.organizational-units.index') }}">Unit Organisasi</a></li>
 <li><a href="{{ route('admin.facilities.index') }}">Fasilitas</a></li>
 <li><a href="{{ route('admin.rooms.index') }}">Ruangan</a></li>

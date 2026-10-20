@@ -13,7 +13,7 @@
                                 <span class="min-w-0 flex-1"><span class="block break-words text-base font-semibold text-primaryDark">{{ $pic->name }}</span><span class="mt-1 block break-all text-sm text-slate-600">{{ $pic->email }}</span>@if(! $pic->is_active)<span class="mt-2 inline-block text-sm font-semibold text-danger">Akun nonaktif</span>@endif</span>
                             </label>
                         @empty
-                            <p class="rounded-xl bg-background p-4 text-base leading-6 text-slate-600">Belum ada akun PIC ruangan. Tambahkan akun dengan role Room PIC melalui Kelola User.</p>
+                            <p class="rounded-xl bg-background p-4 text-base leading-6 text-slate-600">Belum ada akun PIC ruangan. Tambahkan akun dengan role Room PIC melalui Pengguna.</p>
                         @endforelse
                     </div>
                     <p id="pic-help" class="mt-4 text-sm leading-6 text-slate-600">Pilihan ini menggantikan daftar PIC ruangan. Kosongkan semua centang untuk melepas seluruh PIC. Akun nonaktif tidak dapat memproses approval.</p>

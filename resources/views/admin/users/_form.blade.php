@@ -36,7 +36,7 @@
 
 <fieldset class="rounded-xl border border-slate-200 p-5 sm:col-span-2">
     <legend class="px-2 text-base font-semibold text-primaryDark">Izin Akses Kantor / Cabang</legend>
-    <p class="mb-4 text-sm leading-6 text-slate-600">Pilih lokasi akses user/PIC; kosong berarti tanpa akses. Admin mengakses semua lokasi. Approval PIC tetap memerlukan penugasan ruangan.</p>
+    <p class="mb-4 text-sm leading-6 text-slate-600">Pilih lokasi akses pengguna/PIC; kosong berarti tanpa akses. Admin mengakses semua lokasi. Approval PIC tetap memerlukan penugasan ruangan.</p>
     <input type="hidden" name="branch_selection_present" value="1">
     @php($branchSelection = old('branch_selection_present') ? old('branch_ids', []) : (isset($userRecord) ? $userRecord->branches->modelKeys() : []))
     @php($branchSelection = is_array($branchSelection) ? array_map('strval', $branchSelection) : [])
