@@ -9,7 +9,7 @@
 <body class="relative isolate flex min-h-screen flex-col bg-background font-sans text-text antialiased">
     @hasSection('visitor-background')
         <div aria-hidden="true" class="pointer-events-none fixed inset-0 -z-10">
-            <img src="{{ asset('images/guest-harbor-background.png') }}" alt="" class="h-full w-full object-cover opacity-60">
+            <img src="{{ asset('images/guest-harbor-background.png') }}?v=noncontainer" alt="" class="h-full w-full object-cover opacity-60">
             <div class="absolute inset-0 bg-gradient-to-b from-background/85 via-background/65 to-secondaryLight/50"></div>
         </div>
     @endif
