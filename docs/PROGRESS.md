@@ -2,6 +2,11 @@
 
 ## Last Update
 
+2026-10-20 - Latar tamu pelabuhan non-peti kemas.
+
+- Aset public/images/guest-harbor-background.png diganti melalui built-in imagegen dengan pemandangan kapal kargo umum/crane kapal, dermaga curah, gudang dan gulungan baja, tanpa peti kemas sesuai konteks PMT. Prompt lengkap disimpan di docs/GUEST_BACKGROUND.md. Layout visitor memakai versi URL noncontainer untuk menghindari cache gambar lama; posisi, opacity, gradient dan form existing dipertahankan.
+- Verifikasi: gambar 1536 x 1024 diinspeksi langsung dan tidak terlihat peti kemas. Build Vite, kompilasi/clear Blade dan diff check berhasil. Tes fitur dan browser desktop/mobile tidak diulang karena penggantian bitmap dan versi URL saja; tidak mengubah alur/field/validasi tamu.
+
 2026-10-20 - Penyelarasan nama halaman dengan sidebar Pengguna dan Notifikasi.
 
 - Daftar akun memakai judul tab/heading/breadcrumb Pengguna; form Tambah Pengguna dan Kelola Pengguna, tombol kembali, panel daftar, empty state, pesan berhasil serta rujukan menu PIC/navigasi lama mengikuti istilah Pengguna. Role User tetap nama role sesuai keputusan sebelumnya. Halaman notifikasi memakai judul tab, heading dan breadcrumb Notifikasi; deskripsi/riwayat masih menjelaskan kanal WhatsApp yang aktif, tanpa menyiratkan email telah tersedia. Route, field dan authorization tetap.
