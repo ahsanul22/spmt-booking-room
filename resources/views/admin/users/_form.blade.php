@@ -15,8 +15,8 @@
 </x-workspace-field>
 <x-workspace-field type="select" name="role" label="Role" required>
     <option value="">Pilih Role</option>
-    <option value="user" @selected(old('role', data_get($userRecord ?? null, 'role')) === 'user')>user</option>
-    <option value="room_pic" @selected(old('role', data_get($userRecord ?? null, 'role')) === 'room_pic')>room_pic</option>
+    <option value="user" @selected(old('role', data_get($userRecord ?? null, 'role')) === 'user')>User</option>
+    <option value="room_pic" @selected(old('role', data_get($userRecord ?? null, 'role')) === 'room_pic')>Room PIC</option>
     <option value="super_admin" @selected(old('role', data_get($userRecord ?? null, 'role')) === 'super_admin')>Admin</option>
 </x-workspace-field>
 <div class="rounded-xl border border-slate-200 bg-background p-4 sm:col-span-2">
@@ -36,7 +36,7 @@
 
 <fieldset class="rounded-xl border border-slate-200 p-5 sm:col-span-2">
     <legend class="px-2 text-base font-semibold text-primaryDark">Izin Akses Kantor / Cabang</legend>
-    <p class="mb-4 text-sm leading-6 text-slate-600">Centang lokasi yang boleh dilihat dan digunakan pegawai/PIC. Tanpa pilihan berarti tidak memiliki akses lokasi. Admin tetap memiliki akses seluruh lokasi. Izin PIC untuk approval juga memerlukan penugasan ruangan.</p>
+    <p class="mb-4 text-sm leading-6 text-slate-600">Pilih lokasi akses user/PIC; kosong berarti tanpa akses. Admin mengakses semua lokasi. Approval PIC tetap memerlukan penugasan ruangan.</p>
     <input type="hidden" name="branch_selection_present" value="1">
     @php($branchSelection = old('branch_selection_present') ? old('branch_ids', []) : (isset($userRecord) ? $userRecord->branches->modelKeys() : []))
     @php($branchSelection = is_array($branchSelection) ? array_map('strval', $branchSelection) : [])

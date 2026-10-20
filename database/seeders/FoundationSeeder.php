@@ -55,8 +55,8 @@ class FoundationSeeder extends Seeder
             }
 
             $this->user('admin@example.test', 'Admin', User::ROLE_SUPER_ADMIN, $directorate);
-            $pic = $this->user('pic@example.test', 'PIC Ruangan', User::ROLE_ROOM_PIC, $division);
-            $this->user('pegawai@example.test', 'Pegawai', User::ROLE_USER, $department);
+            $pic = $this->user('pic@example.test', 'Room PIC', User::ROLE_ROOM_PIC, $division);
+            $this->user('pegawai@example.test', 'User', User::ROLE_USER, $department);
 
             $floors = collect(range(1, 8))->mapWithKeys(fn (int $number) => [
                 $number => Floor::firstOrCreate(['floor_number' => $number], ['name' => "Lantai {$number}"]),
