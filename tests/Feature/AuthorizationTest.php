@@ -30,7 +30,7 @@ class AuthorizationTest extends PostgresTestCase
         $this->assertPagesAllowed(array_merge(self::GENERAL, self::EMPLOYEE));
         $this->assertPagesDenied(array_merge(self::PIC, self::ADMIN));
         $this->get('/dashboard')->assertSee('Dashboard Pegawai')->assertSee('My Booking')
-            ->assertDontSee('Ruangan Saya')->assertDontSee('Permintaan Approval')->assertDontSee('Kelola User')
+            ->assertDontSee('Ruangan Saya')->assertDontSee('Permintaan Approval')->assertDontSee('href="'.route('admin.users.index').'"', false)
             ->assertSee('Ruang yang tepat.')->assertDontSee('schedule-navigation');
         $this->get('/schedule')->assertOk()->assertDontSee('schedule-navigation')
             ->assertSee('aria-label="Navigasi utama"', false)->assertSee('data-schedule', false);
@@ -42,7 +42,7 @@ class AuthorizationTest extends PostgresTestCase
         $this->assertPagesAllowed(array_merge(self::GENERAL, self::EMPLOYEE, self::PIC));
         $this->assertPagesDenied(self::ADMIN);
         $this->get('/pic/dashboard')->assertSee('Dashboard PIC')->assertDontSee('My Booking')->assertDontSee('Booking Ruangan')
-            ->assertSee('Ruangan Saya')->assertSee('Permintaan Approval')->assertDontSee('Kelola User')
+            ->assertSee('Ruangan Saya')->assertSee('Permintaan Approval')->assertDontSee('href="'.route('admin.users.index').'"', false)
             ->assertSee('schedule-navigation')->assertSee('Tinjau permintaan approval')
             ->assertDontSee('Ruang yang tepat.');
         foreach (['/pic/rooms', '/pic/approvals', '/pic/approvals/history', '/schedule'] as $url) {
@@ -56,7 +56,7 @@ class AuthorizationTest extends PostgresTestCase
         $this->login('admin@example.test', '/admin/dashboard');
         $this->assertPagesAllowed(array_merge(self::GENERAL, self::PIC, self::ADMIN));
         $this->assertPagesDenied(self::EMPLOYEE);
-        $this->get('/admin/dashboard')->assertSee('Dashboard Admin')->assertSee('Kelola User')
+        $this->get('/admin/dashboard')->assertSee('Dashboard Admin')->assertSee('Pengguna')
             ->assertSee('Semua Booking')->assertDontSee('My Booking')
             ->assertViewIs('admin.dashboard')->assertDontSee('Pratinjau dashboard')
             ->assertSee('Belum ada booking.')->assertSee('Laporan Bulanan');

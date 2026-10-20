@@ -7,7 +7,6 @@ use Tests\PostgresTestCase;
 
 class PicDashboardBannerTest extends PostgresTestCase
 {
-
     public function test_pic_dashboard_renders_layout_matching_admin_dashboard(): void
     {
 
@@ -63,6 +62,6 @@ class PicDashboardBannerTest extends PostgresTestCase
         // 8. Must not display employee or admin actions
         $response->assertDontSee('My Booking');
         $response->assertDontSee('Booking Ruangan');
-        $response->assertDontSee('Kelola User');
+        $response->assertDontSee('href="'.route('admin.users.index').'"', false);
     }
 }
