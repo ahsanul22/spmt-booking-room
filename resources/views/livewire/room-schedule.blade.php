@@ -1,9 +1,18 @@
 <div wire:poll.30s class="space-y-5">
-    <div class="grid items-end gap-4 rounded-2xl border border-slate-200 bg-surface p-5 sm:grid-cols-2 lg:grid-cols-[minmax(0,1fr)_240px_auto]">
-        <x-workspace-field name="schedule_room" label="Ruangan" type="select" wire:change="selectRoom($event.target.value)">
-            <option value="" @selected($roomId === null)>Semua ruangan</option>
-            @foreach($rooms as $room)<option value="{{ $room->id }}" @selected($roomId === $room->id)>{{ $room->name }}{{ ! $room->is_active || $room->status !== 'available' ? ' (tidak operasional)' : '' }}</option>@endforeach
+    @can('access-admin')
+    <form wire:submit="applyBranch" class="mb-5 flex flex-wrap items-end gap-4 rounded-2xl border border-slate-200 bg-surface p-5">
+        <x-workspace-field name="branch_filter" label="Kantor / Cabang" type="select" wire:model="draftBranch">
+            <option value="" >Semua lokasi</option>
+            @foreach($branches as $branch)<option value="{{ $branch->id }}" >{{ $branch->name }}</option>@endforeach
         </x-workspace-field>
+        <button type="submit" wire:loading.attr="disabled" class="workspace-button-secondary">Tampilkan</button>
+    </form>
+    @endcan
+    <div class="grid items-end gap-4 rounded-2xl border border-slate-200 bg-surface p-5 sm:grid-cols-2 lg:grid-cols-[minmax(0,1fr)_240px_auto]">
+        <form wire:submit="applyRoom" class="flex flex-wrap items-end gap-3"><div class="min-w-0 flex-1"><x-workspace-field name="schedule_room" label="Ruangan" type="select" wire:model="draftRoom">
+            <option value="" >Semua ruangan</option>
+            @foreach($rooms as $room)<option value="{{ $room->id }}" >{{ $room->branch?->name }} · {{ $room->name }}{{ ! $room->is_active || $room->status !== 'available' ? ' (tidak operasional)' : '' }}</option>@endforeach
+        </x-workspace-field></div><button type="submit" wire:loading.attr="disabled" class="workspace-button-secondary">Tampilkan</button></form>
         <x-workspace-field name="schedule_date" label="Lompat ke tanggal (WIB)" type="date" :value="$selectedDate" wire:change="selectDate($event.target.value)" />
         <button type="button" wire:click="today" wire:loading.attr="disabled" class="workspace-button-secondary">Hari Ini</button>
         @error('date')<p role="alert" class="text-base text-danger">{{ $message }}</p>@enderror

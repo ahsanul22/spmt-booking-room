@@ -29,11 +29,7 @@
     </details>
     <div class="mt-6">
         <x-workspace-panel title="Riwayat pengiriman">
-            <form method="GET" action="{{ route('admin.whatsapp.index') }}" class="flex flex-wrap items-end gap-4 p-5 sm:p-6">
-                <x-workspace-field type="select" name="event" label="Jenis pesan"><option value="">Semua jenis</option><option value="approval_request" @selected(($filters['event'] ?? '') === 'approval_request')>Pengajuan approval</option><option value="consumption" @selected(($filters['event'] ?? '') === 'consumption')>Konsumsi</option></x-workspace-field>
-                {{-- <x-workspace-field type="select" name="status" label="Status"><option value="">Semua status</option>@foreach(['pending','processing','accepted','failed','unknown','skipped'] as $status)<option value="{{ $status }}" @selected(($filters['status'] ?? '') === $status)>{{ $status }}</option>@endforeach</x-workspace-field> --}}
-                <button type="submit" class="workspace-button-secondary">Terapkan</button>
-            </form>
+            <livewire:listing-filters destination="admin.whatsapp.index" kind="whatsapp" />
             <div class="workspace-table overflow-x-auto">
                 <table class="w-full text-left text-base"><caption class="sr-only">Riwayat pesan WhatsApp</caption><thead class="bg-background text-primaryDark"><tr><th class="p-4">Pesan / Booking</th><th class="p-4">Penerima</th><th class="p-4">Status</th><th class="p-4">Isi / aksi</th></tr></thead>
                     <tbody class="divide-y divide-slate-100">

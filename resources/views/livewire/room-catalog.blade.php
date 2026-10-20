@@ -1,4 +1,13 @@
 <section id="room-catalog" class="scroll-mt-6" @if($summary) aria-labelledby="catalog-title" @else aria-label="Katalog ruangan" @endif>
+    @can('access-admin')
+    <form wire:submit="applyBranch" class="mb-5 flex flex-wrap items-end gap-4 rounded-2xl border border-slate-200 bg-surface p-5">
+        <x-workspace-field name="branch_filter" label="Kantor / Cabang" type="select" wire:model="draftBranch">
+            <option value="" >Semua lokasi</option>
+            @foreach($branches as $branch)<option value="{{ $branch->id }}" >{{ $branch->name }}</option>@endforeach
+        </x-workspace-field>
+        <button type="submit" wire:loading.attr="disabled" class="workspace-button-secondary">Tampilkan</button>
+    </form>
+    @endcan
     @if($summary)
     <div class="flex flex-wrap items-center gap-4">
         <div class="min-w-0">

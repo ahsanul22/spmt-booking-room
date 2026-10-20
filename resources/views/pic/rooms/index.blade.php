@@ -18,6 +18,7 @@
             @endif
         </a>
     </div>
+    @include('shared.branch-filter')
     <div class="mb-6 flex flex-wrap items-center justify-between gap-3 rounded-2xl border border-secondaryLight bg-secondaryLight/20 p-5">
         <p class="text-base font-semibold text-primaryDark">{{ $rooms->total() }} ruangan ditugaskan kepada Anda</p>
         <p class="max-w-xl text-sm leading-6 text-slate-600">Status operasional menunjukkan kondisi ruangan. Periksa jadwal untuk melihat jam penggunaannya.</p>

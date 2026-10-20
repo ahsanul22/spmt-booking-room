@@ -9,6 +9,7 @@
         <a href="{{ route($history ? ($approvalRoutePrefix ?? 'pic.approvals').'.index' : ($approvalRoutePrefix ?? 'pic.approvals').'.history') }}" class="workspace-button-secondary">{{ $history ? 'Permintaan Approval' : 'Riwayat Approval' }}</a>
     </div>
     <div class="workspace-feedback"><x-form-feedback /></div>
+    @include('shared.branch-filter')
     <x-workspace-panel :title="$history ? 'Keputusan Pengajuan' : 'Menunggu Keputusan'">
         @include('shared.bookings-table', ['bookings' => $approvals, 'quickDecisions' => ! $history, 'detailRoute' => ($approvalRoutePrefix ?? 'pic.approvals').'.show', 'emptyTitle' => $history ? 'Belum ada riwayat approval.' : 'Belum ada permintaan approval.'])
     </x-workspace-panel>

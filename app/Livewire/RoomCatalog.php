@@ -2,6 +2,7 @@
 
 namespace App\Livewire;
 
+use App\Models\Branch;
 use App\Models\Room;
 use App\Services\BookingPreparation;
 use Illuminate\Support\Facades\Gate;
@@ -20,6 +21,25 @@ class RoomCatalog extends Component
     #[Locked]
     public bool $summary = false;
 
+    #[Locked]
+    public ?int $branchId = null;
+
+    public string $draftBranch = '';
+
+    public function applyBranch(): void
+    {
+        $this->selectBranch($this->draftBranch);
+    }
+
+    public function selectBranch(string $id): void
+    {
+        Gate::authorize('access-admin');
+        abort_unless($id === '' || (filter_var($id, FILTER_VALIDATE_INT, ['options' => ['min_range' => 1]]) !== false && Branch::whereKey($id)->exists()), 422);
+        $this->branchId = $id === '' ? null : (int) $id;
+        $this->draftBranch = $id;
+        $this->resetPage(pageName: 'roomsPage');
+    }
+
     public function boot(): void
     {
         Gate::authorize('access-general');
@@ -36,9 +56,9 @@ class RoomCatalog extends Component
     public function render(): View
     {
         $featuredName = config('room-catalog.featured_room_name');
-        $rooms = Room::query()
+        $rooms = Room::query()->visibleTo(auth()->user())->when($this->branchId, fn ($query) => $query->where('branch_id', $this->branchId))
             ->where('is_active', true)
-            ->with(['floor', 'facilities', 'allowedOrganizationalUnits'])
+            ->with(['branch', 'floor', 'facilities', 'allowedOrganizationalUnits'])
             ->when($this->filter === 'featured', fn ($query) => $query
                 ->where(fn ($names) => $names->whereRaw('LOWER(TRIM(name)) = ?', [mb_strtolower(trim($featuredName))])->orWhereIn('code', config('room-catalog.featured_room_codes', []))))
             ->when($this->filter === 'other', fn ($query) => $query
@@ -53,6 +73,7 @@ class RoomCatalog extends Component
 
         return view('livewire.room-catalog', [
             'reasons' => $reasons,
+            'branches' => auth()->user()->can('access-admin') ? Branch::orderBy('name')->get() : collect(),
             'rooms' => $rooms,
             'filters' => ['all' => 'Semua Ruangan', 'featured' => $featuredName, 'other' => 'Ruang Rapat Lainnya'],
         ]);

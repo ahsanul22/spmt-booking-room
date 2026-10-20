@@ -1,4 +1,9 @@
-const indicator = document.querySelector('[data-page-loading]');
+const indicator = {
+    set hidden(value) {
+        const current = document.querySelector('[data-page-loading]');
+        if (current) current.hidden = value;
+    },
+};
 
 if (indicator) {
     let delay;
@@ -53,6 +58,8 @@ if (indicator) {
         });
     });
 
+    document.addEventListener('livewire:navigated', reset);
+    document.addEventListener('livewire:navigating', start);
     window.addEventListener('pageshow', reset);
     window.addEventListener('pagehide', reset);
     window.addEventListener('load', reset);

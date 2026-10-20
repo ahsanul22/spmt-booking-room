@@ -6,6 +6,7 @@
         <a href="{{ route('admin.rooms.create') }}" class="inline-flex items-center gap-2 rounded-xl bg-primary px-5 py-3 text-base font-semibold text-white transition hover:bg-primaryDark"><x-schedule-icon name="plus" />Tambah Ruangan</a>
     </x-workspace-heading>
     <div class="workspace-feedback"><x-form-feedback /></div>
+    @include('shared.branch-filter')
     <section aria-labelledby="rooms-title">
         <div class="mb-5 flex flex-wrap items-center justify-between gap-3">
             <div><h2 id="rooms-title" class="text-lg font-bold text-primaryDark">Direktori Ruangan</h2><p class="mt-1 text-sm leading-5 text-slate-600">Status operasional tidak menunjukkan ketersediaan jadwal.</p></div>
