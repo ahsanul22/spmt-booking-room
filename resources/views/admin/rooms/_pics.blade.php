@@ -1,11 +1,11 @@
     <div class="grid items-start gap-6 xl:grid-cols-2">
-        <x-workspace-panel title="Pilih PIC" description="Centang seluruh PIC yang ingin ditugaskan atau dipertahankan.">
+        <x-workspace-panel title="Pilih PIC">
             <form method="POST" action="{{ route('admin.rooms.pics.update', $room) }}" class="p-5 sm:p-6">
                 @csrf
                 <input type="hidden" name="_section" value="pics">
                 @method('PUT')
                 <fieldset aria-describedby="pic-help{{ $errors->has('pic_ids') || $errors->has('pic_ids.*') ? ' pic-error' : '' }}">
-                    <legend class="mb-4 text-base font-semibold text-primaryDark">Akun PIC Ruangan</legend>
+                    <legend class="mb-4 text-base font-semibold text-primaryDark">Daftar PIC</legend>
                     <div class="space-y-3">
                         @forelse($eligiblePics as $pic)
                             <label for="pic-{{ $pic->id }}" class="flex cursor-pointer items-start gap-3 rounded-xl border border-slate-200 p-4 transition hover:border-primary focus-within:ring-2 focus-within:ring-primary">
@@ -16,7 +16,7 @@
                             <p class="rounded-xl bg-background p-4 text-base leading-6 text-slate-600">Belum ada akun PIC ruangan. Tambahkan akun dengan role Room PIC melalui Pengguna.</p>
                         @endforelse
                     </div>
-                    <p id="pic-help" class="mt-4 text-sm leading-6 text-slate-600">Pilihan ini menggantikan daftar PIC ruangan. Kosongkan semua centang untuk melepas seluruh PIC. Akun nonaktif tidak dapat memproses approval.</p>
+                    <p id="pic-help" class="mt-4 text-sm leading-6 text-slate-600">Kosongkan pilihan untuk melepas semua PIC. Akun nonaktif tidak dapat memproses approval.</p>
                     @if($errors->has('pic_ids') || $errors->has('pic_ids.*'))
                         <p id="pic-error" role="alert" class="mt-2 text-base text-danger">{{ $errors->first('pic_ids') ?: $errors->first('pic_ids.*') }}</p>
                     @endif

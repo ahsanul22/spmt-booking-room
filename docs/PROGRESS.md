@@ -2,6 +2,18 @@
 
 ## Last Update
 
+2026-10-26 - Pengaturan teknisi IT per ruangan dan penyederhanaan PIC.
+
+- Admin dapat mengaktifkan/menonaktifkan opsi permintaan teknisi IT per ruangan. Ruangan lama tetap mengizinkannya; form booking menyembunyikan opsi bila dinonaktifkan dan server menolak permintaan yang dipaksakan.
+- Keterangan penugasan PIC diringkas.
+- Memperbarui assertion teks pada test form ruangan.
+- Verifikasi: `git diff --check` berhasil. Tes aplikasi tidak dijalankan.
+
+2026-10-26 - Penyederhanaan keterangan pada form booking.
+
+- Menghapus keterangan persetujuan teknisi IT dari form booking dan meringkas teks opsi persiapan rapat pada form ruangan. Label, validasi, dan alur penyimpanan tidak berubah.
+- Verifikasi: pemeriksaan diff; tes aplikasi tidak dijalankan untuk perubahan teks saja.
+
 2026-10-26 - README proyek.
 
 - Mengganti README bawaan Laravel dengan panduan berbahasa Indonesia berisi ringkasan aplikasi, fitur, alur booking/approval, tech stack, persyaratan lokal, langkah setup, konfigurasi WhatsApp/tamu, perintah pengembangan, dan tautan dokumentasi.

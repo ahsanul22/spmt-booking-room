@@ -57,7 +57,11 @@ class BookingPreparation
             'participant_count' => [$enabled ? 'required' : 'nullable', 'integer', 'between:1,2147483647'],
             'consumption_snack' => ['required', 'boolean'],
             'consumption_meal' => ['required', 'boolean'],
-            'it_support' => ['required', 'boolean'],
+            'it_support' => ['required', 'boolean', function ($attribute, $value, $fail) use ($room) {
+                if ($value && ! $room?->allows_it_support) {
+                    $fail('Permintaan teknisi IT belum diaktifkan untuk ruangan ini.');
+                }
+            }],
         ], [
             'required' => ':attribute wajib diisi.',
             'date_format' => 'Format :attribute tidak valid.',

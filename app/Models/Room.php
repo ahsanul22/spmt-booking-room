@@ -13,9 +13,9 @@ class Room extends Model
 {
     use HasReadableRouteKey;
 
-    protected $fillable = ['branch_id', 'name', 'code', 'floor_id', 'capacity', 'description', 'access_type', 'requires_approval', 'allows_meeting_preparation', 'status', 'is_active'];
+    protected $fillable = ['branch_id', 'name', 'code', 'floor_id', 'capacity', 'description', 'access_type', 'requires_approval', 'allows_meeting_preparation', 'allows_it_support', 'status', 'is_active'];
 
-    protected $casts = ['capacity' => 'integer', 'requires_approval' => 'boolean', 'allows_meeting_preparation' => 'boolean', 'is_active' => 'boolean'];
+    protected $casts = ['capacity' => 'integer', 'requires_approval' => 'boolean', 'allows_meeting_preparation' => 'boolean', 'allows_it_support' => 'boolean', 'is_active' => 'boolean'];
 
     public function scopeVisibleTo(Builder $query, User $user): Builder
     {

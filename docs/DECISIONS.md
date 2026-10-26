@@ -1,5 +1,10 @@
 # Decisions
 
+## DEC-060 - Pengaturan permintaan teknisi IT per ruangan
+
+- Admin dapat mengaktifkan atau menonaktifkan permintaan teknisi IT pada form booking untuk tiap ruangan. Ruangan existing tetap aktif saat migrasi agar perilaku yang berjalan tidak berubah.
+- Jika opsi dimatikan, kontrol tidak ditampilkan dan server menolak permintaan IT untuk ruangan tersebut. Jika aktif, permintaan tetap memerlukan persetujuan PIC/Admin sesuai DEC-052.
+
 ## DEC-059 - Batas input HTTP dan penataan controller
 
 - Audit controller atas permintaan pengguna 2026-10-20 memakai Form Request per kontrak operasi, dengan request bersama untuk pagination, filter lokasi dan status aktif. Data tulis hanya dari hasil validasi. Route/Gate dan service tetap bertanggung jawab atas authorization serta aturan bisnis terbaru dalam transaksi.

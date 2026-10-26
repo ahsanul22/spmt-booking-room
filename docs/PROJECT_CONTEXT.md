@@ -104,6 +104,7 @@ Setiap ruang memiliki pengaturan `requires_approval = true/false`.
 
 - Jika `false`: booking tanpa konsumsi/IT langsung Approved; permintaan konsumsi atau teknisi IT tetap Pending untuk review PIC/Admin (DEC-049).
 - Jika `true`: User → Booking → Pending → Room PIC → Approved / Rejected.
+- Admin dapat mengaktifkan atau menonaktifkan permintaan teknisi IT per ruangan. Opsi aktif tetap memerlukan persetujuan PIC/Admin (DEC-060).
 
 Validasi booking tetap berlaku untuk kedua alur.
 

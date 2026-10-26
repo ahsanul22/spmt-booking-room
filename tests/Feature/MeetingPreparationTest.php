@@ -80,7 +80,7 @@ class MeetingPreparationTest extends PostgresTestCase
         ])->assertSessionHasNoErrors();
         $this->assertTrue($room->fresh()->allows_meeting_preparation);
         $this->get(route('admin.rooms.show', $room))->assertOk()->assertSee('Opsi Lanjutan Booking')
-            ->assertSee('Tampilkan jumlah peserta dan permintaan konsumsi')
+            ->assertSee('Aktifkan persiapan rapat')
             ->assertSee('id="allows-meeting-preparation"', false);
         $this->actingAs($employee);
         Livewire::test(BookingPreparationForm::class, ['roomId' => $room->id])->assertSee('Tambahkan kebutuhan persiapan rapat');

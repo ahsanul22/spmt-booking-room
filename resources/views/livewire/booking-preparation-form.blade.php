@@ -111,14 +111,15 @@
                     </div>
                     <div class="sm:col-span-2"><x-workspace-field wire:model="agenda" name="agenda" label="Judul / Agenda Rapat" maxlength="255" required /></div>
                     <div class="sm:col-span-2"><x-workspace-field wire:model="notes" name="notes" label="Catatan (opsional)" type="textarea" rows="2" maxlength="2000" /></div>
+                    @if($room->allows_it_support)
                     <div class="mb-5 rounded-xl border border-slate-200 p-4">
                         <label class="flex min-h-[44px] items-center gap-3 text-base" for="it-support">
                             <input id="it-support" type="checkbox" name="it_support" wire:model.live="it_support" class="h-5 w-5 rounded border-slate-300 text-primary focus:ring-primary">
                             Membutuhkan teknisi IT
                         </label>
-                        <p class="mt-2 text-sm text-slate-600">Permintaan teknisi IT memerlukan persetujuan PIC / Admin.</p>
                         @error('it_support')<p role="alert" class="text-danger">{{ $message }}</p>@enderror
                     </div>
+                    @endif
                     @if($room->allows_meeting_preparation)
                         <fieldset class="min-w-0 overflow-hidden rounded-xl border border-slate-200 bg-surface sm:col-span-2" aria-describedby="meeting-preparation-help">
                             <legend class="sr-only">Persiapan rapat (opsional)</legend>

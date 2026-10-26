@@ -32,6 +32,7 @@ class SaveRoomRequest extends FormRequest
             'access_type' => ['required', Rule::in(['all', 'restricted'])],
             'requires_approval' => ['required', 'boolean'],
             'allows_meeting_preparation' => ['sometimes', 'boolean'],
+            'allows_it_support' => ['sometimes', 'boolean'],
             'status' => ['required', Rule::in(['available', 'maintenance', 'unavailable'])],
             'is_active' => ['required', 'boolean'],
             'facility_ids' => ['present', 'array'],
@@ -45,6 +46,7 @@ class SaveRoomRequest extends FormRequest
             'name' => 'nama ruangan', 'code' => 'kode ruangan', 'floor_id' => 'lantai', 'branch_id' => 'kantor / cabang',
             'capacity' => 'kapasitas', 'description' => 'deskripsi', 'access_type' => 'jenis akses',
             'allows_meeting_preparation' => 'opsi lanjutan booking',
+            'allows_it_support' => 'opsi teknisi IT',
             'requires_approval' => 'kebutuhan approval', 'status' => 'status operasional',
             'is_active' => 'status aktif', 'facility_ids' => 'fasilitas', 'facility_ids.*' => 'fasilitas',
         ];
