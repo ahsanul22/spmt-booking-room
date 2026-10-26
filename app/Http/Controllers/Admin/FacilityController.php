@@ -3,15 +3,16 @@
 namespace App\Http\Controllers\Admin;
 
 use App\Http\Controllers\Controller;
+use App\Http\Requests\PaginationRequest;
 use App\Http\Requests\SaveFacilityRequest;
+use App\Http\Requests\UpdateStatusRequest;
 use App\Models\Facility;
 use Illuminate\Http\RedirectResponse;
-use Illuminate\Http\Request;
 use Illuminate\View\View;
 
 class FacilityController extends Controller
 {
-    public function index(): View
+    public function index(PaginationRequest $request): View
     {
         return view('admin.facilities.index', ['facilities' => Facility::orderBy('name')->orderBy('id')->paginate(20)]);
     }
@@ -45,9 +46,9 @@ class FacilityController extends Controller
         return redirect()->route('admin.facilities.show', $facility)->with('status', 'Fasilitas berhasil diperbarui.');
     }
 
-    public function status(Request $request, Facility $facility): RedirectResponse
+    public function status(UpdateStatusRequest $request, Facility $facility): RedirectResponse
     {
-        $data = $request->validate(['is_active' => ['required', 'boolean']]);
+        $data = $request->validated();
         $facility->update($data);
 
         return redirect()->route('admin.facilities.show', $facility)

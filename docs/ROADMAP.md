@@ -17,7 +17,7 @@ Urutan backend tetap mengikuti tabel berikut. Setelah 4E, pengembangan frontend 
 | 5 | Booking Backend | Booking/pengajuan, konflik, idempotensi, My Booking aktif; pembatalan dan lifecycle lanjutan belum |
 | 6 | Approval Backend | Antrean, detail, approve/reject PIC/Admin, aksi langsung dari daftar dan riwayat aktif (DEC-037); tanpa perubahan keputusan final |
 | 7 | Calendar, Notification, Dashboard | Kalender, dashboard dan laporan aktif (DEC-036); WhatsApp dengan nomor user, penerima PIC/Admin/konsumsi, template dan riwayat/retry Admin aktif (DEC-043); pengiriman membutuhkan konfigurasi Fonnte dan scheduler server |
-| 8 | Backend Refinement | Belum dikerjakan |
+| 8 | Backend Refinement | Audit controller dan penguatan validasi/authorization selesai 2026-10-20 (DEC-059); refinement lainnya belum dikerjakan. Rincian pada progress dan CONTROLLER_AUDIT.md |
 | 9 | Testing dan Finalisasi | Belum dikerjakan |
 
 ## Perluasan scope 2026-10-20

@@ -24,9 +24,9 @@ class SaveRoomRequest extends FormRequest
     {
         return [
             'name' => ['required', 'string', 'max:255'],
-            'code' => ['nullable', 'string', 'max:255', Rule::unique('rooms')->ignore($this->route('room'))],
-            'branch_id' => ['sometimes', 'required', 'integer', 'exists:branches,id'],
-            'floor_id' => ['required', 'integer', 'exists:floors,id'],
+            'code' => ['bail', 'nullable', 'string', 'max:255', Rule::unique('rooms')->ignore($this->route('room'))],
+            'branch_id' => ['bail', 'sometimes', 'required', 'integer', 'exists:branches,id'],
+            'floor_id' => ['bail', 'required', 'integer', 'exists:floors,id'],
             'capacity' => ['sometimes', 'integer', 'between:0,2147483647'],
             'description' => ['nullable', 'string', 'max:5000'],
             'access_type' => ['required', Rule::in(['all', 'restricted'])],
@@ -35,14 +35,14 @@ class SaveRoomRequest extends FormRequest
             'status' => ['required', Rule::in(['available', 'maintenance', 'unavailable'])],
             'is_active' => ['required', 'boolean'],
             'facility_ids' => ['present', 'array'],
-            'facility_ids.*' => ['required', 'integer', 'distinct', 'exists:facilities,id'],
+            'facility_ids.*' => ['bail', 'required', 'integer', 'distinct', 'exists:facilities,id'],
         ];
     }
 
     public function attributes(): array
     {
         return [
-            'name' => 'nama ruangan', 'code' => 'kode ruangan', 'floor_id' => 'lantai',
+            'name' => 'nama ruangan', 'code' => 'kode ruangan', 'floor_id' => 'lantai', 'branch_id' => 'kantor / cabang',
             'capacity' => 'kapasitas', 'description' => 'deskripsi', 'access_type' => 'jenis akses',
             'allows_meeting_preparation' => 'opsi lanjutan booking',
             'requires_approval' => 'kebutuhan approval', 'status' => 'status operasional',

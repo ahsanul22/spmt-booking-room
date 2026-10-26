@@ -1,5 +1,13 @@
 # Decisions
 
+## DEC-059 - Batas input HTTP dan penataan controller
+
+- Audit controller atas permintaan pengguna 2026-10-20 memakai Form Request per kontrak operasi, dengan request bersama untuk pagination, filter lokasi dan status aktif. Data tulis hanya dari hasil validasi. Route/Gate dan service tetap bertanggung jawab atas authorization serta aturan bisnis terbaru dalam transaksi.
+- ID yang mengarah ke query database berhenti pada validasi tipe yang gagal (`bail`). Parameter URL numerik dibatasi integer positif sebelum binding; readable route key existing tetap berlaku. Pagination HTTP menerima integer 1 sampai 2147483647 untuk menghindari overflow offset, tanpa mengubah jumlah item per halaman.
+- Hanya constraint unik PostgreSQL master/user yang dikenal dipetakan ke pesan validasi field; error database lain tidak ditutupi sebagai validasi. Constraint database tetap penentu akhir saat request bersamaan.
+- Penyimpanan pengguna/pivot dan reset password dipusatkan pada UserService, membaca record setelah lock. Penentuan lokasi/expiry/referensi registrasi tamu dipindah ke GuestRegistrationService. Tidak mengubah role, scope lokasi, approval, expiry bisnis atau lifecycle booking. Inventaris dan batas audit di docs/CONTROLLER_AUDIT.md.
+- Profil API bawaan memakai autentikasi Sanctum dan Gate access-general agar akun nonaktif/role tidak dikenal juga ditolak saat menggunakan token; tidak mengaktifkan fitur API baru.
+
 ## DEC-058 - Izin resepsionis melalui satu checkbox Kelola User
 
 - Arahan pengguna 2026-10-20 kembali ke alur pendataan/jadwal tamu lalu booking dibantu pegawai yang ditunjuk, tanpa antrean permintaan baru. Admin cukup mencentang Petugas resepsionis pada tambah/Kelola User existing; daftar user menandai petugasnya. Tidak ada role/menu administrasi/lokasi khusus tambahan.

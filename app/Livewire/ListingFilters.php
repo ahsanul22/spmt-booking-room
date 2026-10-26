@@ -63,7 +63,7 @@ class ListingFilters extends Component
     {
         $this->authorizeDestination();
         $this->validate([
-            'branch' => [Rule::prohibitedIf(! auth()->user()->can('access-admin')), 'nullable', 'integer', 'exists:branches,id'],
+            'branch' => ['bail', Rule::prohibitedIf(! auth()->user()->can('access-admin')), 'nullable', 'integer', 'min:1', 'exists:branches,id'],
             'room' => ['nullable', 'integer', 'min:1'],
             'month' => [Rule::requiredIf($this->kind === 'report'), 'nullable', 'date_format:Y-m', 'after_or_equal:1000-01', 'before_or_equal:9998-12'],
             'event' => ['nullable', Rule::in(['approval_request', 'consumption'])],
@@ -85,10 +85,13 @@ class ListingFilters extends Component
     public function render(): View
     {
         $this->authorizeDestination();
+        // Draft filters render before applyFilters validates them. Never send an
+        // arbitrary draft string to a bigint column while populating room options.
+        $validBranch = $this->branch === '' || filter_var($this->branch, FILTER_VALIDATE_INT, ['options' => ['min_range' => 1]]) !== false;
 
         return view('livewire.listing-filters', [
             'branches' => auth()->user()->can('access-admin') ? Branch::orderBy('name')->get() : collect(),
-            'rooms' => $this->kind === 'report' ? app(MonthlyBookingReport::class)->rooms(auth()->user())
+            'rooms' => $this->kind === 'report' && $validBranch ? app(MonthlyBookingReport::class)->rooms(auth()->user())
                 ->when($this->branch !== '', fn ($query) => $query->where('branch_id', $this->branch))
                 ->with('branch')->orderBy('name')->get() : collect(),
         ]);

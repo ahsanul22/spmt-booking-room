@@ -3,17 +3,18 @@
 namespace App\Http\Controllers\Admin;
 
 use App\Http\Controllers\Controller;
+use App\Http\Requests\PaginationRequest;
 use App\Http\Requests\SaveOrganizationalUnitRequest;
+use App\Http\Requests\UpdateStatusRequest;
 use App\Models\OrganizationalUnit;
 use App\Services\OrganizationalUnitService;
 use Illuminate\Database\Eloquent\Collection;
 use Illuminate\Http\RedirectResponse;
-use Illuminate\Http\Request;
 use Illuminate\View\View;
 
 class OrganizationalUnitController extends Controller
 {
-    public function index(): View
+    public function index(PaginationRequest $request): View
     {
         return view('admin.organizational-units.index', [
             'units' => OrganizationalUnit::with('parent')->orderBy('name')->orderBy('id')->paginate(20),
@@ -49,9 +50,9 @@ class OrganizationalUnitController extends Controller
         return redirect()->route('admin.organizational-units.show', $unit)->with('status', 'Unit organisasi berhasil diperbarui.');
     }
 
-    public function status(Request $request, OrganizationalUnit $unit): RedirectResponse
+    public function status(UpdateStatusRequest $request, OrganizationalUnit $unit): RedirectResponse
     {
-        $data = $request->validate(['is_active' => ['required', 'boolean']]);
+        $data = $request->validated();
         $unit->update($data);
 
         return redirect()->route('admin.organizational-units.show', $unit)

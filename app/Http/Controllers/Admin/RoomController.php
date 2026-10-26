@@ -3,7 +3,10 @@
 namespace App\Http\Controllers\Admin;
 
 use App\Http\Controllers\Controller;
+use App\Http\Requests\BranchFilterRequest;
+use App\Http\Requests\DeleteRoomRequest;
 use App\Http\Requests\SaveRoomRequest;
+use App\Http\Requests\UpdateStatusRequest;
 use App\Models\Branch;
 use App\Models\Facility;
 use App\Models\Floor;
@@ -12,15 +15,12 @@ use App\Models\Room;
 use App\Models\User;
 use App\Services\RoomService;
 use Illuminate\Http\RedirectResponse;
-use Illuminate\Http\Request;
 use Illuminate\View\View;
 
 class RoomController extends Controller
 {
-    public function index(Request $request): View
+    public function index(BranchFilterRequest $request): View
     {
-        $request->validate(['branch_id' => ['nullable', 'integer', 'exists:branches,id']]);
-
         return view('admin.rooms.index', [
             'branches' => Branch::orderBy('name')->get(),
             'rooms' => Room::with(['branch', 'floor', 'facilities'])->when($request->filled('branch_id'), fn ($query) => $query->where('branch_id', $request->integer('branch_id')))->orderBy('name')->orderBy('id')->paginate(20)->withQueryString(),
@@ -63,18 +63,17 @@ class RoomController extends Controller
         return redirect()->route('admin.rooms.show', $room)->with('status', 'Ruangan berhasil diperbarui.');
     }
 
-    public function status(Request $request, Room $room): RedirectResponse
+    public function status(UpdateStatusRequest $request, Room $room): RedirectResponse
     {
-        $data = $request->validate(['is_active' => ['required', 'boolean']]);
+        $data = $request->validated();
         $room->update($data);
 
         return redirect()->route('admin.rooms.show', $room)
             ->with('status', $room->is_active ? 'Ruangan berhasil diaktifkan.' : 'Ruangan berhasil dinonaktifkan.');
     }
 
-    public function destroy(Request $request, Room $room, RoomService $service): RedirectResponse
+    public function destroy(DeleteRoomRequest $request, Room $room, RoomService $service): RedirectResponse
     {
-        $request->validate(['confirm_delete' => ['required', 'accepted']]);
         $service->delete($room);
 
         return redirect()->route('admin.rooms.index')->with('status', 'Ruangan berhasil dihapus.');

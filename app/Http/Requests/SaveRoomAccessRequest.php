@@ -22,7 +22,7 @@ class SaveRoomAccessRequest extends FormRequest
     {
         return [
             'organizational_unit_ids' => ['present', 'array'],
-            'organizational_unit_ids.*' => ['required', 'integer', 'distinct', 'exists:organizational_units,id'],
+            'organizational_unit_ids.*' => ['bail', 'required', 'integer', 'distinct', 'exists:organizational_units,id'],
         ];
     }
 }

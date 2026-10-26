@@ -1,66 +1,125 @@
-<p align="center"><a href="https://laravel.com" target="_blank"><img src="https://raw.githubusercontent.com/laravel/art/master/logo-lockup/5%20SVG/2%20CMYK/1%20Full%20Color/laravel-logolockup-cmyk-red.svg" width="400" alt="Laravel Logo"></a></p>
+# Sistem Booking Ruang Rapat
 
-<p align="center">
-<a href="https://github.com/laravel/framework/actions"><img src="https://github.com/laravel/framework/workflows/tests/badge.svg" alt="Build Status"></a>
-<a href="https://packagist.org/packages/laravel/framework"><img src="https://img.shields.io/packagist/dt/laravel/framework" alt="Total Downloads"></a>
-<a href="https://packagist.org/packages/laravel/framework"><img src="https://img.shields.io/packagist/v/laravel/framework" alt="Latest Stable Version"></a>
-<a href="https://packagist.org/packages/laravel/framework"><img src="https://img.shields.io/packagist/l/laravel/framework" alt="License"></a>
-</p>
+Aplikasi internal untuk membantu pegawai Pelindo Multi Terminal melihat jadwal dan mengajukan penggunaan ruang rapat. Admin mengelola data dan akses, sedangkan Room PIC menangani persetujuan untuk ruang yang menjadi tanggung jawabnya.
 
-## About Laravel
+> **Status:** aplikasi aktif dikembangkan. Beberapa kemampuan operasional, seperti pengiriman WhatsApp, memerlukan konfigurasi server tambahan. Lihat bagian [konfigurasi](#konfigurasi-opsional) dan [dokumentasi proyek](#dokumentasi).
 
-Laravel is a web application framework with expressive, elegant syntax. We believe development must be an enjoyable and creative experience to be truly fulfilling. Laravel takes the pain out of development by easing common tasks used in many web projects, such as:
+![Ilustrasi ruang rapat](public/images/Beranda.jpeg)
 
-- [Simple, fast routing engine](https://laravel.com/docs/routing).
-- [Powerful dependency injection container](https://laravel.com/docs/container).
-- Multiple back-ends for [session](https://laravel.com/docs/session) and [cache](https://laravel.com/docs/cache) storage.
-- Expressive, intuitive [database ORM](https://laravel.com/docs/eloquent).
-- Database agnostic [schema migrations](https://laravel.com/docs/migrations).
-- [Robust background job processing](https://laravel.com/docs/queues).
-- [Real-time event broadcasting](https://laravel.com/docs/broadcasting).
+*Ilustrasi ruang rapat yang digunakan pada beranda aplikasi; gambar ini bukan tangkapan layar antarmuka.*
 
-Laravel is accessible, powerful, and provides tools required for large, robust applications.
+## Fitur utama
 
-## Learning Laravel
+- **Jadwal ruangan:** kalender dan daftar penggunaan untuk membantu melihat waktu yang tersedia.
+- **Booking:** pegawai memilih ruangan, tanggal, waktu, dan agenda. Sistem memeriksa akses, status ruangan, waktu yang sudah lewat, dan konflik jadwal saat pengajuan.
+- **Persetujuan:** booking yang memerlukan persetujuan masuk ke antrean PIC ruangan atau Admin. PIC/Admin dapat menyetujui atau menolak dengan alasan.
+- **Administrasi:** Admin mengelola akun, unit organisasi, kantor/cabang, lantai, fasilitas, ruangan, PIC, akses ruangan, serta kebutuhan approval.
+- **Laporan bulanan:** Admin dan PIC dapat melihat rekap berdasarkan bulan dan ruangan, mengunduh CSV, serta mencetak atau menyimpan PDF melalui browser.
+- **Pendataan tamu:** tamu dapat mengisi registrasi sementara dan melihat jadwal publik terbatas. Pengajuan booking tetap dilakukan oleh pegawai atau resepsionis.
+- **Notifikasi WhatsApp (opsional):** antrean pesan dapat dikirim melalui Fonnte setelah token, penerima, dan scheduler dikonfigurasi.
 
-Laravel has the most extensive and thorough [documentation](https://laravel.com/docs) and video tutorial library of all modern web application frameworks, making it a breeze to get started with the framework.
+## Alur penggunaan
 
-You may also try the [Laravel Bootcamp](https://bootcamp.laravel.com), where you will be guided through building a modern Laravel application from scratch.
+1. Admin menyiapkan kantor/cabang, akun dan unit organisasi, lantai, fasilitas, ruangan, aturan akses, serta PIC.
+2. Pegawai masuk, melihat jadwal, memilih ruangan dan mengirim booking.
+3. Server memeriksa izin pemohon, kondisi ruangan, jam rapat, serta bentrok dengan booking aktif.
+4. Jika ruangan atau permintaan tambahan memerlukan persetujuan, booking menunggu keputusan PIC/Admin. Jika tidak, booking dapat langsung disetujui.
+5. Pemohon melihat status dan riwayat booking melalui halaman **My Booking**. Admin/PIC dapat memantau data dan laporan sesuai aksesnya.
 
-If you don't feel like reading, [Laracasts](https://laracasts.com) can help. Laracasts contains over 2000 video tutorials on a range of topics including Laravel, modern PHP, unit testing, and JavaScript. Boost your skills by digging into our comprehensive video library.
+Status Pending dan Approved menahan slot waktu. Rejected dan Cancelled tidak memblokir slot. Booking multi-tanggal dibuat sebagai pengajuan terpisah untuk tiap tanggal.
 
-## Laravel Sponsors
+## Tech stack
 
-We would like to extend our thanks to the following sponsors for funding Laravel development. If you are interested in becoming a sponsor, please visit the Laravel [Patreon page](https://patreon.com/taylorotwell).
+| Bagian | Teknologi |
+| --- | --- |
+| Backend | PHP 8.1+, Laravel 10 |
+| UI | Blade, Livewire 3, Tailwind CSS 3 |
+| Build aset | Vite 4, Node.js dan npm |
+| Database bawaan konfigurasi | PostgreSQL |
+| Integrasi WhatsApp | Fonnte, opsional |
 
-### Premium Partners
+Autentikasi menggunakan session Laravel; Sanctum juga tersedia untuk API. Aplikasi menggunakan zona waktu kerja WIB pada alur booking, sementara konfigurasi zona waktu inti Laravel mengikuti `config/app.php`.
 
-- **[Vehikl](https://vehikl.com/)**
-- **[Tighten Co.](https://tighten.co)**
-- **[Kirschbaum Development Group](https://kirschbaumdevelopment.com)**
-- **[64 Robots](https://64robots.com)**
-- **[Cubet Techno Labs](https://cubettech.com)**
-- **[Cyber-Duck](https://cyber-duck.co.uk)**
-- **[Many](https://www.many.co.uk)**
-- **[Webdock, Fast VPS Hosting](https://www.webdock.io/en)**
-- **[DevSquad](https://devsquad.com)**
-- **[Curotec](https://www.curotec.com/services/technologies/laravel/)**
-- **[OP.GG](https://op.gg)**
-- **[WebReinvent](https://webreinvent.com/?utm_source=laravel&utm_medium=github&utm_campaign=patreon-sponsors)**
-- **[Lendio](https://lendio.com)**
+## Persyaratan
 
-## Contributing
+- PHP 8.1 atau lebih baru dengan ekstensi yang dibutuhkan Laravel dan driver `pdo_pgsql`.
+- Composer.
+- Node.js dan npm.
+- PostgreSQL yang berjalan dan database kosong yang sudah dibuat.
 
-Thank you for considering contributing to the Laravel framework! The contribution guide can be found in the [Laravel documentation](https://laravel.com/docs/contributions).
+## Menjalankan secara lokal
 
-## Code of Conduct
+Clone repository, lalu jalankan dari direktori proyek:
 
-In order to ensure that the Laravel community is welcoming to all, please review and abide by the [Code of Conduct](https://laravel.com/docs/contributions#code-of-conduct).
+```bash
+composer install
+npm install
+```
 
-## Security Vulnerabilities
+Buat file environment dan kunci aplikasi:
 
-If you discover a security vulnerability within Laravel, please send an e-mail to Taylor Otwell via [taylor@laravel.com](mailto:taylor@laravel.com). All security vulnerabilities will be promptly addressed.
+```bash
+cp .env.example .env
+php artisan key:generate
+```
 
-## License
+Di Windows PowerShell, bila `cp` tidak tersedia gunakan `Copy-Item .env.example .env`.
 
-The Laravel framework is open-sourced software licensed under the [MIT license](https://opensource.org/licenses/MIT).
+Perbarui `.env` agar cocok dengan PostgreSQL lokal Anda, khususnya `DB_HOST`, `DB_PORT`, `DB_DATABASE`, `DB_USERNAME`, dan `DB_PASSWORD`. Buat database tersebut terlebih dahulu, lalu jalankan:
+
+```bash
+php artisan migrate --seed
+npm run build
+php artisan serve
+```
+
+Buka alamat yang ditampilkan oleh `php artisan serve` (umumnya <http://127.0.0.1:8000>). Untuk pengembangan frontend dengan hot reload, jalankan `npm run dev` pada terminal kedua.
+
+Seeder menyiapkan data fondasi dan ruangan. Akun awal atau kredensial login tidak dijanjikan oleh README ini; ikuti prosedur provisioning akun yang berlaku untuk lingkungan Anda. Jangan gunakan data seed lokal sebagai data produksi.
+
+## Konfigurasi opsional
+
+### WhatsApp melalui Fonnte
+
+Secara default integrasi dinonaktifkan. Untuk mengaktifkannya, atur `WHATSAPP_ENABLED=true` dan `FONNTE_TOKEN` di `.env`, kemudian konfigurasi nomor penerima serta template melalui halaman Admin. Pengiriman memerlukan scheduler Laravel berjalan setiap menit:
+
+```bash
+php artisan schedule:work
+```
+
+Pada server produksi, daftarkan cron Laravel Scheduler sesuai panduan Laravel. Periksa status melalui `php artisan whatsapp:status`. Simpan token sebagai rahasia dan jangan commit file `.env`.
+
+### Registrasi tamu
+
+Pengaturan masa aktif tersedia di `.env.example` melalui `GUEST_EXPIRY_MODE` dan `GUEST_ACTIVE_DAYS`. `GUEST_BRANCH_ID` dapat diisi dengan ID lokasi resepsionis; bila kosong, aplikasi memakai lokasi pertama dari master data.
+
+## Perintah pengembangan
+
+```bash
+php artisan test       # menjalankan tes
+npm run dev            # Vite dengan hot reload
+npm run build          # build aset untuk penggunaan
+php artisan route:list # melihat route aplikasi
+```
+
+## Tangkapan layar
+
+Repository saat ini menyediakan ilustrasi beranda, tetapi belum menyertakan tangkapan layar aktual halaman aplikasi. Setelah mengambil screenshot dari aplikasi yang berjalan, letakkan file di `docs/screenshots/` dan tampilkan di sini, misalnya:
+
+```markdown
+![Jadwal ruangan](docs/screenshots/jadwal-ruangan.png)
+```
+
+## Dokumentasi
+
+- [Konteks dan cakupan proyek](docs/PROJECT_CONTEXT.md)
+- [Roadmap](docs/ROADMAP.md)
+- [Progress pengembangan](docs/PROGRESS.md)
+- [Keputusan proyek](docs/DECISIONS.md)
+- [Panduan frontend](docs/FRONTEND_GUIDE.md)
+- [Panduan WhatsApp](docs/WHATSAPP.md)
+- [Panduan pendataan tamu](docs/GUESTS.md)
+
+## Lisensi dan penggunaan
+
+Aplikasi ini dibuat untuk kebutuhan internal. Pastikan Anda memiliki izin dan mengikuti kebijakan organisasi sebelum menggunakan atau mendistribusikan kode maupun data. Lisensi framework Laravel tidak otomatis menjadi lisensi repository ini.

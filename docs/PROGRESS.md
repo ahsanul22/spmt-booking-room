@@ -2,6 +2,32 @@
 
 ## Last Update
 
+2026-10-26 - README proyek.
+
+- Mengganti README bawaan Laravel dengan panduan berbahasa Indonesia berisi ringkasan aplikasi, fitur, alur booking/approval, tech stack, persyaratan lokal, langkah setup, konfigurasi WhatsApp/tamu, perintah pengembangan, dan tautan dokumentasi.
+- Memakai ilustrasi beranda yang tersedia dan memberi label jelas bahwa itu bukan screenshot UI. README juga menjelaskan bahwa screenshot aplikasi aktual belum tersedia dan memberi format penambahannya.
+- Verifikasi: `git diff --check -- README.md` berhasil. Tidak menjalankan tes aplikasi karena perubahan dokumentasi saja.
+
+2026-10-23 - Koreksi ukuran langkah beranda khusus mobile.
+
+- Lingkaran nomor langkah di `/` berukuran 80 px pada mobile dan kembali 112 px mulai breakpoint md (768 px). Ukuran angka desktop dan posisi garis penghubung mengikuti ukuran lingkaran. Perapian tracking teks dan footer beranda yang sudah ada dipertahankan.
+- Verifikasi: build Vite, kompilasi/clear Blade, dan git diff --check berhasil. Tidak menjalankan ulang tes fitur karena perubahan hanya class ukuran responsif; visual browser desktop/mobile belum diverifikasi pada koreksi ini.
+
+2026-10-23 - Perapian beranda (`/`).
+
+- Label pada card memakai jarak huruf normal tanpa uppercase paksa. Lingkaran langkah diperkecil 112 ke 88 px; angka dan garis penghubung disesuaikan.
+- Footer khusus beranda memakai dua kolom desktop, panel kontak, ikon SVG email/telepon/panah seragam, pembungkusan email mobile dan fokus keyboard. Isi dan tujuan tautan tetap. Partial shared/welcome-footer dipilih layout public hanya pada route home.
+- Verifikasi: build Vite berhasil setelah pengulangan di luar sandbox (spawn EPERM); kompilasi/clear Blade dan diff check berhasil. Regresi footer lintas role dan redirect guest: 2 tes lulus / 110 assertions. Chrome headless mobile 390 x 844 dicoba tetapi screenshot hanya latar kosong; visual desktop/mobile dan interaksi keyboard belum terverifikasi. Tidak ada perubahan backend/keputusan bisnis.
+
+2026-10-20 - Audit seluruh controller dan penguatan batas input HTTP (DEC-059).
+
+- Seluruh 24 file controller ditinjau bersama route, Gate, Form Request dan service. Inventaris per controller, temuan dan batas audit ada di docs/CONTROLLER_AUDIT.md. Tidak mengubah dependency, migration, role, aturan booking/approval atau frontend.
+- Menyatukan validasi pagination/filter lokasi, status aktif, reset password, simpan cabang, keputusan booking, registrasi tamu dan riwayat notifikasi dalam Form Request. Rule bail mencegah ID/tipe salah sampai ke query exists/unique; page dibatasi agar offset SQL tidak overflow. ID URL numerik ditolak sebelum binding jika tidak valid/di luar rentang. API profil Sanctum juga memerlukan Gate akun aktif/role dikenal.
+- UserService memusatkan transaksi akun/pivot dan reset password; membaca ulang record setelah lock mempertahankan izin terbaru pada request lama tanpa field izin. GuestRegistrationService memusatkan lokasi/expiry/referensi dari server. Draft filter Livewire tidak lagi mengirim string lokasi invalid ke query opsi ruangan. Tanggal jadwal tamu menolak tahun nol. Enam constraint unik PostgreSQL yang dikenal dipetakan menjadi pesan field tanpa SQL; error database lain tetap error server.
+- Verifikasi aktual akhir: **25 kasus unik lulus / 836 assertions**, berdasarkan hasil terbaru per kasus, bukan menjumlahkan run duplikat. Termasuk empat kasus baru matriks payload salah tipe/ID ekstrem/pagination, penolakan perubahan privilege/keputusan, whitelist tamu dan snapshot izin usang; regresi login, PIC/lokasi/IT, cabang, lantai/fasilitas, hierarchy unit, ruangan, laporan/filter/ekspor/cetak, izin resepsionis, update/reset password/perubahan role dan setting WhatsApp. Tiga tes tanpa database menguji API profil serta pemetaan konflik unik JSON/HTML, input lama tanpa password, dan error tak dikenal yang tidak boleh disamarkan.
+- Rincian run: ControllerValidationTest awal 3 lulus / 1 gagal, 269 assertions; kegagalan assertion label tes baru memakai kapitalisasi "Semua Ruangan" yang berbeda dari UI, bukan kegagalan input/security. Label diperbaiki; kasus itu diulang bersama 18 kasus regresi lain: 19 lulus / 708 assertions (560,82 detik). Unit akhir 3 lulus / 51 assertions. Rekap per kasus/JUnit ada di storage/app/controller-test-summary.json dan controller-*.xml (diabaikan Git). Tes fitur memakai schema PostgreSQL sementara dan tidak mereset database aplikasi.
+- PHP lint 69 file HTTP/service/handler lulus; Pint --dirty --test, route:list, kompilasi/clear Blade dan diff check berhasil. Full suite, audit browser dan build aset tidak diulang karena task backend tanpa perubahan aset/layout. Baseline tes UI lama tidak diubah atau dinyatakan lulus. Source dan dokumentasi dikelompokkan dalam commit terpisah untuk push main.
+
 2026-10-20 - Latar tamu pelabuhan non-peti kemas.
 
 - Aset public/images/guest-harbor-background.png diganti melalui built-in imagegen dengan pemandangan kapal kargo umum/crane kapal, dermaga curah, gudang dan gulungan baja, tanpa peti kemas sesuai konteks PMT. Prompt lengkap disimpan di docs/GUEST_BACKGROUND.md. Layout visitor memakai versi URL noncontainer untuk menghindari cache gambar lama; posisi, opacity, gradient dan form existing dipertahankan.

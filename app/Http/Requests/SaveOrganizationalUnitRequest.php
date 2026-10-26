@@ -17,7 +17,7 @@ class SaveOrganizationalUnitRequest extends FormRequest
         return [
             'name' => ['required', 'string', 'max:255'],
             'type' => ['required', Rule::in(['directorate', 'division', 'department'])],
-            'parent_id' => ['nullable', 'integer', 'exists:organizational_units,id'],
+            'parent_id' => ['bail', 'nullable', 'integer', 'exists:organizational_units,id'],
             'is_active' => ['required', 'boolean'],
         ];
     }

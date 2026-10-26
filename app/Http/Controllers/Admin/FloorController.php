@@ -3,15 +3,16 @@
 namespace App\Http\Controllers\Admin;
 
 use App\Http\Controllers\Controller;
+use App\Http\Requests\PaginationRequest;
 use App\Http\Requests\SaveFloorRequest;
+use App\Http\Requests\UpdateStatusRequest;
 use App\Models\Floor;
 use Illuminate\Http\RedirectResponse;
-use Illuminate\Http\Request;
 use Illuminate\View\View;
 
 class FloorController extends Controller
 {
-    public function index(): View
+    public function index(PaginationRequest $request): View
     {
         return view('admin.floors.index', ['floors' => Floor::orderBy('floor_number')->orderBy('id')->paginate(20)]);
     }
@@ -45,9 +46,9 @@ class FloorController extends Controller
         return redirect()->route('admin.floors.show', $floor)->with('status', 'Lantai berhasil diperbarui.');
     }
 
-    public function status(Request $request, Floor $floor): RedirectResponse
+    public function status(UpdateStatusRequest $request, Floor $floor): RedirectResponse
     {
-        $data = $request->validate(['is_active' => ['required', 'boolean']]);
+        $data = $request->validated();
         $floor->update($data);
 
         return redirect()->route('admin.floors.show', $floor)

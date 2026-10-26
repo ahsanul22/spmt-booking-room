@@ -16,7 +16,7 @@ class SaveFloorRequest extends FormRequest
     {
         return [
             'name' => ['required', 'string', 'max:255'],
-            'floor_number' => ['required', 'integer', 'between:-2147483648,2147483647', Rule::unique('floors')->ignore($this->route('floor'))],
+            'floor_number' => ['bail', 'required', 'integer', 'between:-2147483648,2147483647', Rule::unique('floors')->ignore($this->route('floor'))],
             'description' => ['nullable', 'string', 'max:5000'],
             'is_active' => ['required', 'boolean'],
         ];

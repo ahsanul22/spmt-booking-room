@@ -4,7 +4,7 @@
 <div class="grid w-full min-w-0 gap-6 sm:gap-8">
 <section aria-labelledby="welcome-title" class="grid w-full min-w-0 items-center gap-8 overflow-hidden rounded-3xl border border-secondaryLight/50 bg-surface p-6 sm:p-10 lg:p-12 lg:grid-cols-2 lg:gap-16">
     <div class="flex min-w-0 flex-col items-start justify-center text-primaryDark lg:order-2">
-        <p class="flex items-center gap-3 text-base font-bold uppercase tracking-[0.2em] text-primary sm:text-base">Pelindo Multi Terminal</p>
+        <p class="flex items-center gap-3 text-base font-bold tracking-normal text-primary sm:text-base">Pelindo Multi Terminal</p>
         <h1 id="welcome-title" class="mt-6 text-4xl font-bold leading-[1.12] tracking-tight sm:text-5xl">Pertemuan yang baik.<br><span class="text-primary">Dimulai di sini.</span></h1>
         <p class="mt-6 max-w-lg text-base leading-7 text-slate-600 sm:text-lg sm:leading-8">Selamat datang di Booking Room PT Pelindo Multi Terminal. Ruang untuk bertukar ide, menyatukan rencana, dan membawa kolaborasi lebih jauh.</p>
         <div class="mt-8 flex flex-wrap gap-4">
@@ -15,7 +15,7 @@
     <figure class="relative w-full min-w-0 overflow-hidden rounded-2xl border border-secondaryLight/40 bg-background lg:order-1">
         <img src="{{ asset('images/Beranda.jpeg') }}" alt="Ilustrasi area diskusi dengan meja bundar dan kursi biru menghadap pelabuhan." width="1254" height="1254" fetchpriority="high" class="h-[240px] w-full object-cover sm:h-[320px] lg:h-[400px]">
         <figcaption class="space-y-3 p-6 sm:p-8">
-            <p class="text-base font-bold uppercase tracking-[0.2em] text-primary">Ruang untuk berkolaborasi</p>
+            <p class="text-base font-bold tracking-normal text-primary">Ruang untuk berkolaborasi</p>
             <p class="mt-2 text-xl font-semibold text-primaryDark">Satu meja. Banyak kemungkinan.</p>
             <p class="mt-2 text-base text-slate-600">Ilustrasi suasana ruang rapat</p>
         </figcaption>
@@ -24,7 +24,7 @@
 
 <section aria-labelledby="steps-title" class="w-full min-w-0 rounded-3xl border border-secondaryLight/50 bg-surface p-6 sm:p-10 lg:p-12">
     <div class="text-center">
-        <p class="text-sm font-semibold uppercase tracking-[0.2em] text-primary">Tiga langkah sederhana</p>
+        <p class="text-sm font-semibold tracking-normal text-primary">Tiga langkah sederhana</p>
         <h2 id="steps-title" class="mx-auto mt-4 max-w-xl text-2xl font-semibold leading-snug text-primaryDark sm:text-3xl">Rapat terencana, kerja lebih nyaman.</h2>
     </div>
     <ol class="relative mx-auto mt-12 grid max-w-6xl gap-10 md:grid-cols-3 md:gap-8">
@@ -35,10 +35,10 @@
         ] as $step)
             <li class="relative flex items-center gap-5 md:flex-col md:text-center">
                 @unless ($loop->last)
-                    <span aria-hidden="true" class="absolute left-14 top-28 h-[calc(100%-4.5rem)] w-px bg-secondaryLight md:left-1/2 md:top-14 md:h-px md:w-[calc(100%+2rem)]"></span>
+                    <span aria-hidden="true" class="absolute left-10 top-20 h-[calc(100%-2.5rem)] w-px bg-secondaryLight md:left-1/2 md:top-14 md:h-px md:w-[calc(100%+2rem)]"></span>
                 @endunless
-                <div class="relative z-10 flex h-28 w-28 shrink-0 flex-col items-center justify-center gap-1 rounded-full border border-secondaryLight bg-background ring-8 ring-surface">
-                    <span class="text-2xl font-bold text-primary">{{ $step['number'] }}</span>
+                <div class="relative z-10 flex h-20 w-20 shrink-0 flex-col items-center justify-center gap-1 rounded-full border border-secondaryLight bg-background ring-8 ring-surface md:h-28 md:w-28">
+                    <span class="text-xl font-bold text-primary md:text-2xl">{{ $step['number'] }}</span>
                     <h3 class="text-sm font-semibold text-primaryDark">{{ $step['title'] }}</h3>
                 </div>
                 <p class="relative max-w-xs text-base leading-7 text-slate-600 md:mt-3">{{ $step['description'] }}</p>
@@ -111,7 +111,7 @@
             </p>
         </div>
         <div class="border-t border-white/20 pt-8 lg:col-span-2">
-            <p class="text-sm font-bold uppercase tracking-[0.3em] text-secondaryLight sm:text-[15px]">
+            <p class="text-sm font-bold tracking-normal text-secondaryLight sm:text-[15px]">
                 Langkah Cerdas &bull; Hasil Maksimal
             </p>
         </div>

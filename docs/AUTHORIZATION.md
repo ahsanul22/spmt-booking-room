@@ -63,3 +63,9 @@ Batas berlaku di query dan service, bukan hanya Blade: katalog, jadwal/polling, 
 ## Izin resepsionis (DEC-058)
 
 users.is_receptionist merupakan izin tambahan, bukan role. Admin mengaturnya melalui SaveUserRequest/kelola akun. User/PIC aktif yang ditunjuk dapat memilih tamu aktif di kantor ruangan saat booking, tetap dibatasi izin lokasi/unit/ruangan. Akun Admin tidak mendapat hak booking dari flag ini. Flag tidak mass assignable. BookingService memeriksa user yang dikunci ulang sebelum pemrosesan referensi/idempotensi tamu; Livewire tidak memberikan daftar tamu kepada akun biasa atau setelah izin dicabut. Persetujuan booking tetap kewenangan PIC/Admin existing.
+
+## Penguatan batas HTTP (DEC-059)
+
+Form Request operasi memeriksa izin selain middleware route. Validasi input tidak menggantikan scope kepemilikan/lokasi/assignment atau pengecekan service saat menulis. Filter lokasi pegawai/PIC tetap dilarang. ID URL numerik yang tidak valid/di luar rentang ditolak sebelum binding; ID referensi salah tipe tidak diteruskan ke query. Detail audit ada di CONTROLLER_AUDIT.md.
+
+GET `/api/user` bawaan juga memerlukan `auth:sanctum` dan `can:access-general`: token milik akun nonaktif atau role tidak dikenal tidak cukup untuk membaca profil. Tidak menambah penerbitan token atau endpoint baru.

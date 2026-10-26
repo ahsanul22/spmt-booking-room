@@ -44,17 +44,21 @@ class SaveUserRequest extends FormRequest
             }],
             'whatsapp_number' => ['bail', 'sometimes', 'nullable', 'string', 'regex:/^\+[1-9][0-9]{7,14}$/'],
             'role' => ['required', Rule::in([User::ROLE_USER, User::ROLE_ROOM_PIC, User::ROLE_SUPER_ADMIN])],
-            'organizational_unit_id' => ['nullable', 'integer', 'exists:organizational_units,id'],
+            'organizational_unit_id' => ['bail', 'nullable', 'integer', 'exists:organizational_units,id'],
             'is_active' => ['required', 'boolean'],
             'is_receptionist' => ['sometimes', 'boolean'],
             'branch_ids' => ['sometimes', 'array'],
-            'branch_ids.*' => ['required', 'integer', 'distinct', 'exists:branches,id'],
+            'branch_ids.*' => ['bail', 'required', 'integer', 'distinct', 'exists:branches,id'],
             'password' => [$record ? 'nullable' : 'required', 'string', 'confirmed', Password::min(8)],
         ];
     }
 
     public function attributes(): array
     {
-        return ['name' => 'nama', 'whatsapp_number' => 'nomor WhatsApp', 'organizational_unit_id' => 'unit kerja', 'is_active' => 'status aktif'];
+        return [
+            'name' => 'nama', 'whatsapp_number' => 'nomor WhatsApp', 'organizational_unit_id' => 'unit kerja',
+            'is_active' => 'status aktif', 'is_receptionist' => 'izin resepsionis',
+            'branch_ids' => 'izin lokasi', 'branch_ids.*' => 'lokasi',
+        ];
     }
 }

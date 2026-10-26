@@ -3,15 +3,13 @@
 namespace App\Http\Controllers\Pic;
 
 use App\Http\Controllers\Controller;
-use Illuminate\Http\Request;
+use App\Http\Requests\BranchFilterRequest;
 use Illuminate\View\View;
 
 class RoomController extends Controller
 {
-    public function index(Request $request): View
+    public function index(BranchFilterRequest $request): View
     {
-        abort_if(! $request->user()->can('access-admin') && $request->filled('branch_id'), 403);
-        $request->validate(['branch_id' => ['nullable', 'integer', 'exists:branches,id']]);
         $branches = collect();
         $rooms = $request->user()->managedRooms()
             ->visibleTo($request->user())

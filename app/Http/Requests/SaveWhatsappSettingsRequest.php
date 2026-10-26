@@ -28,7 +28,7 @@ class SaveWhatsappSettingsRequest extends FormRequest
             'include_room_pics' => ['required', 'boolean'],
             'body' => ['required', 'string', 'max:2000'],
             'recipient_ids' => ['sometimes', 'array', 'max:100'],
-            'recipient_ids.*' => ['required', 'integer', 'distinct', Rule::exists('users', 'id')->where('is_active', true)],
+            'recipient_ids.*' => ['bail', 'required', 'integer', 'distinct', Rule::exists('users', 'id')->where('is_active', true)],
         ];
     }
 

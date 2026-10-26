@@ -4,6 +4,7 @@ namespace App\Http\Controllers\Admin;
 
 use App\Http\Controllers\Controller;
 use App\Http\Requests\SaveWhatsappSettingsRequest;
+use App\Http\Requests\WhatsappHistoryRequest;
 use App\Models\Booking;
 use App\Models\Room;
 use App\Models\User;
@@ -13,18 +14,13 @@ use App\Models\WhatsappTemplate;
 use App\Services\BookingWhatsapp;
 use App\Services\WhatsappSettings;
 use Illuminate\Http\RedirectResponse;
-use Illuminate\Http\Request;
-use Illuminate\Validation\Rule;
 use Illuminate\View\View;
 
 class WhatsappController extends Controller
 {
-    public function index(Request $request): View
+    public function index(WhatsappHistoryRequest $request): View
     {
-        $filters = $request->validate([
-            'event' => ['nullable', Rule::in(['approval_request', 'consumption'])],
-            'status' => ['nullable', Rule::in(['pending', 'processing', 'accepted', 'failed', 'unknown', 'skipped'])],
-        ]);
+        $filters = $request->validated();
 
         return view('admin.whatsapp.index', [
             'templates' => WhatsappTemplate::orderBy('id')->get(),
